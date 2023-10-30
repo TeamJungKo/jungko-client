@@ -1,0 +1,3 @@
+[submodule "client-config"]
+	path = client-config
+	url = git@github.com:TeamJungKo/client-config.git
