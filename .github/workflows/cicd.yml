@@ -30,6 +30,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
       - run: |
+          npm install -g pnpm
           pnpm install
           pnpm run lint
           pnpm run build
