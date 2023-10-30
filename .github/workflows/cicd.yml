@@ -35,9 +35,6 @@ jobs:
       - name: Setup Main env
         if: ${{ github.ref == 'refs/heads/main' }}
         run: cat ./client-config/main.env > .env
-        else:
-          - name: Setup Local env
-            run: cat ./client-config/local.env > .env
 
       - run: |
           pnpm install
