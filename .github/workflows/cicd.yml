@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  client-CI/CD:
+  client-CI-CD:
     runs-on: ubuntu-latest
 
     steps:
