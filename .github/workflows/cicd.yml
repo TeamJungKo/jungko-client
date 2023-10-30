@@ -1,0 +1,55 @@
+name: Client CI/CD
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+inputs:
+  node-version:
+    description: 'The version of NodeJS'
+    required: true
+    default: '18'
+
+jobs:
+  client-CI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.SSH_CONFIG }}' | base64 -d > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+        with:
+          submodule: true
+        run: git submodule update --init client-config
+
+      - name: Set up Node.js ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+        run: |
+          pnpm install
+          pnpm run lint
+          pnpm run build
+
+      - name: Configure AWS credentials
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Main S3 and Invalidate CloudFront cache
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          aws s3 sync ./dist s3://${{ secrets.AWS_S3_CLIENT_MAIN_BUCKET_NAME }}
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_MAIN_DISTRIBUTION_ID }} --paths "/*"
