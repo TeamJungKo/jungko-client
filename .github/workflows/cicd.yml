@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodule: true
-        run: git submodule update --init client-config
+      - run: git submodule update --init client-config
 
       - name: Set up Node.js ${{ inputs.node-version }}
         uses: actions/setup-node@v3
@@ -35,7 +35,7 @@ jobs:
           node-version: ${{ inputs.node-version }}
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
-        run: |
+      - run: |
           pnpm install
           pnpm run lint
           pnpm run build
