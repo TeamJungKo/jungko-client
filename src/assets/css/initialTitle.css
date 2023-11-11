@@ -1,0 +1,35 @@
+.main_top {
+  perspective: 800px;
+  height: 100%;
+  width: 100%;
+} /* Perspective요소는 큐브를 메인타이틀이 존재하는 영역에 합치기 위함입니다. 큐브를 위해 설정해 둔 것이고, 타이틀 텍스트에는 영향을 주지않습니다. */ 
+
+.explanation {
+  display: block;
+  margin-top: 10px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.explanation li {
+  opacity: 0;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  transition: opacity 1s;
+}
+
+.explanation li.visible {
+  opacity: 1;
+}
+
+.main_head_title{
+  font-family: 'Gugi', cursive;
+  font-size: 50px;
+}
+
+.cube_background{
+  background: linear-gradient(white, skyblue);
+  width: 100%;
+  height: 800px;
+}
