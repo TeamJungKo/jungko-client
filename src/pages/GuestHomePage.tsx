@@ -4,7 +4,7 @@ import SiteIntroduction from '../components/site_intro/SiteIntroduction.tsx';
 import HotCards from '../components/site_intro/HotCards.tsx';
 import LoginDirection from '../components/site_intro/LoginDirection.tsx';
 
-function InitialMainPage() {
+function GuestHomePage() {
 
   return (
     <>
@@ -17,4 +17,4 @@ function InitialMainPage() {
   );
 }
 
-export default InitialMainPage;
+export default GuestHomePage;

@@ -3,7 +3,7 @@ import jungkoIcon from '../../assets/images/jungkoIcon.png';
 //나중에 설명할 이미지들로 바꿀것. 지금은 데모로 중코이미지 넣어놓음
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CardMaker from '../card/Card.tsx';
+import CardMaker from '../common/Card.tsx';
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8];
 const CARD_WIDTH = 400; //카드하나 너비
@@ -73,7 +73,7 @@ const SiteGuide = (): React.ReactElement => {
         >
           {cards.map((card) => (
             <Box key={card} sx={{ marginRight: '1rem'}}>
-              <CardMaker width={CARD_WIDTH} height={500} image={jungkoIcon} title='제목테스트' description='설명테스트' imageHeight='70%' contentHeight='30%'/>
+              <CardMaker width={CARD_WIDTH+'px'} height='500px' image={jungkoIcon} title='제목테스트' description='설명테스트' imageHeight='70%' contentHeight='30%'/>
             </Box>
           ))}
         </Box>

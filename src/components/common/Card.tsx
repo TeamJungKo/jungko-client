@@ -5,16 +5,16 @@ import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 
 interface Props {
-  width: number;
-  height: number;
-  image: string;
-  title: string;
-  description: string;
+  width?: string;
+  height?: string;
+  image?: string;
+  title?: string;
+  description?: string;
   imageHeight?: string; //옵션으로 카드의 이미지 비율 조정 가능
   contentHeight?: string; //옵션으로 카드의 텍스트 비율 조정 가능 카드를 꽉채우기 위해 (100-이미지높이)% 로 할것
 }
 
-function CardMaker({ width, height, image, title, description, imageHeight = '50%', contentHeight = '50%' }: Props) {
+function CardMaker({ width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%' }: Props) {
   return (
     <Card sx={{ width: width, height: height, title: title, description : description, borderRadius: '10%' }} draggable="false">
       <CardActionArea sx={{ width: '100%', height: '100%' }}>
@@ -25,10 +25,14 @@ function CardMaker({ width, height, image, title, description, imageHeight = '50
           alt="기본이미지" //디폴트이미지 넣을경우 여기에 넣음
         />
         <CardContent sx={{ width: '100%', height: contentHeight }}>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h5" 
+          component="div"
+          sx={{ fontFamily: 'Noto Sans KR' }}>
             {title}
           </Typography>
-          <Typography variant="body2" color="text.secondary" >
+          <Typography variant="body2" 
+          color="text.secondary"
+          sx={{ fontFamily: 'Noto Sans KR' }} >
             {description}
           </Typography>
         </CardContent>
