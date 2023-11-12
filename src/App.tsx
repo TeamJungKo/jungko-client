@@ -1,29 +1,31 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import GuestHomePage from './pages/GuestHomePage.tsx';
+import LoginPage from './pages/LoginPage.tsx';
+import TopTitle from './components/common/Title.tsx';
+import Category from './components/common/Category.tsx';
+import HomePage from './pages/HomePage.tsx';
+import MyProfile from './pages/MyProfile.tsx';
+import DefaultProfile from './components/common/DefaultProfile.tsx';
+import Keyword from './components/common/Keyword.tsx';
+import { Card } from '@mui/material';
+import CardMaker from './components/common/Card.tsx';
+import OtherProfile from './pages/OtherProfile.tsx';
+import AlertDialog from './pages/modals/NotificationModal.tsx';
+import NotificationModal from './pages/modals/NotificationModal.tsx';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const handleClick = () => {
+    console.log('Button clicked!');
+  };
 
   return (
+    /*<div style={{ overflow: 'hidden' }}>
+      <KakaoLoginutton onClick={handleClick}/>
+      <GoogleLoginutton onClick={handleClick}/>
+      <NaverLoginutton onClick={handleClick}/>
+    </div>*/
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <NotificationModal/>
     </>
   );
 }

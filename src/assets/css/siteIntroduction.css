@@ -1,0 +1,45 @@
+.main_site_introduction{
+  background: linear-gradient( rgb(60, 91, 141), skyblue);
+  height: 2600px;
+  width: 100%;
+}
+
+.illust_wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 180px;
+}
+
+.main_illust{
+  width: 700px;
+}
+
+.main_illust.illust_worried{
+  transform: scale(0.6);
+}
+
+.main_illust.illust_platforms{
+  transform: scale(0.8);
+}
+
+.main_illust_text{
+  width: 50%;
+  text-align: center;
+  font-family: 'Gugi', cursive;
+  font-size: 40px;
+}
+
+.main_illust_text.text_thinking{
+  margin-right: 200px;
+}
+
+.main_illust_text.text_worried{
+  margin-left: 200px;
+}
+
+.main_illust_text.text_platforms{
+  margin-right: 200px;
+}

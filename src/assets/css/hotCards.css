@@ -1,0 +1,25 @@
+.hot_cards_area{
+  background: linear-gradient(skyblue,white);
+  height: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#hot_card_title{
+  padding-top: 100px; 
+  padding-left: 50px;
+  font-family: 'Gugi', cursive;
+  font-size: 40px;
+  color: red;
+  width: 100%;
+  text-align: center;
+}
+
+.hot_card_container {
+  display: flex;
+  margin-top: 100px;
+  justify-content: space-around;  /* 이미지 사이에 동일한 간격을 두기 */
+  width: 100%;
+}
