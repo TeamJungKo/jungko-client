@@ -1,0 +1,69 @@
+import { Box, Typography, Button, Divider } from '@mui/material';
+import CardMaker from '../components/common/Card';
+import Logo from '../components/common/logo';
+import DefaultProfile from '../components/common/DefaultProfile';
+import Keyword from '../components/common/Keyword';
+
+function OtherProfile() {
+
+  const title_space = {
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    gap: 2, 
+    marginTop: '40px',
+    marginBottom: '100px'
+  }
+
+  const default_space = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center', 
+    marginTop: '50px',
+    marginBottom: '35px'
+  }
+
+  return (
+    <div style={{
+      background: 'linear-gradient(white, skyblue)',
+      width: '100%',
+      paddingBottom: '50px'
+    }}>
+    <Box>
+      <Logo/>
+      <Box>
+        <Box sx={title_space}>
+          <DefaultProfile/>
+          <Typography fontSize={'50px'} fontFamily={'Jua'}>검정바지님의 프로필</Typography>
+        </Box>
+        <Divider/>
+
+        <Box sx={default_space}>
+          <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}> 카드 목록</Typography>
+          <Button variant="outlined" sx={{color: 'darkblue', fontFamily: 'Noto Sans KR', borderColor: 'blue', background: 'white'}}>내 키워드에 추가</Button>
+        </Box>
+        <Box sx={{display:'flex', alignItems: 'center', marginBottom: '50px', gap: '16px'}}>
+            {/* 타 유저가 만든 카드들 */}
+            <CardMaker/>
+            <CardMaker/>
+            <CardMaker/>
+        </Box>
+        <Divider/>
+
+        <Box sx={default_space}>
+          <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}>키워드 목록</Typography>
+          <Box>
+            <Button variant="outlined" sx={{color: 'darkblue', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'blue', background: 'white'}}>내 키워드에 추가</Button>
+          </Box>
+        </Box>
+        <Box sx={{marginBottom: '50px', display: 'flex', alignItems:'center', gap: '16px'}}>
+            {/* 키워드 박스들 */}
+            <Keyword/><Keyword/><Keyword/><Keyword/>
+        </Box>
+        </Box>
+      </Box>
+    </div>
+  );
+}
+
+export default OtherProfile;

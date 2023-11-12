@@ -25,7 +25,7 @@ function HomePage() {
         </Grid>
         <Grid item xs={3}>
           {/* 카테고리바 */}
-          <Box sx={{ position: 'fixed', top: 200, width: '20%', height: 'calc(100vh - 100px)' }}>
+          <Box sx={{ position: 'fixed', top: 200, left:10, width: '20%', height: 'calc(100vh - 100px)' }}>
             <Category />
           </Box>
         </Grid>

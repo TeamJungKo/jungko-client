@@ -6,7 +6,7 @@ function Logo() {
     width: '150px', 
     height: '150px', 
     objectFit: 'contain',
-    padding: '30px 20px 0px 40px',
+    padding: '30px 0px 0px 30px',
   }
 
   return (
