@@ -2,7 +2,7 @@ import TitleMaker from '../components/common/Title.tsx';
 import GoogleLoginButton from '../components/login/GoogleLoginButton.tsx';
 import KakaoLoginButton from '../components/login/KakaoLoginButton.tsx';
 import NaverLoginButton from '../components/login/NaverLoginButton.tsx';
-import Logo from '../components/common/logo.tsx';
+import Logo from '../components/common/Logo.tsx';
 
 function LoginPage() {
 
@@ -23,7 +23,7 @@ function LoginPage() {
 
   return (
     <>
-      <Logo/>
+      <Logo url="/" />
       <TitleMaker title='로그인'>
         <div style={messageStyle}>로그인하시고 서비스를 이용해보세요</div>
         <div style={buttonPosition}>
@@ -32,7 +32,7 @@ function LoginPage() {
         <div style={buttonPosition}>
           <KakaoLoginButton/>
         </div>
-        <div style={buttonPosition}>
+        <div style={{...buttonPosition, paddingBottom: '200px'}}>
           <NaverLoginButton/>
         </div>
       </TitleMaker>

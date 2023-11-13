@@ -56,10 +56,10 @@ const SiteGuide = (): React.ReactElement => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', width: '100vw', height: '600px', background: 'linear-gradient(to bottom, skyblue, rgb(60, 91, 141))' }}>
+      <Box sx={{ display: 'flex', width: '100%', height: '600px', background: 'linear-gradient(to bottom, skyblue, rgb(60, 91, 141))' }}>
         <Box sx={{ width: '50%', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Typography variant="h4" component="div" sx={{ fontFamily: 'Gugi', fontSize: '40px'}}>
-            중코거래 사이트 이용법을 적는 란
+            중코거래 사이트 이렇게 이용하세요
           </Typography>
         </Box>
         <Box 
