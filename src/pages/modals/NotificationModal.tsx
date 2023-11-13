@@ -33,6 +33,22 @@ export default function NotificationModal() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
 
+  const [cardNotifications, setCardNotifications] = useState(Array(5).fill(null).map((_, index) => ({
+    imageAlt: "Card Image",
+    imageUrl: "",
+    title: `제목${index + 1}`,
+    content: `소식${index + 1}`,
+    time: "n분전",
+  })));
+
+  const [keywordNotifications, setKeywordNotifications] = useState(Array(5).fill(null).map((_, index) => ({
+    imageAlt: "Keyword Image",
+    imageUrl: "",
+    title: `제목${index + 1}`,
+    content: `소식${index + 1}`,
+    time: "n분전",
+  })));
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -45,12 +61,20 @@ export default function NotificationModal() {
     setValue(newValue);
   };
 
-  const handleDeleteAll = () => {
-    // TODO: 전체 삭제 로직
+  const handleDeleteAllCards = () => {
+    setCardNotifications([]);
+  };
+  
+  const handleDeleteAllKeywords = () => {
+    setKeywordNotifications([]);
   };
 
-  const handleDeleteBox = (index: number) => () => {
-    // TODO: 박스 삭제 로직
+  const handleDeleteBox = (index: number) => {
+    if (value === 0) {
+      setCardNotifications(cardNotifications.filter((_, i) => i !== index));
+    } else {
+      setKeywordNotifications(keywordNotifications.filter((_, i) => i !== index));
+    }
   };
 
   return (
@@ -70,24 +94,36 @@ export default function NotificationModal() {
               <Tab label="키워드 알림" sx={{ fontFamily: 'Jua', fontSize: '20px' }} />
             </Tabs>
 
-            {/*카드알림*/}
             <TabPanel value={value} index={0}>
-              <NotificationBox imageAlt="Card Image" imageUrl="" title="제목" content="소식" time="n분전" index={0}  onDelete={handleDeleteBox} />
-              <NotificationBox imageAlt="Card Image" imageUrl="" title="제목2" content="소식2" time="n분전" index={0}  onDelete={handleDeleteBox} />
-              <NotificationBox imageAlt="Card Image" imageUrl="" title="제목3" content="소식3" time="n분전" index={0}  onDelete={handleDeleteBox} />
-              <NotificationBox imageAlt="Card Image" imageUrl="" title="제목4" content="소식4" time="n분전" index={0}  onDelete={handleDeleteBox} />
-              <NotificationBox imageAlt="Card Image" imageUrl="" title="제목5" content="소식5" time="n분전" index={0}  onDelete={handleDeleteBox} />
-              {/* 원하는 만큼 박스를 더 추가 */}
+              {cardNotifications.map((notification, index) => (
+                <NotificationBox
+                  key={index}
+                  imageAlt={notification.imageAlt}
+                  imageUrl={notification.imageUrl}
+                  title={notification.title}
+                  content={notification.content}
+                  time={notification.time}
+                  index={index}
+                  onDelete={handleDeleteBox}
+                />
+              ))}
+              <Button onClick={handleDeleteAllCards} sx={{marginTop: '16px', fontFamily: 'Noto Sans KR', fontSize: '16px'}}>전체삭제</Button>
             </TabPanel>
-
-            {/*키워드알림*/}
             <TabPanel value={value} index={1}>
-              <NotificationBox imageAlt="Keyword Image" imageUrl="" title="제목" content="소식" time="n분전" index={1}  onDelete={handleDeleteBox} />
-              <NotificationBox imageAlt="Keyword Image" imageUrl="" title="제목2" content="소식2" time="n분전" index={1}  onDelete={handleDeleteBox} />
-              {/* 원하는 만큼 박스를 더 추가 */}
+              {keywordNotifications.map((notification, index) => (
+                <NotificationBox
+                  key={index}
+                  imageAlt={notification.imageAlt}
+                  imageUrl={notification.imageUrl}
+                  title={notification.title}
+                  content={notification.content}
+                  time={notification.time}
+                  index={index}
+                  onDelete={handleDeleteBox}
+                />
+              ))}
+              <Button onClick={handleDeleteAllKeywords} sx={{marginTop: '16px', fontFamily: 'Noto Sans KR', fontSize: '16px'}}>전체삭제</Button>
             </TabPanel>
-
-            <Button onClick={handleDeleteAll} sx={{marginTop: '16px', fontFamily: 'Noto Sans KR', fontSize: '16px'}}>전체삭제</Button>
           </Box>
         </DialogContent>
       </Dialog>

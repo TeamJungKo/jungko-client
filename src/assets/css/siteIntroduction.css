@@ -25,11 +25,31 @@
   transform: scale(0.8);
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .main_illust_text{
   width: 50%;
   text-align: center;
   font-family: 'Gugi', cursive;
   font-size: 40px;
+  animation-name: none; /* 초기에는 애니메이션 이름을 none으로 설정 */
+  animation-duration: 2s;
+  animation-timing-function: ease-out;
+  opacity: 0; /* 초기에는 투명하게 설정 */
+}
+
+.main_illust_text.visible{
+  animation-name: slideUp; /* visible 클래스가 적용될 때만 애니메이션 이름을 slideUp으로 설정 */
+  opacity: 1;
 }
 
 .main_illust_text.text_thinking{

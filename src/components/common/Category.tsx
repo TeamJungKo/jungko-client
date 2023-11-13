@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -19,6 +20,10 @@ import PetsIcon from '@mui/icons-material/Pets';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import MenuIcon from '@mui/icons-material/Menu';
 
+interface Props {
+  url?: string;
+}
+
 const items = [
   { icon: <MenuIcon />, text: "카테고리" },
   { icon: <LocalLaundryServiceIcon />, text: "가전,TV" },
@@ -35,8 +40,16 @@ const items = [
   // ... 여기에 더 추가 가능
 ];
 
-const Category = (): React.ReactElement => {
+const Category = ({ url='' }: Props): React.ReactElement => {
+
+  const navigate = useNavigate();
+
+  const goToUrl = () => {
+    navigate(url);
+  }
+
   return (
+
     <Box 
       sx={{ 
         width: '100%', 
@@ -51,16 +64,16 @@ const Category = (): React.ReactElement => {
         <List disablePadding>
           {items.map((item, index) => (
             <React.Fragment key={index}>
-              <ListItem disablePadding sx={item.text === "카테고리" ? { backgroundColor: '#000000', borderRadius: '12px 12px 0 0' } : {}}>
+              <ListItem disablePadding sx={item.text === "카테고리" ? { backgroundColor: '#000000', borderRadius: '10px 10px 0 0' } : {}}>
                 {item.text === "카테고리" ? (
                   <>
                     <ListItemIcon sx={{ paddingLeft: 2, paddingBottom: 2, paddingTop: 2, color: '#ffffff' }}>
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText primary={item.text} primaryTypographyProps={{color: '#ffffff', fontFamily: 'Noto Sans KR'}}/>
+                    <ListItemText primary={item.text} primaryTypographyProps={{color: '#ffffff', fontFamily: 'Gugi'}}/>
                   </>
                 ) : (
-                  <ListItemButton>
+                  <ListItemButton onClick={goToUrl}>
                     <ListItemIcon>
                       {item.icon}
                     </ListItemIcon>

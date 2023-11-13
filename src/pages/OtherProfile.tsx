@@ -1,10 +1,14 @@
 import { Box, Typography, Button, Divider } from '@mui/material';
 import CardMaker from '../components/common/Card';
-import Logo from '../components/common/logo';
+import Logo from '../components/common/Logo';
 import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
 
-function OtherProfile() {
+interface Props {
+  nickname: string;
+}
+
+function OtherProfile({nickname}:Props) {
 
   const title_space = {
     display: 'flex', 
@@ -34,7 +38,7 @@ function OtherProfile() {
       <Box>
         <Box sx={title_space}>
           <DefaultProfile/>
-          <Typography fontSize={'50px'} fontFamily={'Jua'}>검정바지님의 프로필</Typography>
+          <Typography fontSize={'50px'} fontFamily={'Jua'}>{nickname}님의 프로필</Typography>
         </Box>
         <Divider/>
 
@@ -56,9 +60,12 @@ function OtherProfile() {
             <Button variant="outlined" sx={{color: 'darkblue', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'blue', background: 'white'}}>내 키워드에 추가</Button>
           </Box>
         </Box>
-        <Box sx={{marginBottom: '50px', display: 'flex', alignItems:'center', gap: '16px'}}>
+        <Box sx={{marginBottom: '100px', display: 'flex', alignItems:'center', gap: '16px'}}>
             {/* 키워드 박스들 */}
-            <Keyword/><Keyword/><Keyword/><Keyword/>
+            <Keyword keyword='검정바지'/>
+            <Keyword keyword='흰둥이'/>
+            <Keyword keyword='아이유'/>
+            <Keyword keyword='당근'/>
         </Box>
         </Box>
       </Box>

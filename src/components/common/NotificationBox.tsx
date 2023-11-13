@@ -23,7 +23,10 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({ imageAlt='', imageUrl
             <Typography sx={{ fontFamily: 'Noto Sans KR', fontSize: '14px', marginBottom: '3px' }}>{content}</Typography>
             <Typography sx={{ fontFamily: 'Noto Sans KR', fontSize: '14px' }}>{time}</Typography>
           </div>
-          <IconButton onClick={() => onDelete(index)}><CloseIcon /></IconButton> {/* 삭제 버튼 추가 */}
+          <IconButton onClick={(event) => {
+            event.stopPropagation();
+            onDelete(index);
+            }}><CloseIcon /></IconButton>
         </Box>
         <Divider/>
       </Box>

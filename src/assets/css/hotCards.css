@@ -9,10 +9,9 @@
 
 #hot_card_title{
   padding-top: 100px; 
-  padding-left: 50px;
   font-family: 'Gugi', cursive;
   font-size: 40px;
-  color: red;
+  color: crimson;
   width: 100%;
   text-align: center;
 }
