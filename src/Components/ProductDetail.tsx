@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 
-// Style for the modal
 const style = {
   position: 'absolute',
   top: '50%',
@@ -22,7 +21,6 @@ const style = {
   flexDirection: 'column'
 };
 
-// Style for the keyword Chip
 const KeywordChip = styled(Chip)(({ theme, color }) => ({
   margin: theme.spacing(0.5),
   backgroundColor: color === 'primary' ? theme.palette.primary.main : '#e0e0e0',
@@ -39,6 +37,7 @@ type ProductDetailProps = {
 };
 
 const dummyData = {
+  //dummy data for testing
   imageUrl: '/path-to-image.png',
   marketLogoUrl: '/path-to-market-logo.png',
   date: 'YYYY-MM-DD',
@@ -63,9 +62,9 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
   };
 
   const addKeywords = () => {
+    //API호출 등 기능 구현 필요
     console.log('Selected Keywords:', selectedKeywords);
-    // Here you would call the API to add the keywords
-    setSelectedKeywords([]); // Clear the selection
+    setSelectedKeywords([]);
   };
 
   return (
@@ -76,7 +75,6 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
       aria-describedby="product-modal-description"
     >
       <Box sx={style}>
-        {/* Close button */}
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -115,7 +113,6 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
           </Box>
         </Box>
 
-        {/* Keywords and Add to My Keywords Button */}
         <Box
           sx={{
             display: 'flex',
@@ -143,7 +140,6 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
           </Button>
         </Box>
 
-        {/* Product Details */}
         <Typography id="product-modal-description">
           {dummyData.productDescription}
         </Typography>
