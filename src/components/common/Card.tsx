@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { CardActionArea, Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea, Box } from '@mui/material';
 
 interface Props {
   width?: string;
@@ -16,7 +16,7 @@ interface Props {
   url?:string
   isOpen?: number;
   isOpen2?: boolean; //둘중하나 삭제 <- 이게 명암대비
-  onContextMenu: (event: React.MouseEvent) => void;
+  onContextMenu?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
   isSelected?: boolean;
 }

@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import jungkoIcon from '../../assets/images/jungkoIcon.png';
 //나중에 설명할 이미지들로 바꿀것. 지금은 데모로 중코이미지 넣어놓음
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import CardMaker from '../common/Card.tsx';
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8];
