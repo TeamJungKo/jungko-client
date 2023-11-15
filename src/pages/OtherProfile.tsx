@@ -44,7 +44,7 @@ function OtherProfile({nickname}:Props) {
 
         <Box sx={default_space}>
           <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}> 카드 목록</Typography>
-          <Button variant="outlined" sx={{color: 'darkblue', fontFamily: 'Noto Sans KR', borderColor: 'blue', background: 'white'}}>내 키워드에 추가</Button>
+          <Button variant="outlined" sx={{color: 'darkblue', fontFamily: 'Noto Sans KR', borderColor: 'blue', background: 'white'}}>내 관심 카드에 추가</Button>
         </Box>
         <Box sx={{display:'flex', alignItems: 'center', marginBottom: '50px', gap: '16px'}}>
             {/* 타 유저가 만든 카드들 */}
