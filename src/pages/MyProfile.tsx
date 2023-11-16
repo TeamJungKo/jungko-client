@@ -9,6 +9,7 @@ import Add from '@mui/icons-material/Add';
 
 import Fab from '@mui/material/Fab';  //지울것
 import TagIcon from '@mui/icons-material/Tag';  //지울것
+import { getMyProfile } from '../api/axios.custom';
 
 function MyProfile() {
   const [isNotificationOn, setIsNotificationOn] = useState(false);
@@ -85,19 +86,19 @@ function MyProfile() {
   const toggleSelectKeyword = (text: string) => {
     setKeywords(keywords.map((keyword) => keyword.text === text ? {...keyword, isSelected: !keyword.isSelected} : keyword));
   }; // 키워드 선택 토글러
-  
+
   const deleteSelectedKeywords = () => {
     setKeywords(keywords.filter(keyword => !keyword.isSelected));
   };  // 선택한 키워드를 삭제하는 함수
-  
+
   const makeKeywordsPublic = () => {
     setKeywords(keywords.map(keyword => keyword.isSelected ? {...keyword, isOpen: true} : keyword));
   };  // 선택 키워드 공개전환
-  
+
   const makeAllKeywordsPublic = () => {
     setKeywords(keywords.map(keyword => ({...keyword, isOpen: true})));
   };  // 전체 키워드 공개전환
-  
+
   const makeKeywordsPrivate = () => {
     setKeywords(keywords.map(keyword => keyword.isSelected ? {...keyword, isOpen: false} : keyword));
   };  // 선택 키워드 비공개전환
@@ -110,17 +111,26 @@ function MyProfile() {
     setKeywords(prevKeywords => [...prevKeywords, { text: newKeyword, isSelected: false, isOpen: true }]);
     setNewKeyword(''); // 새 키워드 초기화
   };
-  
+
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => { // 이메일 변경 핸들러
     setEmail(event.target.value);
   };
-  
+
   const toggleEmailEdit = () => { // 이메일 수정 토글 핸들러
     setIsEmailEditing(!isEmailEditing);
   };
 
   useEffect(() => {
+    getMyProfile().then((res) => {
+      console.log(res);
+      setNickname(res.data.nickname);
+      setEmail(res.data.email);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
     // 다른 영역 클릭 시 모든 카드 선택 해제
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -128,10 +138,10 @@ function MyProfile() {
         setCards(cards.map(card => ({...card, isSelected: false})));
       }
     };
-  
+
     // 클릭 이벤트 리스너 등록
     document.addEventListener('click', handleClick);
-  
+
     // 컴포넌트 unmount 시 클릭 이벤트 리스너 해제
     return () => {
       document.removeEventListener('click', handleClick);
@@ -139,10 +149,10 @@ function MyProfile() {
   }, [cards]);
 
   const title_space = {
-    display: 'flex', 
-    alignItems: 'center', 
+    display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 2, 
+    gap: 2,
     marginTop: '40px',
     marginBottom: '100px'
   }
@@ -150,7 +160,7 @@ function MyProfile() {
   const default_space = {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center', 
+    alignItems: 'center',
     marginTop: '50px',
     marginBottom: '35px'
   }
@@ -162,7 +172,7 @@ function MyProfile() {
     marginTop: '50px',
     paddingBottom: '50px'
   }
-  
+
   // 카드 추가 함수 (ui구현은 안함)
   /*const addCard = () => {
     setCards((prevCards) => [...prevCards, { id: prevCards.length + 1, isOpen: 0 }]);
@@ -196,32 +206,32 @@ function MyProfile() {
         <Box sx={default_space}>
           <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}>내가 생성한 카드</Typography>
           <Box>
-            <Button variant="outlined" 
-            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}}
             onClick={deleteSelectedCards}>선택삭제</Button>
 
-            <Button variant="outlined" 
-            sx={{color: 'darkgreen', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkgreen', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}}
             onClick={makeCardsPublic} >공개</Button>
 
-            <Button variant="outlined" 
-            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}}
             onClick={makeCardsPrivate}>비공개</Button>
 
-            <Button variant="outlined" 
-            sx={{color: 'darkgreen', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkgreen', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}}
             onClick={makeAllCardsPublic}>전체공개</Button>
           </Box>
         </Box>
         <Box sx={{display: 'flex', alignItems: 'center', marginBottom: '50px', gap: '16px'}}>
           {/* 생성한 카드들 */}
           {cards.map((card) => (
-            <CardMaker 
-              key={card.id} 
-              isOpen={card.isOpen} 
+            <CardMaker
+              key={card.id}
+              isOpen={card.isOpen}
               isSelected={card.isSelected} // 선택 상태 바인딩
-              onContextMenu={(event: React.MouseEvent) => { 
-                event.preventDefault(); 
+              onContextMenu={(event: React.MouseEvent) => {
+                event.preventDefault();
                 toggleSelectCard(card.id);
               }}
             />
@@ -231,25 +241,25 @@ function MyProfile() {
 
         <Box sx={default_space}>
           <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}>관심 카드</Typography>
-          <Button variant="outlined" 
-            sx={{color: 'darkred', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}} 
+          <Button variant="outlined"
+            sx={{color: 'darkred', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}}
             onClick={deleteSelectedFavouriteCards}>선택삭제
           </Button>
         </Box>
         <Box sx={{display:'flex', alignItems: 'center', marginBottom: '50px', gap: '16px'}}>
             {/* 관심 카드들 */}
-            <CardMaker 
-                  onContextMenu={(event: React.MouseEvent) => { 
-                  event.preventDefault(); 
+            <CardMaker
+                  onContextMenu={(event: React.MouseEvent) => {
+                  event.preventDefault();
                 }}/> {/*시연용 이후 삭제할것*/}
             {favouriteCards.map((card) => (
-              <CardMaker 
-                key={card.id} 
+              <CardMaker
+                key={card.id}
                 isOpen={0} //isOpen={card.isOpen} 시연후 이걸로 교체
                 isSelected={card.isSelected} // 선택 상태 바인딩
                 isOpen2={false} //시연용
-                onContextMenu={(event: React.MouseEvent) => { 
-                  event.preventDefault(); 
+                onContextMenu={(event: React.MouseEvent) => {
+                  event.preventDefault();
                   toggleSelectFavouriteCard(card.id);
                 }}
               />
@@ -260,14 +270,14 @@ function MyProfile() {
         <Box sx={default_space}>
           <Typography sx={{fontSize: '30px', fontFamily: 'Gugi'}}>내가 추가한 키워드</Typography>
           <Box>
-            <Button variant="outlined" 
-            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}}
             onClick={deleteSelectedKeywords}>선택삭제</Button>
 
             <Button variant="outlined" sx={{color: 'darkgreen', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}} onClick={makeKeywordsPublic}>공개</Button>
 
-            <Button variant="outlined" 
-            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}} 
+            <Button variant="outlined"
+            sx={{color: 'darkred', marginRight: '15px', fontFamily: 'Noto Sans KR', borderColor: 'red', background: 'white'}}
             onClick={makeKeywordsPrivate}>비공개</Button>
 
             <Button variant="outlined" sx={{color: 'darkgreen', fontFamily: 'Noto Sans KR', borderColor: 'green', background: 'white'}} onClick={makeAllKeywordsPublic}>전체공개</Button>
@@ -276,20 +286,20 @@ function MyProfile() {
         <Box sx={{marginBottom: '50px', display: 'flex', alignItems:'center', gap: '16px'}}>
           {/* 키워드 박스들 */}
           {keywords.map((keyword, index) => (
-            <Keyword 
-              key={index} 
-              keyword={keyword.text} 
+            <Keyword
+              key={index}
+              keyword={keyword.text}
               isSelected={keyword.isSelected} // 선택 상태를 바인딩합니다.
               isOpen={keyword.isOpen} // 공개 상태를 바인딩합니다.
-              onContextMenu={(event: React.MouseEvent) => { 
-                event.preventDefault(); 
+              onContextMenu={(event: React.MouseEvent) => {
+                event.preventDefault();
                 toggleSelectKeyword(keyword.text);
               }}
             />
           ))}
           {/* 아래도 시연용. 확인후 지울것 */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               borderRadius: '28px'
             }}
           >
@@ -337,7 +347,7 @@ function MyProfile() {
                     sx={{marginLeft: '45px'}}
                     value={email}
                     onChange={handleEmailChange}
-                    inputProps={{ style: { fontSize: '20px', padding: '6px', marginLeft: '16px' } }} 
+                    inputProps={{ style: { fontSize: '20px', padding: '6px', marginLeft: '16px' } }}
                   />
                   <Button variant="outlined" sx={{fontSize: '16px', marginLeft: '16px', fontFamily: 'Noto Sans KR', background: 'white'}} onClick={toggleEmailEdit}>저장</Button>
                 </>

@@ -36,3 +36,8 @@ src/preview_searched.PNG
 src/script.js
 src/style.css
 src/test.tsx
+
+.env
+.env.local
+.env.dev
+.env.prod
