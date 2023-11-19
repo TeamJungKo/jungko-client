@@ -15,18 +15,16 @@ interface Props {
   contentHeight?: string;
   url?:string
   isOpen?: number;
-  isOpen2?: boolean; //둘중하나 삭제 <- 이게 명암대비
   onContextMenu?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
   isSelected?: boolean;
 }
 
-function CardMaker({ width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', url = '', isOpen = 0, isOpen2 = true, onContextMenu, isSelected=false }: Props) {
+function CardMaker({ width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', url = '', isOpen = 0, onContextMenu, isSelected=false }: Props) {
 
   const navigate = useNavigate();
 
   const handleClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // 이벤트 버블링 중단
     navigate(url);
   }
 
@@ -44,7 +42,7 @@ function CardMaker({ width = '200px', height = '300px', image='', title='디폴�
       case 2:
         border = '3px outset rgb(255, 102, 102)';
         break;
-      default:
+      defaultimageHeightㄴ:
         border = 'none';
     }
   }
@@ -70,9 +68,6 @@ function CardMaker({ width = '200px', height = '300px', image='', title='디폴�
             {description}
           </Typography>
         </CardContent>
-        {!isOpen2 && (
-          <Box sx={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(50,50,50,0.8) 30%)' }} />
-        )}
       </CardActionArea>
     </Card>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Divider, Switch, IconButton, TextField } from '@mui/material';
 import CardMaker from '../components/common/Card';
-import Logo from '../components/common/Logo';
+import NavigationBar from '../components/common/NavigationBar';
 import EditIcon from '@mui/icons-material/Edit';
 import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
@@ -184,8 +184,8 @@ function MyProfile() {
       width: '100%'
     }}>
     <Box>
-      <Logo/>
-      <Box>
+      <NavigationBar/>
+      <Box sx={{ marginTop: '160px' }}>
         <Box sx={title_space}>
           <DefaultProfile/>
           {isEditing ? (
@@ -255,9 +255,8 @@ function MyProfile() {
             {favouriteCards.map((card) => (
               <CardMaker
                 key={card.id}
-                isOpen={0} //isOpen={card.isOpen} 시연후 이걸로 교체
+                isOpen={0}
                 isSelected={card.isSelected} // 선택 상태 바인딩
-                isOpen2={false} //시연용
                 onContextMenu={(event: React.MouseEvent) => {
                   event.preventDefault();
                   toggleSelectFavouriteCard(card.id);

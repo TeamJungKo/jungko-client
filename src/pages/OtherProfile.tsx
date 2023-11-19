@@ -1,6 +1,6 @@
 import { Box, Typography, Button, Divider } from '@mui/material';
 import CardMaker from '../components/common/Card';
-import Logo from '../components/common/Logo';
+import NavigationBar from '../components/common/NavigationBar';
 import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
 
@@ -33,8 +33,8 @@ function OtherProfile({nickname}:Props) {
       width: '100%',
       paddingBottom: '50px'
     }}>
-    <Box>
-      <Logo/>
+    <Box sx={{ marginTop: '160px' }}>
+      <NavigationBar/>
       <Box>
         <Box sx={title_space}>
           <DefaultProfile/>

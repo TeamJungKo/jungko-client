@@ -13,6 +13,7 @@ import CardMaker from './components/common/Card.tsx';
 import OtherProfile from './pages/OtherProfile.tsx';
 import AlertDialog from './pages/modals/NotificationModal.tsx';
 import NotificationModal from './pages/modals/NotificationModal.tsx';
+import NavigationBar from './components/common/NavigationBar.tsx';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
