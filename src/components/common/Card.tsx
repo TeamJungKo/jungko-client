@@ -30,20 +30,20 @@ function CardMaker({ width = '200px', height = '300px', image='', title='디폴�
 
   let border;
   if (isSelected) {
-    border = 'dotted';
+    border = '4px dashed black';
   } else {
     switch (isOpen) {
       case 0:
-        border = 'none';
+        border = '5px outset lightgrey';
         break;
       case 1:
-        border = '3px outset lightgreen';
+        border = '5px outset lightgreen';
         break;
       case 2:
-        border = '3px outset rgb(255, 102, 102)';
+        border = '5px outset rgb(255, 102, 102)';
         break;
-      defaultimageHeightㄴ:
-        border = 'none';
+      default:
+        border = '5px outset lightgrey';
     }
   }
 
@@ -63,8 +63,9 @@ function CardMaker({ width = '200px', height = '300px', image='', title='디폴�
             {title}
           </Typography>
           <Typography variant="body2" 
-          color="text.secondary"
-          sx={{ fontFamily: 'Noto Sans KR' }} >
+            color="text.secondary"
+            sx={{ fontFamily: 'Noto Sans KR', whiteSpace: 'pre-line' }} 
+          >
             {description}
           </Typography>
         </CardContent>

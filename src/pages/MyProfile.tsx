@@ -9,10 +9,58 @@ import Add from '@mui/icons-material/Add';
 
 import Fab from '@mui/material/Fab';  //지울것
 import TagIcon from '@mui/icons-material/Tag';  //지울것
-import { getMyProfile } from '../api/axios.custom';
+import { getMyProfile, getMyCard } from '../api/axios.custom';
+
+
+interface Card {
+  cardId: number;
+  title: string;
+  keyword: string;
+  minPrice: number;
+  maxPrice: number;
+  scope: string;
+  createdAt: string;
+  author: {
+    memberId: number;
+    nickname: string;
+    imageUrl: string;
+    email: string;
+  };
+  area: {
+    sido: {
+      name: string;
+      code: string;
+      sigg: {
+        name: string;
+        code: string;
+        emd?: {
+          name: string;
+          code: string;
+        };
+      };
+    };
+  };
+
+  category: {
+    categoryId: number;
+    name: string;
+    level: number;
+    subCategory?: {
+      categoryId: number;
+      name: string;
+      level: number;
+      subCategory?: {
+        categoryId: number;
+        name: string;
+        level: number;
+      };
+    };
+  };
+}
 
 function MyProfile() {
   const [isNotificationOn, setIsNotificationOn] = useState(false);
+  const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
 
   const [nickname, setNickname] = useState("닉네임"); // 닉네임 상태값 추가
   const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태값 추가
@@ -122,6 +170,7 @@ function MyProfile() {
   };
 
   useEffect(() => {
+
     getMyProfile().then((res) => {
       console.log(res);
       setNickname(res.data.nickname);
@@ -130,6 +179,16 @@ function MyProfile() {
     .catch((err) => {
       console.log(err);
     });
+
+    const fetchMyCards = async () => {  //내카드 api 데이터 가져오기
+      try {
+        const response = await getMyCard(0, 4);
+        const { cards } = response.data;
+        setMyCards(cards);
+      } catch (error) {
+        console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
+      }
+    };
 
     // 다른 영역 클릭 시 모든 카드 선택 해제
     const handleClick = (event: MouseEvent) => {
@@ -146,6 +205,8 @@ function MyProfile() {
     return () => {
       document.removeEventListener('click', handleClick);
     };
+
+    fetchMyCards();
   }, [cards]);
 
   const title_space = {
@@ -225,14 +286,25 @@ function MyProfile() {
         </Box>
         <Box sx={{display: 'flex', alignItems: 'center', marginBottom: '50px', gap: '16px'}}>
           {/* 생성한 카드들 */}
-          {cards.map((card) => (
+          {cards.map((card) => (  //샘플임
             <CardMaker
               key={card.id}
               isOpen={card.isOpen}
-              isSelected={card.isSelected} // 선택 상태 바인딩
+              isSelected={card.isSelected}
               onContextMenu={(event: React.MouseEvent) => {
                 event.preventDefault();
                 toggleSelectCard(card.id);
+              }}
+            />
+          ))}
+          {myCards.map((card) => (  //이부분이 api에서 가져온 "내 카드"들임
+            <CardMaker
+              key={card.cardId}
+              isOpen={1}
+              isSelected={false}
+              onContextMenu={(event: React.MouseEvent) => {
+                event.preventDefault();
+                toggleSelectCard(card.cardId);
               }}
             />
           ))}
@@ -335,30 +407,6 @@ function MyProfile() {
             <Switch sx={{marginLeft: '20px'}} checked={isNotificationOn} onChange={handleNotificationToggle} />
             <Typography sx={{fontSize: '20px', fontFamily: 'Jua', marginLeft: '10px'}}>{isNotificationOn ? 'ON' : 'OFF'}</Typography>
           </Box>
-
-          <Box sx={{display: 'flex', justifyContent: 'flex-start', marginTop: '30px', alignItems: 'center'}}>
-            <Typography sx={{fontSize: '20px', fontFamily: 'Jua'}}>이메일</Typography>
-            <Box>
-              {isEmailEditing ? (
-                <>
-                  <TextField
-                    variant="outlined"
-                    sx={{marginLeft: '45px'}}
-                    value={email}
-                    onChange={handleEmailChange}
-                    inputProps={{ style: { fontSize: '20px', padding: '6px', marginLeft: '16px' } }}
-                  />
-                  <Button variant="outlined" sx={{fontSize: '16px', marginLeft: '16px', fontFamily: 'Noto Sans KR', background: 'white'}} onClick={toggleEmailEdit}>저장</Button>
-                </>
-              ) : (
-                <>
-                  <TextField disabled variant="outlined" sx={{marginLeft: '45px'}} value={email} inputProps={{ style: { fontSize: '20px', padding: '6px', marginLeft: '16px' } }} />
-                  <Button variant="outlined" sx={{fontSize: '16px', marginLeft: '16px', fontFamily: 'Noto Sans KR', background: 'white'}} onClick={toggleEmailEdit}>수정</Button>
-                </>
-              )}
-            </Box>
-          </Box>
-
 
           <Box sx={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: '30px'}}>
             <Typography sx={{fontSize: '20px', fontFamily: 'Jua'}}>회원탈퇴</Typography>

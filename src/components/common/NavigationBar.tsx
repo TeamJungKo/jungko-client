@@ -18,6 +18,7 @@ import {
 import logo from '../../assets/images/jungkoLogo.png';
 import profilePic from '../../assets/images/profile_pic.png';
 import { getMyProfile } from '../../api/axios.custom.ts';
+import NotificationModal from '../../pages/modals/NotificationModal.tsx';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -54,7 +55,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const NavigationBar = () => {
+  const [openModal, setOpenModal] = useState(false);  // 모달의 열림/닫힘
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
+
+  const handleOpenModal = () => {
+    setOpenModal(true);  // 모달을 엽니다.
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);  // 모달을 닫습니다.
+  };
 
   const [user, setUser] = useState({
     memberId: null,
@@ -121,6 +131,7 @@ const NavigationBar = () => {
             size="large"
             aria-label="show new notifications"
             color="inherit"
+            onClick={handleOpenModal}  // 아이콘을 클릭하면 모달을 엽니다.
           >
             <Badge
               badgeContent={notificationsCount > 0 ? notificationsCount : null}
@@ -129,37 +140,49 @@ const NavigationBar = () => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
+          <NotificationModal open={openModal} onClose={handleCloseModal} />
 
-          <img
-            src={user.imageUrl}
-            alt="Profile"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              marginLeft: '16px'
-            }}
-          />
+          {/*여기에 링크 달았음*/}
+          <Link to="/myProfile" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <img
+                src={user.imageUrl}
+                alt="Profile"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  marginLeft: '16px'
+                }}
+              />
 
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              ml: 2
-            }}
-          >
-            <Typography variant="subtitle1" noWrap>
-              {user.nickname}
-            </Typography>
-            <Button
-              startIcon={<Logout />}
-              sx={{ my: 1, py: 0, minWidth: 'none', color: 'red' }}
-              size="small"
-            >
-              Logout
-            </Button>
-          </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  ml: 2
+                }}
+              >
+                <Typography 
+                  sx={{ padding: '0px'}}
+                  variant="subtitle1"
+                  align='left'
+                  noWrap
+                >
+                  {user.nickname}
+                </Typography>
+                <Button
+                  startIcon={<Logout />}
+                  sx={{ my: 1, py: 0, minWidth: 'none', color: 'red', margin: '0px', padding: '0px' }}
+                  size="small"
+                >
+                  Logout
+                </Button>
+              </Box>
+            </Box>
+          </Link>
+          
         </Box>
       </Toolbar>
     </Box>

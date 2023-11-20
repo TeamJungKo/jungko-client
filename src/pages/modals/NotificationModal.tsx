@@ -9,6 +9,11 @@ interface TabPanelProps {
   value: number;
 }
 
+interface NotificationModalProps {
+  open: boolean;  // 모달의 열림/닫힘 상태를 나타내는 프롭입니다.
+  onClose: () => void;  // 모달을 닫는 함수를 나타내는 프롭입니다.
+}
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -29,8 +34,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function NotificationModal() {
-  const [open, setOpen] = useState(false);
+const NotificationModal: React.FC<NotificationModalProps> = ({ open, onClose }) => {
   const [value, setValue] = useState(0);
 
   const [cardNotifications, setCardNotifications] = useState(Array(5).fill(null).map((_, index) => ({
@@ -48,14 +52,6 @@ export default function NotificationModal() {
     content: `소식${index + 1}`,
     time: "n분전",
   })));
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleChange = (newValue: number) => {
     setValue(newValue);
@@ -79,10 +75,9 @@ export default function NotificationModal() {
 
   return (
     <div>
-      <button onClick={handleClickOpen}>
-        <NotificationsActiveIcon />
-      </button>
-      <Dialog open={open} onClose={handleClose}
+      <Dialog 
+        open={open}  // open 프롭을 사용하여 모달의 열림/닫힘을 제어합니다.
+        onClose={onClose}  // onClose 프롭을 사용하여 모달을 닫습니다.
       sx={{ '& .MuiDialog-paper': { width: '500px' } }}
       >
         <DialogTitle sx={{fontSize: '28px', fontFamily: 'Jua'}}>{"검은바지님의 알림"}</DialogTitle>
@@ -130,3 +125,5 @@ export default function NotificationModal() {
     </div>
   );
 }
+
+export default NotificationModal;

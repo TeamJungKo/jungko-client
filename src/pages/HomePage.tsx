@@ -1,12 +1,95 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Category from '../components/common/Category';
 import CardMaker from '../components/common/Card';
 import NavigationBar from '../components/common/NavigationBar';
 import danggeun from '../assets/images/danggeun.png';
+import { getPopularCard, getMyCard } from '../api/axios.custom';
+import HotCards from '../components/site_intro/HotCards';
+
+interface Card {
+  cardId: number;
+  title: string;
+  keyword: string;
+  minPrice: number;
+  maxPrice: number;
+  scope: string;
+  createdAt: string;
+  author: {
+    memberId: number;
+    nickname: string;
+    imageUrl: string;
+    email: string;
+  };
+  area: {
+    sido: {
+      name: string;
+      code: string;
+      sigg: {
+        name: string;
+        code: string;
+        emd?: {
+          name: string;
+          code: string;
+        };
+      };
+    };
+  };
+
+  category: {
+    categoryId: number;
+    name: string;
+    level: number;
+    subCategory?: {
+      categoryId: number;
+      name: string;
+      level: number;
+      subCategory?: {
+        categoryId: number;
+        name: string;
+        level: number;
+      };
+    };
+  };
+}
+
 
 function HomePage() {
+
+  const [popularCards, setPopularCards] = useState<Card[]>([]);
+  const [myCards, setMyCards] = useState<Card[]>([]);
+
+  useEffect(() => {
+    const fetchPopularCard = async () => {
+      try {
+        const response = await getPopularCard(0, 5);
+        const { cards } = response.data;
+        
+        console.log(cards); //지울것 (테스트용)
+        setPopularCards(cards);
+        console.log(popularCards.length); //지울것 (테스트용)
+
+
+      } catch (error) {
+        console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
+      }
+    };
+
+    const fetchMyCards = async () => {
+      try {
+        const response = await getMyCard(0, 4);
+        const { cards } = response.data;
+        setMyCards(cards);
+      } catch (error) {
+        console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
+      }
+    };
+    
+    fetchPopularCard();
+    fetchMyCards();
+  }, []);
+
 
   const fontStyle = {
     fontSize: '44px',
@@ -36,19 +119,78 @@ function HomePage() {
           <Box sx={{ marginTop: '200px', marginBottom: '40px' }}>
             <div style={fontStyle}>인기 카드 목록</div>
             <Grid container spacing={2}> {/*아래는 테스트*/}
-              <Grid item><CardMaker image={danggeun} title="검정바지 알리미" description='가격이랑 카테고리등 요기에'/></Grid>
               <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
+              {popularCards.map((card, index) => {
+                // 모든 카테고리 이름을 가져옵니다.
+                let category = card.category.name;
+                let subCategory = card.category.subCategory;
+                while (subCategory) {
+                  category += ' > ' + subCategory.name;
+                  subCategory = subCategory.subCategory;
+                }
+
+                // 모든 지역 이름을 가져옵니다.
+                let area = card.area.sido.name;
+                let sigg = card.area.sido.sigg;
+                while (sigg && sigg.emd) {
+                  area += ' > ' + sigg.name;
+                  sigg = sigg.emd;
+                }
+
+                // description을 설정합니다.
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                카테고리: ${category}
+                지역: ${area}`;
+                
+                return (
+                  <Grid item key={card.cardId}>
+                    <CardMaker 
+                      title={card.title} 
+                      image={card.author.imageUrl} 
+                      description={description} 
+                    />
+                  </Grid>
+                );
+              })}
+
             </Grid>
             <div style={fontStyle}>내 카드 목록</div>
             <Grid container spacing={2}>
               <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
+              {myCards.map((card, index) => {
+                // 모든 카테고리 이름을 가져옵니다.
+                let category = card.category.name;
+                let subCategory = card.category.subCategory;
+                while (subCategory) {
+                  category += ' > ' + subCategory.name;
+                  subCategory = subCategory.subCategory;
+                }
+
+                // 모든 지역 이름을 가져옵니다.
+                let area = card.area.sido.name;
+                let sigg = card.area.sido.sigg;
+                while (sigg && sigg.emd) {
+                  area += ' > ' + sigg.name;
+                  sigg = sigg.emd;
+                }
+
+                // description을 설정합니다.
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                카테고리: ${category}
+                지역: ${area}`;
+                
+                return (
+                  <Grid item key={card.cardId}>
+                    <CardMaker 
+                      title={card.title} 
+                      image={card.author.imageUrl} 
+                      description={description} 
+                    />
+                  </Grid>
+                );
+              })}
             </Grid>
+
             <div style={fontStyle}>관심 카드 목록</div>
             <Grid container spacing={2}>
               <Grid item><CardMaker /></Grid>
