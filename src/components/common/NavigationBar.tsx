@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box,
@@ -19,6 +19,7 @@ import logo from '../../assets/images/jungkoLogo.png';
 import profilePic from '../../assets/images/profile_pic.png';
 import { getMyProfile } from '../../api/axios.custom.ts';
 import NotificationModal from '../../pages/modals/NotificationModal.tsx';
+import SearchModal from '../../pages/SearchModal.tsx';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -56,6 +57,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const NavigationBar = () => {
   const [openModal, setOpenModal] = useState(false);  // 모달의 열림/닫힘
+  const [searchModalOpen, setSearchModalOpen] = useState(false);  // SearchModal의 열림/닫힘 상태를 관리하는 state
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   const handleOpenModal = () => {
@@ -66,6 +68,13 @@ const NavigationBar = () => {
     setOpenModal(false);  // 모달을 닫습니다.
   };
 
+  const handleOpenSearchModal = () => { // SearchModal을 여는 함수를 추가합니다.
+    setSearchModalOpen(true);
+  };
+
+  const handleCloseSearchModal = () => { // SearchModal을 닫는 함수를 추가합니다.
+    setSearchModalOpen(false);
+  };
   const [user, setUser] = useState({
     memberId: null,
     nickname: 'Loading...',
@@ -101,7 +110,7 @@ const NavigationBar = () => {
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', padding: '0 16px' }}>
-        <Link to="/">
+        <Link to="/home">
           <img
             src={logo}
             alt="LOGO"
@@ -120,12 +129,18 @@ const NavigationBar = () => {
         </Search>
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <Link
-            to="/searchpage"
-            style={{ textDecoration: 'none', marginLeft: '16px' }}
-          >
-            <Button variant="outlined">옵션 설정</Button>
-          </Link>
+
+        <div
+          style={{ textDecoration: 'none', marginLeft: '16px' }}
+        >
+          <Button variant="outlined" /*onClick={handleOpenSearchModal}*/>검색</Button> {/* onClick 이벤트를 추가하여 버튼 클릭 시 검색결과로 이어지게 함. */}
+        </div>
+
+        <div
+          style={{ textDecoration: 'none', marginLeft: '16px' }}
+        >
+          <Button variant="outlined" onClick={handleOpenSearchModal}>검색 옵션</Button> {/* onClick 이벤트를 추가하여 버튼 클릭 시 SearchModal이 열리도록 합니다. */}
+        </div>
 
           <IconButton
             size="large"
@@ -185,6 +200,7 @@ const NavigationBar = () => {
           
         </Box>
       </Toolbar>
+      <SearchModal open={searchModalOpen} handleClose={handleCloseSearchModal} /> {/* SearchModal 컴포넌트를 추가하고, open과 handleClose prop을 추가합니다. */}
     </Box>
   );
 };

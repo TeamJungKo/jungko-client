@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { CardActionArea, Box } from '@mui/material';
+import { CardActionArea } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 
 interface Props {
+  cardId?: number;
   width?: string;
   height?: string;
   image?: string;
@@ -13,19 +14,18 @@ interface Props {
   description?: string;
   imageHeight?: string;
   contentHeight?: string;
-  url?:string
   isOpen?: number;
   onContextMenu?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
   isSelected?: boolean;
 }
 
-function CardMaker({ width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', url = '', isOpen = 0, onContextMenu, isSelected=false }: Props) {
+function CardMaker({ cardId=0, width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 0, onContextMenu, isSelected=false }: Props) {
 
   const navigate = useNavigate();
 
-  const handleClick = (event: React.MouseEvent) => {
-    navigate(url);
+  const handleClick = (_event: React.MouseEvent) => {
+    navigate(`/card/${cardId}`);
   }
 
   let border;

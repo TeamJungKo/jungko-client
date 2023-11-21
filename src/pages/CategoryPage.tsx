@@ -53,10 +53,10 @@ interface Card {
 }
 
 
-function HomePage() {
+function CategoryPage() {
 
   const [popularCards, setPopularCards] = useState<Card[]>([]);
-  const [myCards, setMyCards] = useState<Card[]>([]);
+  const [_, setMyCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const fetchPopularCard = async () => {
@@ -114,7 +114,7 @@ function HomePage() {
         </Grid>
         <Grid item xs={9}>
           {/* 카드 목록 */}
-          <Box sx={{ marginTop: '200px', marginBottom: '40px' }}>
+          <Box sx={{ marginTop: '200px', marginBottom: '50%' }}>
             <div style={fontStyle}>인기 카드 목록</div>
             <Grid container spacing={2}> {/*아래는 테스트*/}
               <Grid item><CardMaker /></Grid>
@@ -152,51 +152,6 @@ function HomePage() {
               })}
 
             </Grid>
-            <div style={fontStyle}>내 카드 목록</div>
-            <Grid container spacing={2}>
-              <Grid item><CardMaker /></Grid>
-              {myCards.map((card, _) => {
-                // 모든 카테고리 이름을 가져옵니다.
-                let category = card.category.name;
-                let subCategory = card.category.subCategory;
-                while (subCategory) {
-                  category += ' > ' + subCategory.name;
-                  subCategory = subCategory.subCategory;
-                }
-
-                // 모든 지역 이름을 가져옵니다.
-                let area = card.area.sido.name;
-                let sigg = card.area.sido.sigg;
-                while (sigg && sigg.emd) {
-                  area += ' > ' + sigg.name;
-                  sigg = sigg.emd;
-                }
-
-                // description을 설정합니다.
-                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
-                카테고리: ${category}
-                지역: ${area}`;
-                
-                return (
-                  <Grid item key={card.cardId}>
-                    <CardMaker 
-                      title={card.title} 
-                      image={card.author.imageUrl} 
-                      description={description} 
-                    />
-                  </Grid>
-                );
-              })}
-            </Grid>
-
-            <div style={fontStyle}>관심 카드 목록</div>
-            <Grid container spacing={2}>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-              <Grid item><CardMaker /></Grid>
-            </Grid>
           </Box>
         </Grid>
       </Grid>
@@ -204,4 +159,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default CategoryPage;

@@ -25,7 +25,7 @@ const Keyword: FC<KeywordProps> = ({ keyword, isSelected, isOpen = true, onConte
           fontSize: '15px',
           background: isOpen
             ? 'linear-gradient(180deg, rgba(152,251,152,0.8) 0%, rgba(144,238,144,0.8) 100%)'
-            : 'linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(50,50,50,0.8) 5%)'
+            : 'linear-gradient(180deg, rgba(255, 80, 80, 0.8) 0%, rgba(255, 50, 50, 0.6) 100%)'
         }}
       >
         <TagIcon sx={{ mr: 1 }} />

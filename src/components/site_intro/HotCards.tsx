@@ -22,8 +22,6 @@ const HotCards = ({ url }: Props): React.ReactElement => {
 
   const [cards, setCards] = useState<Card[]>([]);
 
-  const cardsArray = Array(6).fill(null); // 임시로 둔것
-
   const navigate = useNavigate();
 
   const goToUrl = () => {

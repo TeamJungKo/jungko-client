@@ -6,9 +6,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
 import Add from '@mui/icons-material/Add';
-
-import Fab from '@mui/material/Fab';  //지울것
-import TagIcon from '@mui/icons-material/Tag';  //지울것
 import { getMyProfile, getMyCard } from '../api/axios.custom';
 
 
@@ -86,9 +83,6 @@ function MyProfile() {
     { text: "당근", isSelected: false, isOpen: true },
   ]); // 키워드 선택 상태값 추가
 
-  const [email, setEmail] = useState("wonjun@naver.com"); // 이메일 상태값 추가
-  const [isEmailEditing, setIsEmailEditing] = useState(false); // 이메일 수정 가능 상태값 추가
-
   const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드 상태값 추가
 
   /*const [cards, setCards] = useState<{id: number, isOpen: number}[]>([]);*/ //이부분은 카드추가함수를 활성화시킬때 같이 활성화시켜주세요.
@@ -160,21 +154,11 @@ function MyProfile() {
     setNewKeyword(''); // 새 키워드 초기화
   };
 
-
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => { // 이메일 변경 핸들러
-    setEmail(event.target.value);
-  };
-
-  const toggleEmailEdit = () => { // 이메일 수정 토글 핸들러
-    setIsEmailEditing(!isEmailEditing);
-  };
-
   useEffect(() => {
 
     getMyProfile().then((res) => {
       console.log(res);
       setNickname(res.data.nickname);
-      setEmail(res.data.email);
     })
     .catch((err) => {
       console.log(err);
@@ -374,17 +358,6 @@ function MyProfile() {
               borderRadius: '28px'
             }}
           >
-            <Fab
-              variant="extended"
-              sx={{
-                fontFamily: 'Noto Sans KR',
-                fontSize: '15px',
-                background: 'linear-gradient(180deg, rgba(255, 80, 80, 0.8) 0%, rgba(255, 50, 50, 0.6) 100%)'
-              }}
-            >
-              <TagIcon sx={{ mr: 1 }} />
-              {'테스트'}
-            </Fab>
           </Box>
 
 
