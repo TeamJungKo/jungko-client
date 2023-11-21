@@ -1,0 +1,243 @@
+.cube {
+  position: absolute;
+  top:483px;
+  left:50%;
+  transform-style: preserve-3d;
+  -webkit-animation: initialRotation 2.5s forwards cubic-bezier(0, 0.6, 1, 0.6), spinCube 5s 3s infinite linear;
+          animation: initialRotation 2.5s forwards cubic-bezier(0, 0.6, 1, 0.6), spinCube 5s 3s infinite linear;
+  animation-fill-mode: forwards;
+}
+
+.cube * {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+[class^=face] {
+  width: 16rem;
+  height: 16rem;
+  margin: -8rem;
+  opacity: 0.5;
+  outline: 1px solid rgba(0, 0, 0, 0.5);
+  font-size: 3rem;
+  line-height: 16rem;
+  text-align: center;
+}
+
+.face1 {
+  -webkit-animation: formFace1 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace1 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face1:before {
+  content: "SIDE 1";
+  opacity: 0;
+  -webkit-animation: displayText 2s 3s forwards;
+          animation: displayText 2s 3s forwards;
+}
+
+.face2 {
+  -webkit-animation: formFace2 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace2 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face2:before {
+  content: "SIDE 2";
+  opacity: 0;
+  -webkit-animation: displayText 2s 6s forwards;
+          animation: displayText 2s 6s forwards;
+}
+
+.face3 {
+  -webkit-animation: formFace3 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace3 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face3:before {
+  content: "SIDE 3";
+  opacity: 0;
+  -webkit-animation: displayText 2s 9s forwards;
+          animation: displayText 2s 9s forwards;
+}
+
+.face4 {
+  -webkit-animation: formFace4 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace4 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face4:before {
+  content: "SIDE 4";
+  opacity: 0;
+  -webkit-animation: displayText 2s 12s forwards;
+          animation: displayText 2s 12s forwards;
+}
+
+.face5 {
+  -webkit-animation: formFace5 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace5 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face5:before {
+  content: "SIDE 5";
+  opacity: 0;
+  -webkit-animation: displayText 2s 15s forwards;
+          animation: displayText 2s 15s forwards;
+}
+
+.face6 {
+  -webkit-animation: formFace6 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace6 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face6:before {
+  content: "SIDE 6";
+  opacity: 0;
+  -webkit-animation: displayText 2s 18s forwards;
+          animation: displayText 2s 18s forwards;
+}
+
+@-webkit-keyframes initialRotation {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+}
+
+@keyframes initialRotation {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+}
+@-webkit-keyframes displayText {
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes displayText {
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes displayExplanation {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes displayExplanation {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes spinCube {
+  0% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+  100% {
+    transform: rotateX(325deg) rotateY(395deg);
+  }
+}
+@keyframes spinCube {
+  0% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+  100% {
+    transform: rotateX(325deg) rotateY(395deg);
+  }
+}
+@-webkit-keyframes formFace1 {
+  100% {
+    transform: translateZ(8rem);
+  }
+}
+@keyframes formFace1 {
+  100% {
+    transform: translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace2 {
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(8rem);
+  }
+}
+@keyframes formFace2 {
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace3 {
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace3 {
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace4 {
+  50% {
+    transform: rotateY(-90deg);
+  }
+  100% {
+    transform: rotateY(-90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace4 {
+  50% {
+    transform: rotateY(-90deg);
+  }
+  100% {
+    transform: rotateY(-90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace5 {
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace5 {
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace6 {
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(-90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace6 {
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(-90deg) translateZ(8rem);
+  }
+}

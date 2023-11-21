@@ -1,0 +1,417 @@
+.main_top {
+  perspective: 800px;
+  height: 100%;
+  width: 100%;
+}
+
+.explanation {
+  display: block;
+  margin-top: 10px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.explanation li {
+  opacity: 0;
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+
+.cube {
+  position: absolute;
+  top:483px;
+  left:50%;
+  transform-style: preserve-3d;
+  -webkit-animation: initialRotation 2.5s forwards cubic-bezier(0, 0.6, 1, 0.6), spinCube 5s 3s infinite linear;
+          animation: initialRotation 2.5s forwards cubic-bezier(0, 0.6, 1, 0.6), spinCube 5s 3s infinite linear;
+  animation-fill-mode: forwards;
+}
+.cube * {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+[class^=face] {
+  width: 16rem;
+  height: 16rem;
+  margin: -8rem;
+  opacity: 0.5;
+  outline: 1px solid rgba(0, 0, 0, 0.5);
+  font-size: 3rem;
+  line-height: 16rem;
+  text-align: center;
+}
+
+.face1 {
+  -webkit-animation: formFace1 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace1 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face1:before {
+  content: "SIDE 1";
+  opacity: 0;
+  -webkit-animation: displayText 2s 3s forwards;
+          animation: displayText 2s 3s forwards;
+}
+
+.face2 {
+  -webkit-animation: formFace2 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace2 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face2:before {
+  content: "SIDE 2";
+  opacity: 0;
+  -webkit-animation: displayText 2s 6s forwards;
+          animation: displayText 2s 6s forwards;
+}
+
+.explanation li{
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.explanation li.visible {
+  opacity: 1;
+}
+
+
+.face3 {
+  -webkit-animation: formFace3 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace3 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face3:before {
+  content: "SIDE 3";
+  opacity: 0;
+  -webkit-animation: displayText 2s 9s forwards;
+          animation: displayText 2s 9s forwards;
+}
+
+.face4 {
+  -webkit-animation: formFace4 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace4 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face4:before {
+  content: "SIDE 4";
+  opacity: 0;
+  -webkit-animation: displayText 2s 12s forwards;
+          animation: displayText 2s 12s forwards;
+}
+
+.face5 {
+  -webkit-animation: formFace5 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace5 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face5:before {
+  content: "SIDE 5";
+  opacity: 0;
+  -webkit-animation: displayText 2s 15s forwards;
+          animation: displayText 2s 15s forwards;
+}
+
+.face6 {
+  -webkit-animation: formFace6 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+  animation: formFace6 2.5s 0s forwards cubic-bezier(0, 0.6, 1, 0.6);
+}
+.face6:before {
+  content: "SIDE 6";
+  opacity: 0;
+  -webkit-animation: displayText 2s 18s forwards;
+          animation: displayText 2s 18s forwards;
+}
+
+@-webkit-keyframes initialRotation {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+}
+
+@keyframes initialRotation {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+}
+@-webkit-keyframes displayText {
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes displayText {
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes displayExplanation {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes displayExplanation {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes spinCube {
+  0% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+  100% {
+    transform: rotateX(325deg) rotateY(395deg);
+  }
+}
+@keyframes spinCube {
+  0% {
+    transform: rotateX(-35deg) rotateY(35deg);
+  }
+  100% {
+    transform: rotateX(325deg) rotateY(395deg);
+  }
+}
+@-webkit-keyframes formFace1 {
+  100% {
+    transform: translateZ(8rem);
+  }
+}
+@keyframes formFace1 {
+  100% {
+    transform: translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace2 {
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(8rem);
+  }
+}
+@keyframes formFace2 {
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace3 {
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace3 {
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace4 {
+  50% {
+    transform: rotateY(-90deg);
+  }
+  100% {
+    transform: rotateY(-90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace4 {
+  50% {
+    transform: rotateY(-90deg);
+  }
+  100% {
+    transform: rotateY(-90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace5 {
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace5 {
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(90deg) translateZ(8rem);
+  }
+}
+@-webkit-keyframes formFace6 {
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(-90deg) translateZ(8rem);
+  }
+}
+@keyframes formFace6 {
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(-90deg) translateZ(8rem);
+  }
+}
+
+.main_head_title{
+  font-family: 'Gugi', cursive;
+  font-size: 50px;
+}
+
+.cube_background{
+  background: linear-gradient(white, skyblue);
+  width: 100%;
+  height: 800px;
+}
+
+/*여기부터 로그인 배너*/
+
+.login_button_area{
+  position: fixed;
+  bottom: 0%;
+  width: 100%;
+  height: 10%;
+  background: linear-gradient(to bottom, rgb(158, 215, 239), rgb(135, 206, 235));
+  display: flex;  /* flexbox 레이아웃 적용 */
+  justify-content: center;  /* 가로축 정중앙 배치 */
+  align-items: center;  /* 세로축 정중앙 배치 */
+  z-index: 100;
+}
+
+.login_button {
+  background-color: #007BFF;  /* 버튼의 배경색 */
+  color: white;  /* 버튼의 글자색 */
+  padding: 10px 20px;  /* 버튼 내부의 여백 */
+  border: none;  /* 버튼 테두리 제거 */
+  cursor: pointer;  /* 마우스 커서를 손가락 모양으로 변경 */
+  font-size: 16px;  /* 글자 크기 */
+  border-radius: 5px;  /* 버튼 모서리 둥글게 */
+  transition: background-color 0.3s ease;  /* 배경색이 부드럽게 변하는 효과 */
+}
+
+.login_button:hover {
+  background-color: #0056b3;  /* 마우스를 올렸을 때의 버튼 배경색 */
+}
+
+
+/*여기부터 설명 배너 css*/
+
+.testimonial-slider {
+  background: linear-gradient(to bottom, skyblue, rgb(60, 91, 141));
+  padding: 8em 2em;
+  padding-bottom: 100px;
+}
+.testimonial-title {
+  color: #fff;
+}
+.testimonial-title h2 {
+  padding-left: 0.2em;
+}
+.card {
+  margin: 0 0.5em;
+  box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
+  border: none;
+  height: 100%;
+}
+
+/* 여기부터 하단 일러스트 영역 */
+.main_site_introduction{
+  background: linear-gradient( rgb(60, 91, 141), skyblue);
+  height: 2600px;
+  width: 100%;
+}
+
+.illust_wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 180px;
+}
+
+.main_illust{
+  width: 700px;
+}
+
+.main_illust.illust_worried{
+  transform: scale(0.6);
+}
+
+.main_illust.illust_platforms{
+  transform: scale(0.8);
+}
+
+.main_illust_text{
+  width: 50%;
+  text-align: center;
+  font-family: 'Gugi', cursive;
+  font-size: 40px;
+}
+
+.main_illust_text.text_thinking{
+  margin-right: 200px;
+}
+
+.main_illust_text.text_worried{
+  margin-left: 200px;
+}
+
+.main_illust_text.text_platforms{
+  margin-right: 200px;
+}
+
+/* 여기부터 최하단 핫카드 영역 */
+
+.hot_cards{
+  background: linear-gradient(skyblue,white);
+  height: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#hot_card_title{
+  padding-top: 100px; 
+  padding-left: 50px;
+  font-family: 'Gugi', cursive;
+  font-size: 40px;
+  color: red;
+  width: 100%;
+  text-align: center;
+}
+
+.hot_card_container {
+  display: flex;
+  margin-top: 100px;
+  justify-content: space-around;  /* 이미지 사이에 동일한 간격을 두기 */
+  width: 100%;  /* div의 너비 설정 */
+}
+
+.hot_card{
+  object-fit: cover;
+  width: 100%;
+  height: 150px;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  margin-bottom: 10px;
+}
