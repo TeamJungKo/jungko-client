@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
+import {
+  Modal,
+  Box,
+  Typography,
+  Chip,
+  IconButton,
+  Button
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box,
@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import logo from '../assets/jungko-logo.png';
 import profilePic from '../assets/profile-pic.png';
+import SearchModal from '../Page/SearchModal.tsx';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -53,6 +54,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const NavigationBar = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   return (
@@ -86,12 +97,13 @@ const NavigationBar = () => {
         </Search>
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <Link
-            to="/searchpage"
-            style={{ textDecoration: 'none', marginLeft: '16px' }}
+          <Button
+            variant="outlined"
+            style={{ marginLeft: '16px' }}
+            onClick={handleOpenModal}
           >
-            <Button variant="outlined">옵션 설정</Button>
-          </Link>
+            옵션 설정
+          </Button>
 
           <IconButton
             size="large"
@@ -138,6 +150,7 @@ const NavigationBar = () => {
           </Box>
         </Box>
       </Toolbar>
+      <SearchModal open={isModalOpen} handleClose={handleCloseModal} />
     </Box>
   );
 };

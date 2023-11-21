@@ -1,124 +1,163 @@
 import React, { useState } from 'react';
-import {
-  Checkbox,
-  Button,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  CardActions,
-  Pagination
-} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, Typography, Pagination, Divider } from '@mui/material';
+import { ProductComponent, Product } from '../Components/ProductComponent';
 import NavigationBar from '../Components/NavigationBar';
+import ProductDetail from '../Components/ProductDetail';
 
-//Product data 정의
-type Product = {
-  id: string;
-  imageUrl: string;
-  title: string;
-  description: string;
-  price: string;
-  location: string;
-  keywords: string[];
-};
-
-const DummyProducts: Product[] = [
+// 더미 데이터
+const dummyProducts: Product[] = [
   //dummy for testing
   {
     id: '1',
-    imageUrl: 'path-to-your-image-1.png',
+    image: 'path-to-your-image-1.png',
     title: '반려동물존',
     price: '150,000',
-    location: '서울',
     description:
       '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.',
     keywords: ['반려동물존', '애완용품']
   },
   {
     id: '2',
-    imageUrl: 'path-to-your-image-2.png',
+    image: 'path-to-your-image-2.png',
     title: '강아지 집',
     price: '50,000',
-    location: '서울',
     description: '사랑합니다, 귀여워요',
     keywords: ['반려동물존', '애완용품']
   },
   {
     id: '3',
-    imageUrl: 'path-to-your-image-3.png',
+    image: 'path-to-your-image-3.png',
     title: '강아지 장난감',
     price: '20,000',
-    location: '서울',
     description: '아이들이 좋아해요',
     keywords: ['반려동물존', '애완용품']
   },
   {
     id: '4',
-    imageUrl: 'path-to-your-image-4.png',
+    image: 'path-to-your-image-4.png',
     title: '고양이 캣타워',
     price: '80,000',
-    location: '서울',
     description: '고양이가 놀기 좋은 캣타워입니다.',
     keywords: ['반려동물존', '애완용품']
   }
 ];
 
-const ITEMS_PER_PAGE = 2;
-
-const ProductCard: React.FC<
-  Product & { onToggle: () => void; isSelected: boolean }
-> = ({ id, title, description, price, imageUrl, onToggle, isSelected }) => {
-  return (
-    <Card>
-      {imageUrl && (
-        <CardMedia component="img" height="140" image={imageUrl} alt={title} />
-      )}
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-        <Typography variant="body1">Price: {price}</Typography>
-      </CardContent>
-      <CardActions>
-        <Checkbox
-          checked={isSelected}
-          onChange={onToggle}
-          inputProps={{ 'aria-label': 'Select for comparison' }}
-        />
-      </CardActions>
-    </Card>
-  );
-};
-
 const CardDetail: React.FC = () => {
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [cardStatus, setCardStatus] = useState('interestedCard');
+  const productsPerPage = 2; // 한 페이지에 표시할 상품 수
+  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const navigate = useNavigate();
 
-  const paginatedProducts = DummyProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const handleCardClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsProductDetailOpen(true);
+  };
 
-  const toggleProductSelection = (productId: string) => {
+  const handleCloseProductDetail = () => {
+    setIsProductDetailOpen(false);
+  };
+
+  const handleCheck = (product: Product) => {
     setSelectedProducts((prevSelected) =>
-      prevSelected.includes(productId)
-        ? prevSelected.filter((id) => id !== productId)
-        : [...prevSelected, productId]
+      prevSelected.find((p) => p.id === product.id)
+        ? prevSelected.filter((p) => p.id !== product.id)
+        : [...prevSelected, product]
     );
   };
 
-  const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
-    setCurrentPage(page);
+  const handleCompareClick = () => {
+    if (selectedProducts.length > 0) {
+      navigate('/compare');
+    } else {
+      console.log('비교할 상품을 선택해주세요.');
+    }
   };
 
-  const numberOfPages = Math.ceil(DummyProducts.length / ITEMS_PER_PAGE);
+  // 페이지 변경 처리
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown>,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
 
+  // 현재 페이지에 표시될 상품 계산
+  const currentProducts = dummyProducts.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  );
+
+  // 관심 해제 버튼 클릭 이벤트
+  const handleUnwatchClick = () => {
+    console.log('관심 해제 호출');
+  };
+
+  // 옵션 수정 버튼 클릭 이벤트
+  const handleOptionsClick = () => {
+    console.log('옵션 수정 호출');
+  };
+
+  // 카드 삭제 버튼 클릭 이벤트
+  const handleDelete = () => {
+    console.log('카드 삭제 호출');
+  };
+
+  // 관심 추가 버튼 클릭 이벤트
+  const handleInteretClick = () => {
+    console.log('관심 추가 호출');
+  };
+
+  const RenderButtons: React.FC = () => {
+    switch (cardStatus) {
+      case 'myCard':
+        return (
+          <>
+            <Button variant="outlined" onClick={handleDelete} sx={{ mr: 1 }}>
+              카드 삭제
+            </Button>
+            <Button variant="contained" onClick={handleOptionsClick}>
+              옵션 수정
+            </Button>
+          </>
+        );
+      case 'interestedCard':
+        return (
+          <>
+            <Button
+              variant="outlined"
+              onClick={handleUnwatchClick}
+              sx={{ mr: 1 }}
+            >
+              관심 해제
+            </Button>
+            <Button variant="contained" onClick={handleOptionsClick}>
+              옵션 수정
+            </Button>
+          </>
+        );
+      case 'otherCard':
+        return (
+          <>
+            <Button
+              variant="outlined"
+              onClick={handleInteretClick}
+              sx={{ mr: 1 }}
+            >
+              관심 추가
+            </Button>
+            <Button variant="contained" onClick={handleOptionsClick}>
+              옵션 수정
+            </Button>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <>
       <NavigationBar />
@@ -126,29 +165,86 @@ const CardDetail: React.FC = () => {
         style={{
           position: 'absolute',
           top: 64,
-          left: 0,
+          left: '50%',
           right: 0,
           bottom: 0,
-          backgroundColor: '#f0f0f0',
+          transform: 'translateX(-50%)',
+          width: '100%',
           padding: '20px'
         }}
       >
-        <div>
-          {paginatedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              {...product}
-              onToggle={() => toggleProductSelection(product.id)}
-              isSelected={selectedProducts.includes(product.id)}
-            />
-          ))}
+        <Box sx={{ flexGrow: 1, m: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            <Typography variant="h4" gutterBottom component="div">
+              CardTitle
+            </Typography>
+            <Box>
+              <RenderButtons />
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              display: 'grid',
+              gridGap: '16px',
+              marginBottom: '16px',
+              justifyContent: 'center'
+            }}
+          >
+            {currentProducts.map((product) => (
+              <ProductComponent
+                key={product.id}
+                product={product}
+                onCheck={handleCheck}
+                isChecked={selectedProducts.some((p) => p.id === product.id)}
+                onCardClick={handleCardClick}
+              />
+            ))}
+          </Box>
           <Pagination
-            count={numberOfPages}
-            page={currentPage}
-            onChange={handlePageChange}
+            count={Math.ceil(dummyProducts.length / productsPerPage)}
+            page={page}
+            onChange={handleChangePage}
+            color="primary"
+            sx={{ my: 2, justifyContent: 'center', display: 'flex' }}
           />
-        </div>
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="contained" onClick={handleCompareClick}>
+              비교하기
+            </Button>
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            {selectedProducts.map((product) => (
+              <img
+                key={product.id}
+                src={product.image}
+                alt={product.title}
+                style={{ width: '100px', height: '100px', marginRight: '8px' }}
+              />
+            ))}
+          </Box>
+        </Box>
       </div>
+      {selectedProduct && (
+        <ProductDetail
+          isOpen={isProductDetailOpen}
+          onClose={handleCloseProductDetail}
+        />
+      )}
     </>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Modal,
   Box,
   TextField,
   Button,
@@ -13,10 +14,14 @@ import {
   Grid,
   SelectChangeEvent
 } from '@mui/material';
-import NavigationBar from '../Components/NavigationBar';
+import { useTheme } from '@mui/material/styles';
 
-const SearchPage = () => {
-  const navigate = useNavigate();
+interface SearchModalProps {
+  open: boolean;
+  handleClose: () => void;
+}
+
+const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -79,26 +84,30 @@ const SearchPage = () => {
   };
 
   const handleCancel = () => {
-    navigate(-1);
+    handleClose();
   };
 
+  const theme = useTheme();
+
   return (
-    <>
-      <NavigationBar />
-      <div
-        style={{
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="search-modal-title"
+      aria-describedby="search-modal-description"
+    >
+      <Box
+        sx={{
           position: 'absolute',
-          top: 64,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: '#f0f0f0',
-          padding: '20px'
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70%',
+          bgcolor: 'background.paper',
+          boxShadow: theme.shadows[5],
+          p: 4
         }}
       >
-        <Typography component="h1" variant="h4" align="center" gutterBottom>
-          검색 페이지
-        </Typography>
         <Box sx={{ mt: 3, width: '100%' }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -209,9 +218,9 @@ const SearchPage = () => {
             </Button>
           </Box>
         </Box>
-      </div>
-    </>
+      </Box>
+    </Modal>
   );
 };
 
-export default SearchPage;
+export default SearchModal;
