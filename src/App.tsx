@@ -4,13 +4,7 @@ import GuestHomePage from './pages/GuestHomePage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import MyProfile from './pages/MyProfile.tsx';
-
-
-
 import OtherProfile from './pages/OtherProfile.tsx';
-
-
-
 import ComparePage from './pages/ComparePage.tsx';
 import CardDetail from './pages/CardDetail.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
