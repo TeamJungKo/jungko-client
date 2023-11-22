@@ -118,7 +118,7 @@ function HomePage() {
             <div style={fontStyle}>인기 카드 목록</div>
             <Grid container spacing={2}> {/*아래는 테스트*/}
               <Grid item><CardMaker /></Grid>
-              {popularCards.map((card, _) => {
+              {popularCards.map((card, ) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
@@ -155,7 +155,7 @@ function HomePage() {
             <div style={fontStyle}>내 카드 목록</div>
             <Grid container spacing={2}>
               <Grid item><CardMaker /></Grid>
-              {myCards.map((card, _) => {
+              {myCards.map((card, ) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;

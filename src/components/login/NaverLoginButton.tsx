@@ -7,7 +7,7 @@ const login = () => {
   );
 };
 
-const NaverLoginButton: React.FC = ({}) => {
+const NaverLoginButton: React.FC = () => {
   return (
     <button className="naver_login_button" onClick={login}>
       <div className="naver_login_symbol" />

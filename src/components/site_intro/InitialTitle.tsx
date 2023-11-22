@@ -6,14 +6,14 @@ const InitialTitle = (): React.ReactElement => {
 
   useLayoutEffect(() => {
     const timer1 = setTimeout(() => {
-      var element = document.querySelector('.explanation li:nth-child(1)');
+      const element = document.querySelector('.explanation li:nth-child(1)');
       if (element) {
         element.classList.add('visible');
       }
     }, 600);
   
     const timer2 = setTimeout(() => {
-      var element = document.querySelector('.explanation li:nth-child(2)');
+      const element = document.querySelector('.explanation li:nth-child(2)');
       if (element) {
         element.classList.add('visible');
       }

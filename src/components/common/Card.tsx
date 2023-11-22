@@ -24,9 +24,9 @@ function CardMaker({ cardId=0, width = '200px', height = '300px', image='', titl
 
   const navigate = useNavigate();
 
-  const handleClick = (_event: React.MouseEvent) => {
+  const handleClick = () => {
     navigate(`/card/${cardId}`);
-  }
+  }  
 
   let border;
   if (isSelected) {

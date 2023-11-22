@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../../assets/css/cube.css';
 import danggeun from '../../assets/images/danggeun.png';
 import junggonara from '../../assets/images/junggonara.png';
@@ -8,6 +8,11 @@ import jungkoIcon from '../../assets/images/jungkoIcon.png';
 
 const Cube = (): React.ReactElement => {
   const [isHovered, setIsHovered] = useState(false);
+  const isHoveredRef = useRef(isHovered);
+
+  useEffect(() => {
+    isHoveredRef.current = isHovered;
+  }, [isHovered]);
 
   useEffect(() => {
     const cube = document.querySelector('.cube');

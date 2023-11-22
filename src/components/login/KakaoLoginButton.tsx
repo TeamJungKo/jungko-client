@@ -7,7 +7,7 @@ const login = () => {
   );
 };
 
-const KakaoLoginButton: React.FC = ({}) => {
+const KakaoLoginButton: React.FC = () => {
   return (
     <button className="kakao_login_button" onClick={login}>
       <div className="kakao_login_symbol" />

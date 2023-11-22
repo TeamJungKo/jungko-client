@@ -7,7 +7,7 @@ const login = () => {
   );
 };
 
-const GoogleLoginButton: React.FC = ({}) => {
+const GoogleLoginButton: React.FC = () => {
   return (
     <button
       className="google_login_button"

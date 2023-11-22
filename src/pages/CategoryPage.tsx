@@ -56,7 +56,7 @@ interface Card {
 function CategoryPage() {
 
   const [popularCards, setPopularCards] = useState<Card[]>([]);
-  const [_, setMyCards] = useState<Card[]>([]);
+  const [_, _setMyCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const fetchPopularCard = async () => {
@@ -78,7 +78,7 @@ function CategoryPage() {
       try {
         const response = await getMyCard(0, 4);
         const { cards } = response.data;
-        setMyCards(cards);
+        _setMyCards(cards);
       } catch (error) {
         console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
       }
@@ -118,7 +118,7 @@ function CategoryPage() {
             <div style={fontStyle}>인기 카드 목록</div>
             <Grid container spacing={2}> {/*아래는 테스트*/}
               <Grid item><CardMaker /></Grid>
-              {popularCards.map((card, _) => {
+              {popularCards.map((card) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
