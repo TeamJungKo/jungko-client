@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Category from '../components/common/Category';
 import CardMaker from '../components/common/Card';
 import NavigationBar from '../components/common/NavigationBar';
-import { getPopularCard, getMyCard } from '../api/axios.custom';
+import { getPopularCard } from '../api/axios.custom';
 
 interface Card {
   cardId: number;
@@ -56,7 +56,7 @@ interface Card {
 function CategoryPage() {
 
   const [popularCards, setPopularCards] = useState<Card[]>([]);
-  const [_, _setMyCards] = useState<Card[]>([]);
+  //const [_, _setMyCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const fetchPopularCard = async () => {
@@ -74,18 +74,18 @@ function CategoryPage() {
       }
     };
 
+    /*
     const fetchMyCards = async () => {
       try {
         const response = await getMyCard(0, 4);
         const { cards } = response.data;
-        _setMyCards(cards);
+        setMyCards(cards);
       } catch (error) {
         console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
       }
     };
-    
+    fetchMyCards();*/
     fetchPopularCard();
-    fetchMyCards();
   }, []);
 
 

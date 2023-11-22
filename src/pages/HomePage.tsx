@@ -63,17 +63,14 @@ function HomePage() {
       try {
         const response = await getPopularCard(0, 5);
         const { cards } = response.data;
-        
+          
         console.log(cards); //지울것 (테스트용)
         setPopularCards(cards);
-        console.log(popularCards.length); //지울것 (테스트용)
-
-
       } catch (error) {
         console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
       }
     };
-
+  
     const fetchMyCards = async () => {
       try {
         const response = await getMyCard(0, 4);
@@ -83,10 +80,11 @@ function HomePage() {
         console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
       }
     };
-    
+      
     fetchPopularCard();
     fetchMyCards();
   }, []);
+  
 
 
   const fontStyle = {

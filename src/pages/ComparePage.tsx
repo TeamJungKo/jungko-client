@@ -128,7 +128,7 @@ const ComparePage = () => {
               maxWidth: `${windowWidth - arrowWidth * 2}px`
             }}
           >
-            {productData.map((product, _) => (
+            {productData.map((product) => (
               <Paper
                 key={product.id}
                 elevation={3}

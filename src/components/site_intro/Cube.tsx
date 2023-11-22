@@ -65,7 +65,7 @@ const Cube = (): React.ReactElement => {
         }
       });
     }
-  }, []);
+  },[isHovered]);
 
   return (
     <>
