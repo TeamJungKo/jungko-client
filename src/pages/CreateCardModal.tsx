@@ -13,6 +13,7 @@ import {
   Checkbox,
   FormControlLabel
 } from '@mui/material';
+import { createCard } from '../api/axios.custom.ts';
 
 const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,16 +71,22 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setIsPublic(event.target.checked);
   };
 
-  const handleCreate = () => {
-    console.log('카드 정보:', {
-      searchTerm,
-      minPrice,
-      maxPrice,
-      selectedCategories,
-      selectedRegions,
-      isPublic
-    });
-    //API 호출 등 기능 구현 필요
+  const handleCreate = async () => {
+    const formData = new FormData();
+    formData.append('categoryId', selectedCategories.toString());
+    formData.append('areaId', selectedRegions.toString());
+    formData.append('title', searchTerm);
+    formData.append('minPrice', minPrice);
+    formData.append('maxPrice', maxPrice);
+    formData.append('scope', isPublic.toString());
+    try {
+      const response = await createCard(formData);
+      if (response.status === 201) {
+        console.log('생성 완료'); //생성 완료 alert
+      }
+    } catch (error) {
+      console.log('에러'); //에러 모달 혹은 페이지
+    }
   };
 
   return (
@@ -197,10 +204,22 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </Box>
             </Grid>
           </Grid>
-          <Box sx={{ paddingTop: '50px', display: 'flex', justifyContent: 'center', mt: 3 }}>
+          <Box
+            sx={{
+              paddingTop: '50px',
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 3
+            }}
+          >
             <div>
               {/* ...기존 코드... */}
-              <Button variant="contained" color="primary" sx={{ marginRight: '20px' }} onClick={handleCreate}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ marginRight: '20px' }}
+                onClick={handleCreate}
+              >
                 생성
               </Button>
               <Button variant="outlined" color="primary" onClick={onClose}>

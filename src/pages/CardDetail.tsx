@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Typography, Pagination, Divider, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import { ProductComponent, Product } from '../components/common/ProductComponent';
+import {
+  Box,
+  Button,
+  Typography,
+  Pagination,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent
+} from '@mui/material';
+import {
+  ProductComponent,
+  Product
+} from '../components/common/ProductComponent';
 import NavigationBar from '../components/common/NavigationBar';
 import ProductDetail from '../components/common/ProductDetail';
 import CreateCardPage from './CreateCardModal';
 import SearchModal from './SearchModal';
+import { deleteCard } from '../api/axios.custom';
 
 interface CardDetailProps {
+  //Props 받아 오는 부분 구현 필요한듯
   cardStatus: 'myCard' | 'interestedCard' | 'otherCard';
+  cardId: number | null;
 }
 
 // 더미 데이터
@@ -50,10 +65,9 @@ const dummyProducts: Product[] = [
 ];
 
 const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
-
   const [isCardDeleted, setIsCardDeleted] = useState(false); //카드삭제됨?
   const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성모달열림?
-  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false);  // 카드옵션 열림?
+  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림?
   const [isCardTitleVisible, setIsCardTitleVisible] = useState(true); //카드 타이틀 표시 여부
 
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
@@ -70,7 +84,6 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
   const handleCloseCardOption = () => {
     setIsCardOptionOpen(false);
   };
-
 
   const handleCardClick = (product: Product) => {
     setSelectedProduct(product);
@@ -122,10 +135,14 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
   };*/
 
   // 카드 삭제 이벤트
-  const handleDelete = () => {
-    console.log('카드 삭제 호출');
-    setIsCardDeleted(true);
-    setIsCardTitleVisible(false); // 카드 타이틀 숨기기
+  const handleDelete = async (cardId: number) => {
+    try {
+      await deleteCard(cardId);
+      setIsCardDeleted(true);
+      setIsCardTitleVisible(false); // 카드 타이틀 숨기기
+    } catch (error) {
+      console.log('카드 삭제 error');
+    }
   };
 
   // 카드 생성 이벤트
@@ -157,9 +174,13 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
               </Button>
             ) : (
               <>
-                <Button variant="outlined" onClick={handleDelete} sx={{ mr: 1 }}>
+                {/* <Button
+                  variant="outlined"
+                  onClick={handleDelete}
+                  sx={{ mr: 1 }}
+                >
                   카드 삭제
-                </Button>
+                </Button> */}
                 <Button variant="contained" onClick={handleOpenCardOption}>
                   카드 옵션
                 </Button>
@@ -201,7 +222,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
         return null;
     }
   };
-  
+
   return (
     <>
       <NavigationBar />
@@ -296,12 +317,17 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
         maxWidth="md" // 모달의 최대 너비 설정
         fullWidth // 모달이 전체 너비를 차지하도록 설정
       >
-        <DialogTitle id="form-dialog-title" style={{fontFamily:'jua'}}>카드 생성</DialogTitle>
-        <DialogContent style={{height: 'auto', minHeight: '400px'}}>
+        <DialogTitle id="form-dialog-title" style={{ fontFamily: 'jua' }}>
+          카드 생성
+        </DialogTitle>
+        <DialogContent style={{ height: 'auto', minHeight: '400px' }}>
           <CreateCardPage onClose={handleCloseCreateCard} />
         </DialogContent>
       </Dialog>
-      <SearchModal open={isCardOptionOpen} handleClose={handleCloseCardOption} />
+      <SearchModal
+        open={isCardOptionOpen}
+        handleClose={handleCloseCardOption}
+      />
     </>
   );
 };
