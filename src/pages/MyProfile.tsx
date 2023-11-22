@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
 import Add from '@mui/icons-material/Add';
-import { getMyProfile, getMyCard } from '../api/axios.custom';
+import { getMyProfile, getMyCard, updateMyProfile } from '../api/axios.custom';
 
 
 interface Card {
@@ -56,11 +56,13 @@ interface Card {
 }
 
 function MyProfile() {
+  const [, setImageData] = useState<File | null>(null);
   const [isNotificationOn, setIsNotificationOn] = useState(false);
   const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
 
   const [nickname, setNickname] = useState("닉네임"); // 닉네임 상태값 추가
   const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태값 추가
+  const [email, setEmail] = useState("이메일"); // 기존 이메일
 
   const [cards, setCards] = useState([
     { id: 1, isOpen: 1, isSelected: false },
@@ -90,8 +92,10 @@ function MyProfile() {
   const handleNotificationToggle = () => setIsNotificationOn(!isNotificationOn);
 
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
-  };
+    const newNickname = event.target.value;
+    setNickname(newNickname);
+    updateMyProfile(newNickname, email, null);
+  }; 
 
   const toggleEdit = () => { // 닉네임 수정 토글 핸들러
     setIsEditing(!isEditing);
@@ -154,11 +158,23 @@ function MyProfile() {
     setNewKeyword(''); // 새 키워드 초기화
   };
 
+  const handleImageChange = (image: string | null) => {
+    if (image) {
+      setImageData(new File([image], "userImage"));
+      updateMyProfile(nickname, email, null);
+    } else {
+      setImageData(null);
+      updateMyProfile(nickname, email, null);
+    }
+  };
+  
   useEffect(() => {
 
     getMyProfile().then((res) => {
       console.log(res);
       setNickname(res.data.nickname);
+      setEmail(res.data.email);
+      setImageData(res.data.imageData);
     })
     .catch((err) => {
       console.log(err);
@@ -232,10 +248,10 @@ function MyProfile() {
       <NavigationBar/>
       <Box sx={{ marginTop: '160px' }}>
         <Box sx={title_space}>
-          <DefaultProfile/>
+          <DefaultProfile onImageChange={handleImageChange} />
           {isEditing ? (
             <TextField
-              value={nickname}
+              value={nickname}    
               onChange={handleNicknameChange}
               onBlur={toggleEdit} // 수정을 완료하면 토글
             />
