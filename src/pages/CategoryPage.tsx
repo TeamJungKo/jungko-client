@@ -1,68 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+//import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Category from '../components/common/Category';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import { getPopularCard } from '../api/axios.custom';
-
-interface Card {
-  cardId: number;
-  title: string;
-  keyword: string;
-  minPrice: number;
-  maxPrice: number;
-  scope: string;
-  createdAt: string;
-  author: {
-    memberId: number;
-    nickname: string;
-    imageUrl: string;
-    email: string;
-  };
-  area: {
-    sido: {
-      name: string;
-      code: string;
-      sigg: {
-        name: string;
-        code: string;
-        emd?: {
-          name: string;
-          code: string;
-        };
-      };
-    };
-  };
-
-  category: {
-    categoryId: number;
-    name: string;
-    level: number;
-    subCategory?: {
-      categoryId: number;
-      name: string;
-      level: number;
-      subCategory?: {
-        categoryId: number;
-        name: string;
-        level: number;
-      };
-    };
-  };
-}
+import {Card} from '../types/types';
 
 function CategoryPage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
-  const { categoryId } = useParams();
-  const categoryIdNumber = Number(categoryId);
+  //const { categoryId } = useParams();
+  //const categoryIdNumber = Number(categoryId);
   //const [_, _setMyCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const fetchPopularCard = async () => {
       try {
-        const response = await getPopularCard(0, 5, categoryIdNumber);
+        const response = await getPopularCard(0, 5); // categoryIdNumber 파라미터 추가
         const { cards } = response.data;
         console.log(cards); //지울것 (테스트용)
         setPopularCards(cards);
@@ -129,9 +84,11 @@ function CategoryPage() {
                 // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
                 let sigg = card.area.sido.sigg;
-                while (sigg && sigg.emd) {
+                if (sigg) {
                   area += ' > ' + sigg.name;
-                  sigg = sigg.emd;
+                  if (sigg.emd) {
+                    area += ' > ' + sigg.emd.name;
+                  }
                 }
 
                 // description을 설정합니다.

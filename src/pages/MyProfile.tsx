@@ -15,54 +15,12 @@ import DefaultProfile from '../components/common/DefaultProfile';
 import Keyword from '../components/common/Keyword';
 import Add from '@mui/icons-material/Add';
 import { getMyProfile, getMyCard, updateMyProfile } from '../api/axios.custom';
-
-interface Card {
-  cardId: number;
-  title: string;
-  keyword: string;
-  minPrice: number;
-  maxPrice: number;
-  scope: string;
-  createdAt: string;
-  author: {
-    memberId: number;
-    nickname: string;
-    imageUrl: string;
-    email: string;
-  };
-  area: {
-    sido: {
-      name: string;
-      code: string;
-      sigg: {
-        name: string;
-        code: string;
-        emd?: {
-          name: string;
-          code: string;
-        };
-      };
-    };
-  };
-
-  category: {
-    categoryId: number;
-    name: string;
-    level: number;
-    subCategory?: {
-      categoryId: number;
-      name: string;
-      level: number;
-      subCategory?: {
-        categoryId: number;
-        name: string;
-        level: number;
-      };
-    };
-  };
-}
+import {Card} from '../types/types';
+import { useSetRecoilState } from 'recoil';
+import { userState } from '../recoil/userState';
 
 function MyProfile() {
+  const setUser = useSetRecoilState(userState);
   const [, setImageData] = useState<File | null>(null);
   const [isNotificationOn, setIsNotificationOn] = useState(false);
   const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
@@ -102,6 +60,10 @@ function MyProfile() {
     const newNickname = event.target.value;
     setNickname(newNickname);
     updateMyProfile(newNickname, email, null);
+    setUser((user) => ({
+      ...user,
+      nickname: newNickname,
+    }));
   };
 
   const toggleEdit = () => {
@@ -211,6 +173,10 @@ function MyProfile() {
 
       setImageData(file);
       updateMyProfile(nickname, email, null);
+      setUser((user) => ({
+        ...user,
+        imageUrl: base64String,
+      }));
     } else {
       setImageData(null);
       updateMyProfile(nickname, email, null);
