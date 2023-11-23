@@ -65,7 +65,7 @@ function OtherProfile({ nickname }: Props) {
         <NavigationBar />
         <Box>
           <Box sx={title_space}>
-            <DefaultProfile />
+            <DefaultProfile/>
             <Typography fontSize={'50px'} fontFamily={'Jua'}>
               {nickname}님의 프로필
             </Typography>
