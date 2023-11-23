@@ -24,9 +24,9 @@ instance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       removeCookie(COOKIE_NAME);
+      window.location.href = 'login';
+      alert(error.response.data.message);
     }
-    window.location.href = 'login';
-    alert(error.response.data.message);
   }
 );
 
