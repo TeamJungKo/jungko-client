@@ -2,11 +2,8 @@ import { Avatar, ButtonBase } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { ChangeEvent, useRef, useState } from 'react';
 
-function DefaultProfile({
-  onImageChange
-}: {
-  onImageChange: (image: string | null) => void;
-}) {
+function DefaultProfile({ onImageChange = () => {} }: { onImageChange?: (image: string | null) => void }) {
+  
   const [image, setImage] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -18,10 +15,11 @@ function DefaultProfile({
         const base64String = reader.result as string;
         setImage(base64String);
         onImageChange(base64String);
+        localStorage.setItem('userImage', base64String); // 이미지를 localStorage에 저장
       };
       reader.readAsDataURL(file);
     }
-  };
+  };  
 
   const handleClick = () => {
     fileInput.current?.click();
@@ -31,25 +29,8 @@ function DefaultProfile({
     <>
       <input type="file" hidden ref={fileInput} onChange={handleFileChange} />
       <ButtonBase onClick={handleClick}>
-        <Avatar
-          sx={{ width: 80, height: 80, marginRight: '30px', color: 'black' }}
-        >
-          {image ? (
-            <img
-              src={image}
-              alt="profile"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                borderRadius: '50%'
-              }}
-            />
-          ) : (
-            <AccountCircleIcon
-              sx={{ width: 80, height: 80, backgroundColor: 'darkgrey' }}
-            />
-          )}
+        <Avatar sx={{ width: 80, height: 80, marginRight: '30px', color:'black'}}>
+          {image ? <img src={image} alt="profile" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} /> : <AccountCircleIcon sx={{ width: 80, height: 80, backgroundColor: 'darkgrey' }}/>}
         </Avatar>
       </ButtonBase>
     </>

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { userState } from '../../recoil/userState.ts';
 import {
   Box,
   Toolbar,
@@ -16,7 +18,6 @@ import {
   Logout
 } from '@mui/icons-material';
 import logo from '../../assets/images/jungkoLogo.png';
-import profilePic from '../../assets/images/profile_pic.png';
 import { getMyProfile } from '../../api/axios.custom.ts';
 import NotificationModal from '../../pages/modals/NotificationModal.tsx';
 import SearchModal from '../../pages/SearchModal.tsx';
@@ -56,6 +57,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const NavigationBar = () => {
+  const [user, setUser] = useRecoilState(userState); 
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
   const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
@@ -77,19 +79,14 @@ const NavigationBar = () => {
     // SearchModal을 닫는 함수를 추가합니다.
     setSearchModalOpen(false);
   };
-  const [user, setUser] = useState({
-    memberId: null,
-    nickname: 'Loading...',
-    imageUrl: profilePic,
-    email: ''
-  });
 
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await getMyProfile();
         if (response.data) {
-          setUser(response.data); // API 응답으로 받은 사용자 정보를 상태에 저장합니다.
+          setUser(response.data); // API 응답으로 받은 사용자 정보로 user 상태를 업데이트합니다.
         } else {
           console.error('Failed to fetch profile');
         }
@@ -100,6 +97,7 @@ const NavigationBar = () => {
 
     fetchProfile();
   }, []);
+
   return (
     <Box
       sx={{
