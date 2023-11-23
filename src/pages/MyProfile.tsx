@@ -8,7 +8,7 @@ import {
   IconButton,
   TextField
 } from '@mui/material';
-import CardMaker from '../components/common/Card';
+import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import EditIcon from '@mui/icons-material/Edit';
 import DefaultProfile from '../components/common/DefaultProfile';

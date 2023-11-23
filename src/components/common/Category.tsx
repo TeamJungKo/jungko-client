@@ -8,9 +8,9 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import { getAllProductCategory } from '../../api/axios.custom';
 
-interface Props {
-  url?: string;
-}
+// interface Props {
+//   url?: string;
+// }
 
 interface ProductCategory {
   categoryId: number;
@@ -19,14 +19,14 @@ interface ProductCategory {
   subCategory: ProductCategory[];
 }
 
-const Category = ({ url = '' }: Props): React.ReactElement => {
+const Category = (): React.ReactElement => {
   const navigate = useNavigate();
 
   const [categories, setCategories] = React.useState<ProductCategory[]>([]);
 
-  const goToUrl = () => {
-    navigate(url);
-  };
+  // const goToUrl = () => {
+  //   navigate(url);
+  // };
 
   React.useEffect(() => {
     const fetchCategories = async () => {

@@ -18,3 +18,8 @@ export interface ProductSearchRequest {
   categoryId: number;
   areaId: number;
 }
+
+export interface keywordDTO {
+  keyword: string;
+  ID: number;
+}

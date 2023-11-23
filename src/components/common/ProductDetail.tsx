@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
+import { createKeywords } from '../../api/axios.custom.ts';
 
 const style = {
   position: 'absolute',
@@ -46,27 +47,37 @@ const dummyData = {
   title: 'Product Title',
   price: '8000원',
   location: '서울시 동대문구',
-  keywords: ['반려동물존', '애견용품'],
+  keywords: [
+    { id: 1, name: '반려동물존' },
+    { id: 2, name: '애견용품' }
+  ],
   productDescription:
     '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.'
 };
 
 const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [selectedKeywordIds, setSelectedKeywordIds] = useState<number[]>([]);
 
-  const toggleKeyword = (keyword: string) => {
-    setSelectedKeywords((prevSelectedKeywords) => {
-      const nextSelectedKeywords = prevSelectedKeywords.includes(keyword)
-        ? prevSelectedKeywords.filter((k) => k !== keyword)
-        : [...prevSelectedKeywords, keyword];
-      return nextSelectedKeywords;
+  const toggleKeyword = (keywordId: number) => {
+    setSelectedKeywordIds((prevSelectedKeywords) => {
+      if (prevSelectedKeywords.includes(keywordId)) {
+        return prevSelectedKeywords.filter((id) => id !== keywordId);
+      } else {
+        return [...prevSelectedKeywords, keywordId];
+      }
     });
   };
 
-  const addKeywords = () => {
-    //API호출 등 기능 구현 필요
-    console.log('Selected Keywords:', selectedKeywords);
-    setSelectedKeywords([]);
+  const addKeywords = async () => {
+    if (selectedKeywordIds.length > 0) {
+      try {
+        const response = await createKeywords(selectedKeywordIds);
+        console.log('Keywords added:', response); // Handle response
+        setSelectedKeywordIds([]); // Clear selected keywords
+      } catch (error) {
+        console.error('Error creating keywords:', error);
+      }
+    }
   };
 
   return (
@@ -126,16 +137,18 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
         >
           {dummyData.keywords.map((keyword) => (
             <KeywordChip
-              key={keyword}
-              label={keyword}
-              onClick={() => toggleKeyword(keyword)}
-              color={selectedKeywords.includes(keyword) ? 'primary' : 'default'}
+              key={keyword.id}
+              label={keyword.name}
+              onClick={() => toggleKeyword(keyword.id)}
+              color={
+                selectedKeywordIds.includes(keyword.id) ? 'primary' : 'default'
+              }
             />
           ))}
           <Button
             variant="contained"
             onClick={addKeywords}
-            disabled={selectedKeywords.length === 0}
+            disabled={selectedKeywordIds.length === 0}
             sx={{ ml: 1 }}
           >
             Add to My Keywords

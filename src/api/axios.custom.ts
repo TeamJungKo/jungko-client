@@ -63,7 +63,15 @@ export const changeCardOption = async (
   return response;
 };
 
-export const getPopularCard = async (page = 0, size = 10) => {
+export const getPopularCard = async (
+  page = 0,
+  size = 10,
+  categoryId?: number
+) => {
+  const params = { page, size, categoryId };
+  if (categoryId) {
+    params.categoryId = categoryId;
+  }
   const response = await instance.get(
     `/api/v1/cards/popular?page=${page}&size=${size}`
   );
@@ -144,7 +152,7 @@ export const getAllArea = async () => {
 };
 
 // Keyword
-export const createKeywords = async (keyword: string[]) => {
+export const createKeywords = async (keyword: number[]) => {
   const response = await instance.put('/api/v1/keywords', {
     keyword
   });

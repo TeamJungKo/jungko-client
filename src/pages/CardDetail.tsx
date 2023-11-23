@@ -30,7 +30,7 @@ interface CardDetailProps {
 const dummyProducts: Product[] = [
   //dummy for testing
   {
-    id: '1',
+    id: 1,
     image: 'path-to-your-image-1.png',
     title: '반려동물존',
     price: '150,000',
@@ -39,7 +39,7 @@ const dummyProducts: Product[] = [
     keywords: ['반려동물존', '애완용품']
   },
   {
-    id: '2',
+    id: 2,
     image: 'path-to-your-image-2.png',
     title: '강아지 집',
     price: '50,000',
@@ -47,7 +47,7 @@ const dummyProducts: Product[] = [
     keywords: ['반려동물존', '애완용품']
   },
   {
-    id: '3',
+    id: 3,
     image: 'path-to-your-image-3.png',
     title: '강아지 장난감',
     price: '20,000',
@@ -55,7 +55,7 @@ const dummyProducts: Product[] = [
     keywords: ['반려동물존', '애완용품']
   },
   {
-    id: '4',
+    id: 4,
     image: 'path-to-your-image-4.png',
     title: '고양이 캣타워',
     price: '80,000',
@@ -64,7 +64,7 @@ const dummyProducts: Product[] = [
   }
 ];
 
-const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
+const CardDetail: React.FC<CardDetailProps> = ({ cardStatus, cardId }) => {
   const [isCardDeleted, setIsCardDeleted] = useState(false); //카드삭제됨?
   const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성모달열림?
   const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림?
@@ -130,9 +130,9 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
   };
 
   // 옵션 수정 버튼 클릭 이벤트
-  /*const handleOptionsClick = () => {
-    console.log('옵션 수정 호출');
-  };*/
+  // const handleOptionsClick = () => {
+  //   console.log('옵션 수정 호출');
+  // };
 
   // 카드 삭제 이벤트
   const handleDelete = async (cardId: number) => {
@@ -174,13 +174,15 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus }) => {
               </Button>
             ) : (
               <>
-                {/* <Button
-                  variant="outlined"
-                  onClick={handleDelete}
-                  sx={{ mr: 1 }}
-                >
-                  카드 삭제
-                </Button> */}
+                {cardId && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleDelete(cardId)}
+                    sx={{ mr: 1 }}
+                  >
+                    카드 삭제
+                  </Button>
+                )}
                 <Button variant="contained" onClick={handleOpenCardOption}>
                   카드 옵션
                 </Button>

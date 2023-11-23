@@ -56,23 +56,25 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const NavigationBar = () => {
-  const [openModal, setOpenModal] = useState(false);  // 모달의 열림/닫힘
-  const [searchModalOpen, setSearchModalOpen] = useState(false);  // SearchModal의 열림/닫힘 상태를 관리하는 state
+  const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
+  const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   const handleOpenModal = () => {
-    setOpenModal(true);  // 모달을 엽니다.
+    setOpenModal(true); // 모달을 엽니다.
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);  // 모달을 닫습니다.
+    setOpenModal(false); // 모달을 닫습니다.
   };
 
-  const handleOpenSearchModal = () => { // SearchModal을 여는 함수를 추가합니다.
+  const handleOpenSearchModal = () => {
+    // SearchModal을 여는 함수를 추가합니다.
     setSearchModalOpen(true);
   };
 
-  const handleCloseSearchModal = () => { // SearchModal을 닫는 함수를 추가합니다.
+  const handleCloseSearchModal = () => {
+    // SearchModal을 닫는 함수를 추가합니다.
     setSearchModalOpen(false);
   };
   const [user, setUser] = useState({
@@ -87,7 +89,7 @@ const NavigationBar = () => {
       try {
         const response = await getMyProfile();
         if (response.data) {
-          setUser(response.data);  // API 응답으로 받은 사용자 정보를 상태에 저장합니다.
+          setUser(response.data); // API 응답으로 받은 사용자 정보를 상태에 저장합니다.
         } else {
           console.error('Failed to fetch profile');
         }
@@ -129,24 +131,25 @@ const NavigationBar = () => {
         </Search>
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <div style={{ textDecoration: 'none', marginLeft: '16px' }}>
+            <Button variant="outlined" /*onClick={handleOpenSearchModal}*/>
+              검색
+            </Button>{' '}
+            {/* onClick 이벤트를 추가하여 버튼 클릭 시 검색결과로 이어지게 함. */}
+          </div>
 
-        <div
-          style={{ textDecoration: 'none', marginLeft: '16px' }}
-        >
-          <Button variant="outlined" /*onClick={handleOpenSearchModal}*/>검색</Button> {/* onClick 이벤트를 추가하여 버튼 클릭 시 검색결과로 이어지게 함. */}
-        </div>
-
-        <div
-          style={{ textDecoration: 'none', marginLeft: '16px' }}
-        >
-          <Button variant="outlined" onClick={handleOpenSearchModal}>검색 옵션</Button> {/* onClick 이벤트를 추가하여 버튼 클릭 시 SearchModal이 열리도록 합니다. */}
-        </div>
+          <div style={{ textDecoration: 'none', marginLeft: '16px' }}>
+            <Button variant="outlined" onClick={handleOpenSearchModal}>
+              검색 옵션
+            </Button>{' '}
+            {/* onClick 이벤트를 추가하여 버튼 클릭 시 SearchModal이 열리도록 합니다. */}
+          </div>
 
           <IconButton
             size="large"
             aria-label="show new notifications"
             color="inherit"
-            onClick={handleOpenModal}  // 아이콘을 클릭하면 모달을 엽니다.
+            onClick={handleOpenModal} // 아이콘을 클릭하면 모달을 엽니다.
           >
             <Badge
               badgeContent={notificationsCount > 0 ? notificationsCount : null}
@@ -158,7 +161,10 @@ const NavigationBar = () => {
           <NotificationModal open={openModal} onClose={handleCloseModal} />
 
           {/*여기에 링크 달았음*/}
-          <Link to="/myProfile" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link
+            to="/myProfile"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img
                 src={user.imageUrl}
@@ -179,28 +185,41 @@ const NavigationBar = () => {
                   ml: 2
                 }}
               >
-                <Typography 
-                  sx={{ padding: '0px'}}
+                <Typography
+                  sx={{ padding: '0px' }}
                   variant="subtitle1"
-                  align='left'
+                  align="left"
                   noWrap
                 >
                   {user.nickname}
                 </Typography>
-                <Button
-                  startIcon={<Logout />}
-                  sx={{ my: 1, py: 0, minWidth: 'none', color: 'red', margin: '0px', padding: '0px' }}
-                  size="small"
-                >
-                  Logout
-                </Button>
+
+                <Link to="/">
+                  <Button
+                    startIcon={<Logout />}
+                    sx={{
+                      my: 1,
+                      py: 0,
+                      minWidth: 'none',
+                      color: 'red',
+                      margin: '0px',
+                      padding: '0px'
+                    }}
+                    size="small"
+                  >
+                    Logout
+                  </Button>
+                </Link>
               </Box>
             </Box>
           </Link>
-          
         </Box>
       </Toolbar>
-      <SearchModal open={searchModalOpen} handleClose={handleCloseSearchModal} /> {/* SearchModal 컴포넌트를 추가하고, open과 handleClose prop을 추가합니다. */}
+      <SearchModal
+        open={searchModalOpen}
+        handleClose={handleCloseSearchModal}
+      />{' '}
+      {/* SearchModal 컴포넌트를 추가하고, open과 handleClose prop을 추가합니다. */}
     </Box>
   );
 };

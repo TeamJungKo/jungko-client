@@ -42,15 +42,15 @@ function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route
             path="/myCard"
-            element={<CardDetail cardStatus="myCard" cardId={null} />}
+            element={<CardDetail cardStatus="myCard" cardId={1} />}
           />
           <Route
             path="/interestedCard"
-            element={<CardDetail cardStatus="interestedCard" cardId={null} />}
+            element={<CardDetail cardStatus="interestedCard" cardId={2} />}
           />
           <Route
             path="/otherCard"
-            element={<CardDetail cardStatus="otherCard" cardId={null} />}
+            element={<CardDetail cardStatus="otherCard" cardId={3} />}
           />
         </Routes>
       </Router>
