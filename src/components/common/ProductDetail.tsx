@@ -71,7 +71,8 @@ const ProductDetail = ({ isOpen, onClose }: ProductDetailProps) => {
   const addKeywords = async () => {
     if (selectedKeywordIds.length > 0) {
       try {
-        const response = await createKeywords(selectedKeywordIds);
+        // FIXME: 실제 선택된 키워드를 사용해야 함
+        const response = await createKeywords(['keyword1', 'keyword2']);
         console.log('Keywords added:', response); // Handle response
         setSelectedKeywordIds([]); // Clear selected keywords
       } catch (error) {

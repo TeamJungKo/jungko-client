@@ -35,7 +35,7 @@ const Category = (): React.ReactElement => {
         if (response.data.productCategories) {
           const productCategories: ProductCategory[] =
             response.data.productCategories.map(
-              (category: any): ProductCategory => ({
+              (category: ProductCategory): ProductCategory => ({
                 categoryId: category.categoryId,
                 name: category.name,
                 level: category.level,

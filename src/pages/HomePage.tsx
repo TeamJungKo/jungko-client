@@ -5,7 +5,7 @@ import Category from '../components/common/Category';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import { getPopularCard, getMyCard } from '../api/axios.custom';
-import {Card} from '../types/types';
+import { Card } from '../types/types';
 
 function HomePage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
@@ -92,7 +92,7 @@ function HomePage() {
 
                 // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
-                let sigg = card.area.sido.sigg;
+                const sigg = card.area.sido.sigg;
                 if (sigg) {
                   area += ' > ' + sigg.name;
                   if (sigg.emd) {
@@ -132,7 +132,7 @@ function HomePage() {
 
                 // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
-                let sigg = card.area.sido.sigg;
+                const sigg = card.area.sido.sigg;
                 if (sigg) {
                   area += ' > ' + sigg.name;
                   if (sigg.emd) {
