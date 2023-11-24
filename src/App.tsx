@@ -13,6 +13,7 @@ import OtherProfile from './pages/OtherProfile.tsx';
 import ComparePage from './pages/ComparePage.tsx';
 import CardDetail from './pages/CardDetail.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
+import './firebase-messaging-sw.ts';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
