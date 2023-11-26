@@ -54,7 +54,7 @@ const HotCards = ({ url }: Props): React.ReactElement => {
           {cards.map((card, index) => (
             <div key={index} className="hot_card_wrapper" onClick={goToUrl}>
               <CardMaker
-                image={jungkoIcon}
+                imageUrl={jungkoIcon}
                 title={card.title}
                 description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
                 imageHeight="50%"
@@ -63,7 +63,7 @@ const HotCards = ({ url }: Props): React.ReactElement => {
             </div>
           ))}
           <CardMaker //이부분은 샘플이니 지워도무관
-            image={jungkoIcon}
+            imageUrl={jungkoIcon}
             title="카드제목"
             description="카드설명"
             imageHeight="50%"

@@ -121,7 +121,7 @@ function MyProfile() {
   const makeCardsPublic = () => {
     const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
     selectedCardIds.forEach((id) => {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('scope', 'public');
       changeCardOption(id, formData);
     });
@@ -132,7 +132,7 @@ function MyProfile() {
 
   const makeAllCardsPublic = () => {
     cards.forEach((card) => {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('scope', 'public');
       changeCardOption(card.id, formData);
     });
@@ -142,7 +142,7 @@ function MyProfile() {
   const makeCardsPrivate = () => {
     const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
     selectedCardIds.forEach((id) => {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('scope', 'private');
       changeCardOption(id, formData);
     });

@@ -173,7 +173,7 @@ export const getAllArea = async () => {
 };
 
 // Keyword
-export const createKeywords = async (keyword: String[]) => {
+export const createKeywords = async (keyword: string[]) => {
   const response = await instance.put('/api/v1/keywords', {
     keyword
   });
