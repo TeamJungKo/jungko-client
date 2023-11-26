@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
 import NotificationBox from '../components/common/NotificationBox';
 
 interface NotificationModalProps {
-  nickname: String;
+  nickname: string;
   open: boolean;  // 모달의 열림/닫힘 상태를 나타내는 프롭입니다.
   onClose: () => void;  // 모달을 닫는 함수를 나타내는 프롭입니다.
 }

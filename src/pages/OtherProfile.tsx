@@ -120,7 +120,7 @@ function OtherProfile() {
         console.log(err);
       });
     
-  }, []);
+  }, [memberId]);
 
   return (
     <div
