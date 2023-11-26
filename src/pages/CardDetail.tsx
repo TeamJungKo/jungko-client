@@ -74,7 +74,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus, cardId }) => {
   const [page, setPage] = useState(1);
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, /*setSelectedProduct*/] = useState<Product | null>(null);
   const navigate = useNavigate();
 
   const handleOpenCardOption = () => {
@@ -86,9 +86,8 @@ const CardDetail: React.FC<CardDetailProps> = ({ cardStatus, cardId }) => {
   };
 
   const handleCardClick = (product: Product) => {
-    setSelectedProduct(product);
-    setIsProductDetailOpen(true);
-  };
+    navigate(`/productDetail/${product.id}`);
+  };  
 
   const handleCloseProductDetail = () => {
     setIsProductDetailOpen(false);

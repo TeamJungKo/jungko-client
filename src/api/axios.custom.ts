@@ -1,10 +1,10 @@
-import { ProductSearchRequest } from '../types/types';
+import * as types from '../types/types';
 import instance from './axios.instance';
 
 // Member
 
 export const getMyProfile = async () => {
-  const response = await instance.get(`/api/v1/members/me/profile`);
+  const response = await instance.get<types.MemberResponse>(`/api/v1/members/me/profile`);
   return response;
 };
 
@@ -31,6 +31,16 @@ export const updateMyProfile = async (
   const response = await instance.patch(url, formData, config);
   return response;
 };
+
+export const getMembersProfile = async (
+  memberId: number
+)=> {
+  const response = await instance.get<types.MemberResponse>(
+    `/api/v1/members/${memberId}/profile`
+  );
+  return response;
+};
+
 
 export const unregisterUser = async () => {
   const response = await instance.delete(`/api/v1/auth/unregister`);
@@ -96,6 +106,17 @@ export const getMemberCard = async (
   return response;
 };
 
+export const getInterestedCard = async (
+  memberId: number,
+  page = 0,
+  size = 10
+): Promise<any> => {
+  const response = await instance.get(
+    `/api/v1/cards/like/members/${memberId}?page=${page}&size=${size}`
+  );
+  return response;
+};
+
 export const likeCard = async (cardId: number) => {
   const response = await instance.put(`/api/v1/cards/${cardId}/like`);
   return response;
@@ -121,7 +142,7 @@ export const getProductDetail = async (productId: number) => {
 };
 
 export const searchProduct = async (
-  productSearchRequest: ProductSearchRequest,
+  productSearchRequest: types.ProductSearchRequest,
   page = 0,
   size = 10,
   sort: string,
@@ -152,7 +173,7 @@ export const getAllArea = async () => {
 };
 
 // Keyword
-export const createKeywords = async (keyword: string[]) => {
+export const createKeywords = async (keyword: String[]) => {
   const response = await instance.put('/api/v1/keywords', {
     keyword
   });

@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 20px;
-  border: none;
+  border: outset;
 }
 
 .kakao_login_symbol {

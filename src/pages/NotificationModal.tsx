@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
-import NotificationBox from '../../components/common/NotificationBox';
+import NotificationBox from '../components/common/NotificationBox';
 
 interface NotificationModalProps {
+  nickname: String;
   open: boolean;  // 모달의 열림/닫힘 상태를 나타내는 프롭입니다.
   onClose: () => void;  // 모달을 닫는 함수를 나타내는 프롭입니다.
 }
 
-const NotificationModal: React.FC<NotificationModalProps> = ({ open, onClose }) => {
+const NotificationModal: React.FC<NotificationModalProps> = ({ nickname, open, onClose }) => {
   const [keywordNotifications, setKeywordNotifications] = useState(Array(5).fill(null).map((_, index) => ({
     imageAlt: "Keyword Image",
     imageUrl: "",
@@ -31,7 +32,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ open, onClose }) 
         onClose={onClose}  // onClose 프롭을 사용하여 모달을 닫습니다.
         sx={{ '& .MuiDialog-paper': { width: '500px', borderRadius: '5px' } }}
       >
-        <DialogTitle sx={{fontSize: '28px', fontFamily: 'Jua'}}>{"검은바지님의 알림"}</DialogTitle>
+        <DialogTitle sx={{fontSize: '28px', fontFamily: 'Jua'}}>{`${nickname}님의 알림`}</DialogTitle>
 
         <DialogContent>
           <div style={{

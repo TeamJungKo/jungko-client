@@ -9,18 +9,18 @@ interface Props {
   cardId?: number;
   width?: string;
   height?: string;
-  image?: string;
+  imageUrl?: string;
   title?: string;
   description?: string;
   imageHeight?: string;
   contentHeight?: string;
-  isOpen?: number;
+  isOpen?: string;
   onContextMenu?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
   isSelected?: boolean;
 }
 
-function CardMaker({ cardId=0, width = '200px', height = '300px', image='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 0, onContextMenu, isSelected=false }: Props) {
+function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 'default', onContextMenu, isSelected=false }: Props) {
 
   const navigate = useNavigate();
 
@@ -33,13 +33,13 @@ function CardMaker({ cardId=0, width = '200px', height = '300px', image='', titl
     border = '4px dashed black';
   } else {
     switch (isOpen) {
-      case 0:
+      case 'default':
         border = '5px outset lightgrey';
         break;
-      case 1:
+      case 'public':
         border = '5px outset lightgreen';
         break;
-      case 2:
+      case 'private':
         border = '5px outset rgb(255, 102, 102)';
         break;
       default:
@@ -53,7 +53,7 @@ function CardMaker({ cardId=0, width = '200px', height = '300px', image='', titl
         <CardMedia
           sx={{ width: '100%', height: imageHeight }}
           component="img"
-          image={image}
+          image={imageUrl}
           alt="기본이미지"
         />
         <CardContent sx={{ width: '100%', height: contentHeight }}>
