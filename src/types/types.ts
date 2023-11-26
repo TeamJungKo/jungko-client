@@ -127,7 +127,7 @@ export interface KeywordListResponse {
 }
 
 // 키워드 정보
-interface Keyword {
+export interface Keyword {
   keywordId: number;
   keyword: string;
 }

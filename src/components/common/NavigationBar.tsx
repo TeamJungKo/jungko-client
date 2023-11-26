@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { userState } from '../../recoil/userState.ts';
 import {
   Box,
   Toolbar,
@@ -19,8 +17,9 @@ import {
 } from '@mui/icons-material';
 import logo from '../../assets/images/jungkoLogo.png';
 import { getMyProfile } from '../../api/axios.custom.ts';
-import NotificationModal from '../../pages/modals/NotificationModal.tsx';
+import NotificationModal from '../../pages/NotificationModal.tsx';
 import SearchModal from '../../pages/SearchModal.tsx';
+import defaultImage from '../../assets/images/profile_pic.png';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -57,7 +56,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const NavigationBar = () => {
-  const [user, setUser] = useRecoilState(userState); 
+  const [nickname, setNickname] = useState('닉네임');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
   const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
@@ -86,7 +86,8 @@ const NavigationBar = () => {
       try {
         const response = await getMyProfile();
         if (response.data) {
-          setUser(response.data); // API 응답으로 받은 사용자 정보로 user 상태를 업데이트합니다.
+          setNickname(response.data.nickname);
+          setImageUrl(response.data.imageUrl);
         } else {
           console.error('Failed to fetch profile');
         }
@@ -156,7 +157,7 @@ const NavigationBar = () => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <NotificationModal open={openModal} onClose={handleCloseModal} />
+          <NotificationModal nickname={nickname} open={openModal} onClose={handleCloseModal} />
 
           {/*여기에 링크 달았음*/}
           <Link
@@ -165,7 +166,7 @@ const NavigationBar = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img
-                src={user.imageUrl}
+                src={imageUrl ? imageUrl : defaultImage}
                 alt="Profile"
                 style={{
                   width: '40px',
@@ -189,7 +190,7 @@ const NavigationBar = () => {
                   align="left"
                   noWrap
                 >
-                  {user.nickname}
+                  {nickname}
                 </Typography>
 
                 <Link to="/">

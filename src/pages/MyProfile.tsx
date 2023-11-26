@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import {
+  Avatar, 
+  ButtonBase,
   Box,
   Typography,
   Button,
@@ -8,35 +10,44 @@ import {
   IconButton,
   TextField
 } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import EditIcon from '@mui/icons-material/Edit';
-import DefaultProfile from '../components/common/DefaultProfile';
-import Keyword from '../components/common/Keyword';
+import KeywordMaker from '../components/common/KeywordMaker';
 import Add from '@mui/icons-material/Add';
-import { getMyProfile, getMyCard, updateMyProfile } from '../api/axios.custom';
-import {Card} from '../types/types';
-import { useSetRecoilState } from 'recoil';
-import { userState } from '../recoil/userState';
+import { getMyProfile, getMyCard, updateMyProfile, deleteCard, changeCardOption, unlikeCard, getInterestedCard, getMyKeywords, deleteKeywords, createKeywords, changeNoticeSetting, unregisterUser } from '../api/axios.custom';
+import {Card, Keyword} from '../types/types';
+
+
+
+// 추후 interested -> myInterested
+//      cards -> myCard 
+//      keywords -> myKeywords
+//로 변환하는 작업이 필요합니다. 지금 더미데이터를 위해 이 작업은 미뤄두었습니다.
+
+
 
 function MyProfile() {
-  const setUser = useSetRecoilState(userState);
-  const [, setImageData] = useState<File | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isNotificationOn, setIsNotificationOn] = useState(false);
   const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
+  const [myInterestedCards, setMyInterestedCards] = useState<Card[]>([]); // api로 받은 내 관심카드
+  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 관심카드
 
   const [nickname, setNickname] = useState('닉네임'); // 닉네임 상태값 추가
   const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태값 추가
   const [email, setEmail] = useState('이메일'); // 기존 이메일
 
   const [cards, setCards] = useState([
-    { id: 1, isOpen: 1, isSelected: false },
-    { id: 2, isOpen: 1, isSelected: false },
-    { id: 3, isOpen: 2, isSelected: false },
-    { id: 4, isOpen: 2, isSelected: false }
+    { id: 1, isOpen: 'public', isSelected: false },
+    { id: 2, isOpen: 'public', isSelected: false },
+    { id: 3, isOpen: 'private', isSelected: false },
+    { id: 4, isOpen: 'private', isSelected: false }
   ]); //카드 선택 상태값 추가
 
-  const [favouriteCards, setFavouriteCards] = useState([
+  const [interestedCards, setInterestedCards] = useState([
     { id: 1, isOpen: 1, isSelected: false },
     { id: 2, isOpen: 1, isSelected: false },
     { id: 3, isOpen: 2, isSelected: false },
@@ -44,30 +55,49 @@ function MyProfile() {
   ]); // 관심 카드 상태값 추가
 
   const [keywords, setKeywords] = useState([
-    { text: '검정바지', isSelected: false, isOpen: true },
-    { text: '흰둥이', isSelected: false, isOpen: true },
-    { text: '아이유', isSelected: false, isOpen: true },
-    { text: '당근', isSelected: false, isOpen: true }
+    { id: 1, text: '검정바지', isSelected: false, isOpen: true },
+    { id: 2, text: '흰둥이', isSelected: false, isOpen: true },
+    { id: 3, text: '아이유', isSelected: false, isOpen: true },
+    { id: 4, text: '당근', isSelected: false, isOpen: true }
   ]); // 키워드 선택 상태값 추가
 
   const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드 상태값 추가
 
-  /*const [cards, setCards] = useState<{id: number, isOpen: number}[]>([]);*/ //이부분은 카드추가함수를 활성화시킬때 같이 활성화시켜주세요.
-
-  const handleNotificationToggle = () => setIsNotificationOn(!isNotificationOn);
+  const handleNotificationToggle = () => {
+    setIsNotificationOn(!isNotificationOn);
+    console.log(isNotificationOn);
+    changeNoticeSetting();  //전체알림 On/Off 토글 api연결
+  }
 
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = event.target.value;
     setNickname(newNickname);
     updateMyProfile(newNickname, email, null);
-    setUser((user) => ({
-      ...user,
-      nickname: newNickname,
-    }));
+  };
+
+  const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImageUrl(base64String);
+        updateMyProfile(nickname, email, base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProfileImageClick = () => {
+    fileInput.current?.click();
   };
 
   const toggleEdit = () => {
     // 닉네임 수정 토글 핸들러
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      window.location.reload();
+    }
     setIsEditing(!isEditing);
   };
 
@@ -80,35 +110,62 @@ function MyProfile() {
   }; //카드 선택 토글러
 
   const deleteSelectedCards = () => {
-    setCards(cards.filter((card) => !card.isSelected));
-  }; // 선택 카드 삭제
+    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    selectedCardIds.forEach((id) => {
+      deleteCard(id);
+    });
+    setCards(cards.filter((card) => !card.isSelected)); //뷰 테스트용 삭제
+  };
+   // 선택 카드 삭제
 
   const makeCardsPublic = () => {
+    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    selectedCardIds.forEach((id) => {
+      const formData = new FormData();
+      formData.append('scope', 'public');
+      changeCardOption(id, formData);
+    });
     setCards(
-      cards.map((card) => (card.isSelected ? { ...card, isOpen: 1 } : card))
-    );
+      cards.map((card) => (card.isSelected ? { ...card, isOpen: 'public' } : card))
+    );  //뷰 테스트용 공개
   }; // 선택 카드 공개전환
 
   const makeAllCardsPublic = () => {
-    setCards(cards.map((card) => ({ ...card, isOpen: 1 })));
+    cards.forEach((card) => {
+      const formData = new FormData();
+      formData.append('scope', 'public');
+      changeCardOption(card.id, formData);
+    });
+    setCards(cards.map((card) => ({ ...card, isOpen: 'public' }))); //뷰 테스트용 전체공개
   }; // 전체 카드 공개전환
 
   const makeCardsPrivate = () => {
+    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    selectedCardIds.forEach((id) => {
+      const formData = new FormData();
+      formData.append('scope', 'private');
+      changeCardOption(id, formData);
+    });
     setCards(
-      cards.map((card) => (card.isSelected ? { ...card, isOpen: 2 } : card))
-    );
+      cards.map((card) => (card.isSelected ? { ...card, isOpen: 'private' } : card))
+    );  //뷰 테스트용 비공개
   }; // 선택 카드 비공개전환
 
-  const toggleSelectFavouriteCard = (id: number) => {
-    setFavouriteCards(
-      favouriteCards.map((card) =>
+  const toggleSelectInterestedCard = (id: number) => {
+    setInterestedCards(
+      interestedCards.map((card) =>
         card.id === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
   }; // 관심 카드 선택 토글러
 
-  const deleteSelectedFavouriteCards = () => {
-    setFavouriteCards(favouriteCards.filter((card) => !card.isSelected));
+  const deleteSelectedInterestedCards = () => {
+    const selectedCardIds = 
+      interestedCards.filter((card) => card.isSelected).map((card) => card.id);
+    selectedCardIds.forEach((id) => {
+      unlikeCard(id);
+    });
+    setInterestedCards(interestedCards.filter((card) => !card.isSelected)); //뷰 테스트용 관심해제
   }; // 선택한 관심 카드 삭제
 
   const toggleSelectKeyword = (text: string) => {
@@ -122,89 +179,129 @@ function MyProfile() {
   }; // 키워드 선택 토글러
 
   const deleteSelectedKeywords = () => {
-    setKeywords(keywords.filter((keyword) => !keyword.isSelected));
+    const selectedKeywordIds = 
+      keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
+    selectedKeywordIds.forEach((id) => {
+      deleteKeywords(id);
+    });
+    setKeywords(keywords.filter((keyword) => !keyword.isSelected));// 뷰 테스트용 키워드 삭제
   }; // 선택한 키워드를 삭제하는 함수
 
   const makeKeywordsPublic = () => {
+    /* 아직 키워드 옵션 변경 api가 없음..!
+    const selectedKeywordIds = keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
+    selectedKeywordIds.forEach((id) => {
+      let formData = new FormData();
+      formData.append('scope', 'public');
+      changeKeywordOption(id, formData);
+    });*/
     setKeywords(
       keywords.map((keyword) =>
         keyword.isSelected ? { ...keyword, isOpen: true } : keyword
-      )
+      ) //뷰에서만 키워드 퍼블릭화
     );
   }; // 선택 키워드 공개전환
 
   const makeAllKeywordsPublic = () => {
+    /* 아직 키워드 옵션 변경 api가 없음..!
+    keywords.forEach((keyword) => {
+      let formData = new FormData();
+      formData.append('scope', 'public');
+      changeKeywordOption(id, formData);
+    });*/
     setKeywords(keywords.map((keyword) => ({ ...keyword, isOpen: true })));
+    //뷰에서만 전체키워드 퍼블릭화
   }; // 전체 키워드 공개전환
 
   const makeKeywordsPrivate = () => {
+    /* 아직 키워드 옵션 변경 api가 없음..!
+    const selectedKeywordIds = keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
+    selectedKeywordIds.forEach((id) => {
+      let formData = new FormData();
+      formData.append('scope', 'private');
+      changeKeywordOption(id, formData);
+    });*/
     setKeywords(
       keywords.map((keyword) =>
         keyword.isSelected ? { ...keyword, isOpen: false } : keyword
       )
-    );
+    );  //뷰에서만 키워드 프라이빗화
   }; // 선택 키워드 비공개전환
 
   const handleNewKeywordChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    // 새 키워드 변경 핸들러
     setNewKeyword(event.target.value);
-  };
+  };  // 새 키워드 작성 핸들러
 
   const addKeyword = () => {
     setKeywords((prevKeywords) => [
       ...prevKeywords,
-      { text: newKeyword, isSelected: false, isOpen: true }
-    ]);
-    setNewKeyword(''); // 새 키워드 초기화
-  };
-
-  const handleImageChange = (base64String: string | null) => {
-    if (base64String) {
-      const byteCharacters = atob(base64String.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      { 
+        id: prevKeywords.length > 0 ? prevKeywords[prevKeywords.length - 1].id + 1 : 1,
+        text: newKeyword, 
+        isSelected: false, 
+        isOpen: false 
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/jpeg' });
-      const file = new File([blob], 'userImage', { type: 'image/jpeg' });
+    ]);
+    createKeywords([newKeyword]);
+    setNewKeyword('');
+  }; // 키워드에 추가 속성을 부여하는 함수
 
-      setImageData(file);
-      updateMyProfile(nickname, email, null);
-      setUser((user) => ({
-        ...user,
-        imageUrl: base64String,
-      }));
-    } else {
-      setImageData(null);
-      updateMyProfile(nickname, email, null);
+  const handleUnregister = () => {
+    if (window.confirm('정말 탈퇴하시겠습니까?')) {
+      unregisterUser();
+      window.location.href = 'http://localhost';
+      alert('그동안 이용해주셔서 감사합니다.');
     }
   };
 
   useEffect(() => {
     getMyProfile()
       .then((res) => {
-        console.log(res);
         setNickname(res.data.nickname);
         setEmail(res.data.email);
-        setImageData(res.data.imageData);
+        setImageUrl(res.data.imageUrl);
+        getInterestedCard(res.data.memberId)
+          .then((response) => {
+            const completeCards = response.data.cards.map((card: any) => ({
+              ...card,
+              isSelected: false
+            }));
+            setMyInterestedCards(completeCards);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
       });
 
-    const fetchMyCards = async () => {
-      //내카드 api 데이터 가져오기
-      try {
-        const response = await getMyCard(0, 4);
-        const { cards } = response.data;
-        setMyCards(cards);
-      } catch (error) {
-        console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
-      }
-    };
+    getMyCard()
+      .then((res) => {
+        const completeCards = res.data.cards.map((card: any) => ({
+          ...card,
+          isSelected: false
+        }));
+        setMyCards(completeCards);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    getMyKeywords()
+      .then((res) => {
+        const completeKeywords = res.data.keywordList.map((keyword: any) => ({
+          ...keyword,
+          isSelected: false,
+          isOpen: false
+        }));
+        setMyKeywords(completeKeywords);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     // 다른 영역 클릭 시 모든 카드 선택 해제
     const handleClick = (event: MouseEvent) => {
@@ -223,7 +320,6 @@ function MyProfile() {
       document.removeEventListener('click', handleClick);
     };
 
-    fetchMyCards();
   }, [cards]);
 
   const title_space = {
@@ -267,7 +363,15 @@ function MyProfile() {
         <NavigationBar />
         <Box sx={{ marginTop: '160px' }}>
           <Box sx={title_space}>
-            <DefaultProfile onImageChange={handleImageChange} />
+          <input 
+            type="file" 
+            hidden ref={fileInput} 
+            onChange={handleProfileImageChange} />
+          <ButtonBase onClick={handleProfileImageClick}>
+            <Avatar sx={{ width: 80, height: 80, marginRight: '30px', color:'black'}}>
+              {imageUrl ? <img src={imageUrl} alt="profile" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} /> : <AccountCircleIcon sx={{ width: 80, height: 80, backgroundColor: 'darkgrey' }}/>}
+            </Avatar>
+          </ButtonBase>
             {isEditing ? (
               <TextField
                 value={nickname}
@@ -360,7 +464,7 @@ function MyProfile() {
                 card //샘플임
               ) => (
                 <CardMaker
-                  key={card.id}
+                  cardId={card.id}
                   isOpen={card.isOpen}
                   isSelected={card.isSelected}
                   onContextMenu={(event: React.MouseEvent) => {
@@ -375,8 +479,8 @@ function MyProfile() {
                 card //이부분이 api에서 가져온 "내 카드"들임
               ) => (
                 <CardMaker
-                  key={card.cardId}
-                  isOpen={1}
+                  cardId={card.cardId}
+                  isOpen={card.scope}
                   isSelected={false}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
@@ -400,7 +504,7 @@ function MyProfile() {
                 borderColor: 'red',
                 background: 'white'
               }}
-              onClick={deleteSelectedFavouriteCards}
+              onClick={deleteSelectedInterestedCards}
             >
               선택삭제
             </Button>
@@ -420,14 +524,25 @@ function MyProfile() {
               }}
             />{' '}
             {/*시연용 이후 삭제할것*/}
-            {favouriteCards.map((card) => (
+            {interestedCards.map((card) => (  //샘플
               <CardMaker
-                key={card.id}
-                isOpen={0}
-                isSelected={card.isSelected} // 선택 상태 바인딩
+                cardId={card.id}
+                isOpen={'default'}
+                isSelected={card.isSelected}
                 onContextMenu={(event: React.MouseEvent) => {
                   event.preventDefault();
-                  toggleSelectFavouriteCard(card.id);
+                  toggleSelectInterestedCard(card.id);
+                }}
+              />
+            ))}
+            {myInterestedCards.map((card) => (  //api에서 호출한 진짜 관심카드
+              <CardMaker
+                cardId={card.cardId}
+                isOpen={'default'}
+                isSelected={false}
+                onContextMenu={(event: React.MouseEvent) => {
+                  event.preventDefault();
+                  toggleSelectInterestedCard(card.cardId);
                 }}
               />
             ))}
@@ -504,25 +619,28 @@ function MyProfile() {
             }}
           >
             {/* 키워드 박스들 */}
-            {keywords.map((keyword, index) => (
-              <Keyword
-                key={index}
+            {keywords.map((keyword, ) => (  // 샘플임
+              <KeywordMaker
                 keyword={keyword.text}
-                isSelected={keyword.isSelected} // 선택 상태를 바인딩합니다.
-                isOpen={keyword.isOpen} // 공개 상태를 바인딩합니다.
+                isSelected={keyword.isSelected}
+                isOpen={keyword.isOpen} 
                 onContextMenu={(event: React.MouseEvent) => {
                   event.preventDefault();
                   toggleSelectKeyword(keyword.text);
                 }}
               />
             ))}
-            {/* 아래도 시연용. 확인후 지울것 */}
-            <Box
-              sx={{
-                borderRadius: '28px'
-              }}
-            ></Box>
-
+            {myKeywords.map((keyword, ) => (  // 실제 api로부터 가져오는 키워드
+              <KeywordMaker
+                keyword={keyword.keyword}
+                isSelected={false}
+                isOpen={false}
+                onContextMenu={(event: React.MouseEvent) => {
+                  event.preventDefault();
+                  toggleSelectKeyword(keyword.keyword);
+                }}
+              />
+            ))}
             <TextField
               value={newKeyword}
               onChange={handleNewKeywordChange}
@@ -582,6 +700,7 @@ function MyProfile() {
                   borderColor: 'red',
                   background: 'white'
                 }}
+                onClick={handleUnregister}
               >
                 회원탈퇴
               </Button>

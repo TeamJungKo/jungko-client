@@ -100,7 +100,7 @@ const SiteGuide = (): React.ReactElement => {
               <CardMaker
                 width={CARD_WIDTH + 'px'}
                 height="500px"
-                image={jungkoIcon}
+                imageUrl={jungkoIcon}
                 title="제목테스트"
                 description="설명테스트"
                 imageHeight="70%"

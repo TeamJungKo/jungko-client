@@ -10,7 +10,7 @@ interface KeywordProps {
   isSelected?: boolean;
 }
 
-const Keyword: FC<KeywordProps> = ({ keyword, isSelected, isOpen = true, onContextMenu }) => {
+const KeywordMaker: FC<KeywordProps> = ({ keyword, isSelected, isOpen = true, onContextMenu }) => {
   return (
     <Box 
       onContextMenu={onContextMenu}
@@ -35,4 +35,4 @@ const Keyword: FC<KeywordProps> = ({ keyword, isSelected, isOpen = true, onConte
   );
 }
 
-export default Keyword;
+export default KeywordMaker;

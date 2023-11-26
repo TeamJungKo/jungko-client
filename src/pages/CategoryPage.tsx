@@ -100,7 +100,7 @@ function CategoryPage() {
                   <Grid item key={card.cardId}>
                     <CardMaker
                       title={card.title}
-                      image={card.author.imageUrl}
+                      imageUrl={card.author.imageUrl}
                       description={description}
                     />
                   </Grid>
