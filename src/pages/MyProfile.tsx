@@ -82,9 +82,11 @@ function MyProfile() {
     if (!isNotificationOn) {
       const token = await requestFCMAndGetDeviceToken();
       await changeNoticeSetting(token);
+      alert('알림 수신 동의가 완료되었습니다.');
     } else {
       await deleteFCMToken();
       await changeNoticeSetting(null);
+      alert('알림 수신 동의가 취소되었습니다.');
     }
     setIsNotificationOn(!isNotificationOn);
     console.log(isNotificationOn);
