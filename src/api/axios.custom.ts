@@ -4,7 +4,9 @@ import instance from './axios.instance';
 // Member
 
 export const getMyProfile = async () => {
-  const response = await instance.get<types.MemberResponse>(`/api/v1/members/me/profile`);
+  const response = await instance.get<types.MemberResponse>(
+    `/api/v1/members/me/profile`
+  );
   return response;
 };
 
@@ -32,15 +34,12 @@ export const updateMyProfile = async (
   return response;
 };
 
-export const getMembersProfile = async (
-  memberId: number
-)=> {
+export const getMembersProfile = async (memberId: number) => {
   const response = await instance.get<types.MemberResponse>(
     `/api/v1/members/${memberId}/profile`
   );
   return response;
 };
-
 
 export const unregisterUser = async () => {
   const response = await instance.delete(`/api/v1/auth/unregister`);
@@ -205,8 +204,10 @@ export const deleteKeywords = async (keywordId: number) => {
 
 // Notification
 
-export const changeNoticeSetting = async () => {
-  const response = await instance.put('/api/v1/notices/settings');
+export const changeNoticeSetting = async (deviceToken: string | null) => {
+  const response = await instance.put('/api/v1/notices/setting', {
+    deviceToken
+  });
   return response;
 };
 
