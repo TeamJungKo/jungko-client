@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import {
-  Avatar, 
+  Avatar,
   ButtonBase,
   Box,
   Typography,
@@ -16,17 +16,30 @@ import NavigationBar from '../components/common/NavigationBar';
 import EditIcon from '@mui/icons-material/Edit';
 import KeywordMaker from '../components/common/KeywordMaker';
 import Add from '@mui/icons-material/Add';
-import { getMyProfile, getMyCard, updateMyProfile, deleteCard, changeCardOption, unlikeCard, getInterestedCard, getMyKeywords, deleteKeywords, createKeywords, changeNoticeSetting, unregisterUser } from '../api/axios.custom';
-import {Card, Keyword} from '../types/types';
-
-
+import {
+  getMyProfile,
+  getMyCard,
+  updateMyProfile,
+  deleteCard,
+  changeCardOption,
+  unlikeCard,
+  getInterestedCard,
+  getMyKeywords,
+  deleteKeywords,
+  createKeywords,
+  changeNoticeSetting,
+  unregisterUser
+} from '../api/axios.custom';
+import { Card, Keyword } from '../types/types';
+import {
+  requestFCMAndGetDeviceToken,
+  deleteFCMToken
+} from '../firebase-messaging-sw';
 
 // 추후 interested -> myInterested
-//      cards -> myCard 
+//      cards -> myCard
 //      keywords -> myKeywords
 //로 변환하는 작업이 필요합니다. 지금 더미데이터를 위해 이 작업은 미뤄두었습니다.
-
-
 
 function MyProfile() {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -63,11 +76,21 @@ function MyProfile() {
 
   const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드 상태값 추가
 
-  const handleNotificationToggle = () => {
+  const handleNotificationToggle = async () => {
+    // 알림이 비동의 상태일 때 동의로 바꾸는 함수
+    // FCM firebase-messaging-sw.ts에 있는 코드를 실행하여 토큰을 발급받음.
+    if (!isNotificationOn) {
+      const token = await requestFCMAndGetDeviceToken();
+      await changeNoticeSetting(token);
+      alert('알림 수신 동의가 완료되었습니다.');
+    } else {
+      await deleteFCMToken();
+      await changeNoticeSetting(null);
+      alert('알림 수신 동의가 취소되었습니다.');
+    }
     setIsNotificationOn(!isNotificationOn);
     console.log(isNotificationOn);
-    changeNoticeSetting();  //전체알림 On/Off 토글 api연결
-  }
+  };
 
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = event.target.value;
@@ -110,24 +133,30 @@ function MyProfile() {
   }; //카드 선택 토글러
 
   const deleteSelectedCards = () => {
-    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    const selectedCardIds = cards
+      .filter((card) => card.isSelected)
+      .map((card) => card.id);
     selectedCardIds.forEach((id) => {
       deleteCard(id);
     });
     setCards(cards.filter((card) => !card.isSelected)); //뷰 테스트용 삭제
   };
-   // 선택 카드 삭제
+  // 선택 카드 삭제
 
   const makeCardsPublic = () => {
-    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    const selectedCardIds = cards
+      .filter((card) => card.isSelected)
+      .map((card) => card.id);
     selectedCardIds.forEach((id) => {
       const formData = new FormData();
       formData.append('scope', 'public');
       changeCardOption(id, formData);
     });
     setCards(
-      cards.map((card) => (card.isSelected ? { ...card, isOpen: 'public' } : card))
-    );  //뷰 테스트용 공개
+      cards.map((card) =>
+        card.isSelected ? { ...card, isOpen: 'public' } : card
+      )
+    ); //뷰 테스트용 공개
   }; // 선택 카드 공개전환
 
   const makeAllCardsPublic = () => {
@@ -140,15 +169,19 @@ function MyProfile() {
   }; // 전체 카드 공개전환
 
   const makeCardsPrivate = () => {
-    const selectedCardIds = cards.filter((card) => card.isSelected).map((card) => card.id);
+    const selectedCardIds = cards
+      .filter((card) => card.isSelected)
+      .map((card) => card.id);
     selectedCardIds.forEach((id) => {
       const formData = new FormData();
       formData.append('scope', 'private');
       changeCardOption(id, formData);
     });
     setCards(
-      cards.map((card) => (card.isSelected ? { ...card, isOpen: 'private' } : card))
-    );  //뷰 테스트용 비공개
+      cards.map((card) =>
+        card.isSelected ? { ...card, isOpen: 'private' } : card
+      )
+    ); //뷰 테스트용 비공개
   }; // 선택 카드 비공개전환
 
   const toggleSelectInterestedCard = (id: number) => {
@@ -160,8 +193,9 @@ function MyProfile() {
   }; // 관심 카드 선택 토글러
 
   const deleteSelectedInterestedCards = () => {
-    const selectedCardIds = 
-      interestedCards.filter((card) => card.isSelected).map((card) => card.id);
+    const selectedCardIds = interestedCards
+      .filter((card) => card.isSelected)
+      .map((card) => card.id);
     selectedCardIds.forEach((id) => {
       unlikeCard(id);
     });
@@ -179,12 +213,13 @@ function MyProfile() {
   }; // 키워드 선택 토글러
 
   const deleteSelectedKeywords = () => {
-    const selectedKeywordIds = 
-      keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
+    const selectedKeywordIds = keywords
+      .filter((keyword) => keyword.isSelected)
+      .map((keyword) => keyword.id);
     selectedKeywordIds.forEach((id) => {
       deleteKeywords(id);
     });
-    setKeywords(keywords.filter((keyword) => !keyword.isSelected));// 뷰 테스트용 키워드 삭제
+    setKeywords(keywords.filter((keyword) => !keyword.isSelected)); // 뷰 테스트용 키워드 삭제
   }; // 선택한 키워드를 삭제하는 함수
 
   const makeKeywordsPublic = () => {
@@ -225,23 +260,26 @@ function MyProfile() {
       keywords.map((keyword) =>
         keyword.isSelected ? { ...keyword, isOpen: false } : keyword
       )
-    );  //뷰에서만 키워드 프라이빗화
+    ); //뷰에서만 키워드 프라이빗화
   }; // 선택 키워드 비공개전환
 
   const handleNewKeywordChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setNewKeyword(event.target.value);
-  };  // 새 키워드 작성 핸들러
+  }; // 새 키워드 작성 핸들러
 
   const addKeyword = () => {
     setKeywords((prevKeywords) => [
       ...prevKeywords,
-      { 
-        id: prevKeywords.length > 0 ? prevKeywords[prevKeywords.length - 1].id + 1 : 1,
-        text: newKeyword, 
-        isSelected: false, 
-        isOpen: false 
+      {
+        id:
+          prevKeywords.length > 0
+            ? prevKeywords[prevKeywords.length - 1].id + 1
+            : 1,
+        text: newKeyword,
+        isSelected: false,
+        isOpen: false
       }
     ]);
     createKeywords([newKeyword]);
@@ -262,6 +300,7 @@ function MyProfile() {
         setNickname(res.data.nickname);
         setEmail(res.data.email);
         setImageUrl(res.data.imageUrl);
+        setIsNotificationOn(res.data.notificationAgreement);
         getInterestedCard(res.data.memberId)
           .then((response) => {
             const completeCards = response.data.cards.map((card: any) => ({
@@ -319,7 +358,6 @@ function MyProfile() {
     return () => {
       document.removeEventListener('click', handleClick);
     };
-
   }, [cards]);
 
   const title_space = {
@@ -363,15 +401,39 @@ function MyProfile() {
         <NavigationBar />
         <Box sx={{ marginTop: '160px' }}>
           <Box sx={title_space}>
-          <input 
-            type="file" 
-            hidden ref={fileInput} 
-            onChange={handleProfileImageChange} />
-          <ButtonBase onClick={handleProfileImageClick}>
-            <Avatar sx={{ width: 80, height: 80, marginRight: '30px', color:'black'}}>
-              {imageUrl ? <img src={imageUrl} alt="profile" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%'}} /> : <AccountCircleIcon sx={{ width: 80, height: 80, backgroundColor: 'darkgrey' }}/>}
-            </Avatar>
-          </ButtonBase>
+            <input
+              type="file"
+              hidden
+              ref={fileInput}
+              onChange={handleProfileImageChange}
+            />
+            <ButtonBase onClick={handleProfileImageClick}>
+              <Avatar
+                sx={{
+                  width: 80,
+                  height: 80,
+                  marginRight: '30px',
+                  color: 'black'
+                }}
+              >
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="profile"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '50%'
+                    }}
+                  />
+                ) : (
+                  <AccountCircleIcon
+                    sx={{ width: 80, height: 80, backgroundColor: 'darkgrey' }}
+                  />
+                )}
+              </Avatar>
+            </ButtonBase>
             {isEditing ? (
               <TextField
                 value={nickname}
@@ -524,28 +586,36 @@ function MyProfile() {
               }}
             />{' '}
             {/*시연용 이후 삭제할것*/}
-            {interestedCards.map((card) => (  //샘플
-              <CardMaker
-                cardId={card.id}
-                isOpen={'default'}
-                isSelected={card.isSelected}
-                onContextMenu={(event: React.MouseEvent) => {
-                  event.preventDefault();
-                  toggleSelectInterestedCard(card.id);
-                }}
-              />
-            ))}
-            {myInterestedCards.map((card) => (  //api에서 호출한 진짜 관심카드
-              <CardMaker
-                cardId={card.cardId}
-                isOpen={'default'}
-                isSelected={false}
-                onContextMenu={(event: React.MouseEvent) => {
-                  event.preventDefault();
-                  toggleSelectInterestedCard(card.cardId);
-                }}
-              />
-            ))}
+            {interestedCards.map(
+              (
+                card //샘플
+              ) => (
+                <CardMaker
+                  cardId={card.id}
+                  isOpen={'default'}
+                  isSelected={card.isSelected}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectInterestedCard(card.id);
+                  }}
+                />
+              )
+            )}
+            {myInterestedCards.map(
+              (
+                card //api에서 호출한 진짜 관심카드
+              ) => (
+                <CardMaker
+                  cardId={card.cardId}
+                  isOpen={'default'}
+                  isSelected={false}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectInterestedCard(card.cardId);
+                  }}
+                />
+              )
+            )}
           </Box>
           <Divider className="divider" />
 
@@ -619,28 +689,36 @@ function MyProfile() {
             }}
           >
             {/* 키워드 박스들 */}
-            {keywords.map((keyword, ) => (  // 샘플임
-              <KeywordMaker
-                keyword={keyword.text}
-                isSelected={keyword.isSelected}
-                isOpen={keyword.isOpen} 
-                onContextMenu={(event: React.MouseEvent) => {
-                  event.preventDefault();
-                  toggleSelectKeyword(keyword.text);
-                }}
-              />
-            ))}
-            {myKeywords.map((keyword, ) => (  // 실제 api로부터 가져오는 키워드
-              <KeywordMaker
-                keyword={keyword.keyword}
-                isSelected={false}
-                isOpen={false}
-                onContextMenu={(event: React.MouseEvent) => {
-                  event.preventDefault();
-                  toggleSelectKeyword(keyword.keyword);
-                }}
-              />
-            ))}
+            {keywords.map(
+              (
+                keyword // 샘플임
+              ) => (
+                <KeywordMaker
+                  keyword={keyword.text}
+                  isSelected={keyword.isSelected}
+                  isOpen={keyword.isOpen}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectKeyword(keyword.text);
+                  }}
+                />
+              )
+            )}
+            {myKeywords.map(
+              (
+                keyword // 실제 api로부터 가져오는 키워드
+              ) => (
+                <KeywordMaker
+                  keyword={keyword.keyword}
+                  isSelected={false}
+                  isOpen={false}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectKeyword(keyword.keyword);
+                  }}
+                />
+              )
+            )}
             <TextField
               value={newKeyword}
               onChange={handleNewKeywordChange}

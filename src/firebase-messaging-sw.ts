@@ -1,14 +1,11 @@
-// TODO: 알림 설정 동의 버튼을 눌렀을 경우에만 알림을 받도록 수정
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  deleteToken
+} from 'firebase/messaging';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -19,19 +16,18 @@ export const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
+export const requestFCMAndGetDeviceToken = async (): Promise<string | null> => {
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
 
-const messaging = getMessaging(app);
+  const messaging = getMessaging(app);
 
-async function requestPermission() {
   console.log('권한 요청 중...');
 
   const permission = await Notification.requestPermission();
   if (permission === 'denied') {
     console.log('알림 권한 허용 안됨');
-    return;
+    return null;
   }
 
   console.log('알림 권한이 허용됨');
@@ -47,12 +43,16 @@ async function requestPermission() {
     console.log('메시지가 도착했습니다.', payload);
     // ...
   });
-}
 
-requestPermission()
-  .then(() => {
-    console.log('권한 요청 완료');
-  })
-  .catch((err) => {
-    console.log('권한 요청 실패', err);
-  });
+  return token;
+};
+
+// FCM APP 제거 및 브라우저 알람 권한 해제
+
+export const deleteFCMToken = async (): Promise<void> => {
+  const app = initializeApp(firebaseConfig);
+
+  const messaging = getMessaging(app);
+  await deleteToken(messaging);
+  console.log('Token deleted.');
+};

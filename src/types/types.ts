@@ -81,7 +81,6 @@ interface Sido {
   sigg: Sigg;
 }
 
-
 // 시군구
 interface Sigg {
   name: string;
@@ -138,33 +137,34 @@ export interface MemberResponse {
   nickname: string;
   imageUrl: string;
   email: string;
+  notificationAgreement: boolean;
 }
 
 // 여기서부턴 Request 입니다.
 
 // 카드 생성
-export interface CardCreationRequest{
+export interface CardCreationRequest {
   categoryId: number;
   areaId: number;
   title: string;
   keyword: string;
-  minPrice: number
+  minPrice: number;
   maxPrice: number;
   scope: string;
 }
 
 // 카드 삭제
-export interface CardDeletionRequest{
+export interface CardDeletionRequest {
   cardId: number;
 }
 
 // 카드 옵션 변경
-export interface CardOptionChangeRequest{
+export interface CardOptionChangeRequest {
   cardId: number;
 }
 
 // 카드내 매물 검색
-export interface ProductInCardSearchRequest{
+export interface ProductInCardSearchRequest {
   cardId: number;
   page: number;
   size: number;
@@ -173,14 +173,14 @@ export interface ProductInCardSearchRequest{
 }
 
 // 인기 카드 목록 조회
-export interface PopularCardListRequest{
+export interface PopularCardListRequest {
   page: number;
   size: number;
   categoryId: number;
 }
 
 // 특정 유저의 카드 목록 조회
-export interface MembersCardListRequest{
+export interface MembersCardListRequest {
   memberId: number;
   page: number;
   size: number;
@@ -188,19 +188,19 @@ export interface MembersCardListRequest{
 }
 
 //내 카드 목록 조회
-export interface MyCardListRequest{
+export interface MyCardListRequest {
   page: number;
   size: number;
   categoryId: number;
 }
 
 // 선택한 상품들 비교 요청
-export interface ProductComparisonRequest{
+export interface ProductComparisonRequest {
   productIds: Array<number>;
 }
 
 // 특정 상품의 상세 정보 조회
-export interface ProductDetailRequest{
+export interface ProductDetailRequest {
   productId: number;
 }
 
@@ -218,45 +218,45 @@ export interface ProductSearchRequest {
 }
 
 // 검색 결과에 대한 연관 검색어 조회
-export interface RelatedQueriesRequest{
+export interface RelatedQueriesRequest {
   query: string;
 }
 
 // 키워드 생성
-export interface KeywordCreationRequest{
+export interface KeywordCreationRequest {
   keywords: Array<number>;
 }
 
 // 특정 회원의 키워드 목록 조회
-export interface MembersKeywordListRequest{
+export interface MembersKeywordListRequest {
   memberId: number;
 }
 
 // 내 키워드 목록 조회
-export interface MyKeywordListRequest{
+export interface MyKeywordListRequest {
   page: number;
   size: number;
 }
 
 // 키워드 삭제
-export interface KeywordDeletionRequest{
+export interface KeywordDeletionRequest {
   memberId: number;
 }
 
 // 키워드알림쪽 명세 변경예정, 이후 적어야합니다
 
 // 관심카드 등록
-export interface InterestedCardRegistrationRequest{
+export interface InterestedCardRegistrationRequest {
   cardId: number;
 }
 
 // 관심카드 삭제
-export interface InterestedCardDeletionRequest{
+export interface InterestedCardDeletionRequest {
   cardId: number;
 }
 
 //특정회원의 관심카드 목록 조회 (내카드조회없음)
-export interface InterestedCardListRequest{
+export interface InterestedCardListRequest {
   memberId: number;
   page: number;
   size: number;
@@ -264,6 +264,6 @@ export interface InterestedCardListRequest{
 }
 
 // 특정 회원의 프로필 조회 (내 프로필은 파라미터없이 가능)
-export interface MembersProfileRequest{
+export interface MembersProfileRequest {
   memberId: number;
 }
