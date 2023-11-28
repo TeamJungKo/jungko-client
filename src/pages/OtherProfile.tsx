@@ -90,7 +90,8 @@ function OtherProfile() {
   };
 
   useEffect(() => {
-    getMembersProfile(10)
+    console.log("멤버아이디",memberId);
+    getMembersProfile(memberId)
       .then((res) => {
         console.log(res);
         setNickname(res.data.nickname);

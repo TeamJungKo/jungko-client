@@ -6,6 +6,9 @@ import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import { getPopularCard, getMyCard, getMyProfile, getInterestedCard } from '../api/axios.custom';
 import { Card } from '../types/types';
+import IconButton from '@mui/material/IconButton';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 function HomePage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
@@ -54,7 +57,8 @@ function HomePage() {
     fontSize: '44px',
     fontFamily: 'Gugi',
     marginTop: '60px',
-    marginBottom: '30px'
+    marginBottom: '30px',
+    marginLeft: '100px'
   };
 
   return (
@@ -85,10 +89,14 @@ function HomePage() {
         </Grid>
         <Grid item xs={9}>
           {/* 카드 목록 */}
-          <Box sx={{ marginTop: '200px', marginBottom: '40px' }}>
+          <Box sx={{ marginTop: '200px', marginBottom: '40px', }}>
             <div style={fontStyle}>인기 카드 목록</div>
             <Grid container spacing={2}>
-
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => handleScroll('left')}>
+              <ArrowBackIosIcon />
+            </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
                 <CardMaker />
@@ -129,11 +137,20 @@ function HomePage() {
                   </Grid>
                 );
               })}
+              <IconButton 
+                onClick={() => handleScroll('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                <ArrowForwardIosIcon />
+              </IconButton>
             </Grid>
 
             <div style={fontStyle}>내 카드 목록</div>
             <Grid container spacing={2}>
-
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => handleScroll('left')}>
+              <ArrowBackIosIcon />
+            </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
                 <CardMaker />
@@ -174,11 +191,20 @@ function HomePage() {
                   </Grid>
                 );
               })}
+              <IconButton 
+                onClick={() => handleScroll('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                <ArrowForwardIosIcon />
+              </IconButton>
             </Grid>
 
             <div style={fontStyle}>관심 카드 목록</div>
             <Grid container spacing={2}>
-
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => handleScroll('left')}>
+              <ArrowBackIosIcon />
+            </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
                 <CardMaker />
@@ -219,6 +245,11 @@ function HomePage() {
                   </Grid>
                 );
               })}
+              <IconButton 
+                onClick={() => handleScroll('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                <ArrowForwardIosIcon />
+              </IconButton>
             </Grid>
           </Box>
         </Grid>
