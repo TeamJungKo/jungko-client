@@ -5,32 +5,21 @@ import jungkoIcon from '../../assets/images/jungkoIcon.png';
 import CardMaker from '../common/CardMaker.tsx';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import { getPopularCard } from '../../api/axios.custom.ts';
+import { Card } from '../../types/types.ts';
 
-interface Props {
-  url: string;
-}
-
-interface Card {
-  cardId: number;
-  title: string;
-  keyword: string;
-  minPrice: number;
-  maxPrice: number;
-}
-
-const HotCards = ({ url }: Props): React.ReactElement => {
+const HotCards = (): React.ReactElement => {
   const [cards, setCards] = useState<Card[]>([]);
 
   const navigate = useNavigate();
 
   const goToUrl = () => {
-    navigate(url);
+    navigate('/login');
   };
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getPopularCard();
+        const response = await getPopularCard(0, 6);
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {
@@ -39,6 +28,9 @@ const HotCards = ({ url }: Props): React.ReactElement => {
       } catch (error) {
         console.error(error);
       }
+      console.log(`호출된 인기카드 개수: ${cards.length}`);
+      console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
+
     };
 
     fetchCards();

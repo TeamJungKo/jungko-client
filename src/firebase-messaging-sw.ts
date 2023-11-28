@@ -25,7 +25,7 @@ const app = initializeApp(firebaseConfig);
 
 const messaging = getMessaging(app);
 
-async function requestPermission() {
+export async function requestPermission() {
   console.log('권한 요청 중...');
 
   const permission = await Notification.requestPermission();
@@ -37,8 +37,11 @@ async function requestPermission() {
   console.log('알림 권한이 허용됨');
 
   const token = await getToken(messaging, {
-    vapidKey: import.meta.env.VITE_FIREBASE_APP_VAPID_KEY
+    vapidKey: import.meta.env.VITE_FIREBASE_APP_VAPID_KEY as string
   });
+
+  changeNoticeSetting(token);
+  console.log("토큰은이거:",token);
 
   if (token) console.log('token: ', token);
   else console.log('Can not get Token');

@@ -74,16 +74,12 @@ export const changeCardOption = async (
 };
 
 export const getPopularCard = async (
-  page = 0,
-  size = 10,
-  categoryId?: number
+  page: number,
+  size: number,
+  categoryId=0
 ) => {
-  const params = { page, size, categoryId };
-  if (categoryId) {
-    params.categoryId = categoryId;
-  }
   const response = await instance.get(
-    '/api/v1/cards/popular?page=${page}&size=${size}&categoryId={categoryId}'
+    `/api/v1/cards/popular?page=${page}&size=${size}&categoryId=${categoryId}`
   );
   return response;
 };
@@ -204,11 +200,6 @@ export const deleteKeywords = async (keywordId: number) => {
 };
 
 // Notification
-
-export const changeNoticeSetting = async () => {
-  const response = await instance.put('/api/v1/notices/settings');
-  return response;
-};
 
 export const changeKeywordNoticeSetting = async (keywordId: number) => {
   const response = await instance.put(`/api/v1/notices/keywords/${keywordId}`);

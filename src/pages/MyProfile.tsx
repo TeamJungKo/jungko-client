@@ -18,6 +18,7 @@ import KeywordMaker from '../components/common/KeywordMaker';
 import Add from '@mui/icons-material/Add';
 import { getMyProfile, getMyCard, updateMyProfile, deleteCard, changeCardOption, unlikeCard, getInterestedCard, getMyKeywords, deleteKeywords, createKeywords, changeNoticeSetting, unregisterUser } from '../api/axios.custom';
 import {Card, Keyword} from '../types/types';
+import {requestPermission} from "../firebase-messaging-sw";
 
 
 
@@ -66,7 +67,7 @@ function MyProfile() {
   const handleNotificationToggle = () => {
     setIsNotificationOn(!isNotificationOn);
     console.log(isNotificationOn);
-    changeNoticeSetting();  //전체알림 On/Off 토글 api연결
+    requestPermission();  //전체알림 On/Off 토글 api연결
   }
 
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
