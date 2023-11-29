@@ -14,40 +14,91 @@ function HomePage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [interestedCards, setInterestedCards] = useState<Card[]>([]);
+  const [popularCardPage, setPopularCardPage] = useState(0);
+  const [myCardPage, setMyCardPage] = useState(0);
+  const [interestedCardPage, setInterestedCardPage] = useState(0);
+
+  const fetchPopularCard = async () => {
+    try {
+      const response = await getPopularCard(popularCardPage, 6);
+      setPopularCards(response.data.cards);
+      console.log(`호출한 인기카드 개수: ${popularCards.length}`);
+    } catch (error) {
+      console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
+    }
+  };
+
+  const fetchMyCards = async () => {
+    try {
+      const response = await getMyCard(myCardPage, 6);
+      setMyCards(response.data.cards);
+      console.log(`호출한 내 카드 개수: ${myCards.length}`);
+    } catch (error) {
+      console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
+    }
+  };
+
+  const fetchInterestedCard = async () => {
+    try {
+      const myProfile = await getMyProfile();
+      const myId = myProfile.data.memberId;
+      const response = await getInterestedCard(myId, interestedCardPage, 6);
+      setInterestedCards(response.data.cards);
+      console.log(`호출한 관심 카드 개수: ${interestedCards.length}`);
+    } catch (error) {
+      console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
+    }
+  };
+
+  const scrollPopularCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setPopularCardPage(popularCardPage => popularCardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (popularCardPage > 0) {
+        setPopularCardPage(popularCardPage => popularCardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",popularCardPage);
+    // 다른 경우는 무시
+  };
+
+  const scrollMyCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setMyCardPage(myCardPage => myCardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (myCardPage > 0) {
+        setMyCardPage(myCardPage => myCardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",myCardPage);
+    // 다른 경우는 무시
+  };
+
+  const scrollInterestedCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setInterestedCardPage(interestedCardPage => interestedCardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (interestedCardPage > 0) {
+        setInterestedCardPage(interestedCardPage => interestedCardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",interestedCardPage);
+    // 다른 경우는 무시
+  };
 
   useEffect(() => {
-    const fetchPopularCard = async () => {
-      try {
-        const response = await getPopularCard(0, 6);
-        setPopularCards(response.data.cards);
-        console.log(`호출한 인기카드 개수: ${popularCards.length}`);
-      } catch (error) {
-        console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
-      }
-    };
-
-    const fetchMyCards = async () => {
-      try {
-        const response = await getMyCard(0, 6);
-        setMyCards(response.data.cards);
-        console.log(`호출한 내 카드 개수: ${myCards.length}`);
-      } catch (error) {
-        console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
-      }
-    };
-
-    const fetchInterestedCard = async () => {
-      try {
-        const myProfile = await getMyProfile();
-        const myId = myProfile.data.memberId;
-        const response = await getInterestedCard(myId, 0, 6);
-        setInterestedCards(response.data.cards);
-        console.log(`호출한 관심 카드 개수: ${interestedCards.length}`);
-      } catch (error) {
-        console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
-      }
-    };
-
     fetchPopularCard();
     fetchMyCards();
     fetchInterestedCard();
@@ -94,7 +145,7 @@ function HomePage() {
             <Grid container spacing={2}>
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
-              onClick={() => handleScroll('left')}>
+              onClick={() => scrollPopularCard('left')}>
               <ArrowBackIosIcon />
             </IconButton>
               {/*아래는 테스트*/}
@@ -138,8 +189,8 @@ function HomePage() {
                 );
               })}
               <IconButton 
-                onClick={() => handleScroll('right')}
-                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                onClick={() => scrollPopularCard('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'26px'}}>
                 <ArrowForwardIosIcon />
               </IconButton>
             </Grid>
@@ -148,7 +199,7 @@ function HomePage() {
             <Grid container spacing={2}>
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
-              onClick={() => handleScroll('left')}>
+              onClick={() => scrollMyCard('left')}>
               <ArrowBackIosIcon />
             </IconButton>
               {/*아래는 테스트*/}
@@ -192,8 +243,8 @@ function HomePage() {
                 );
               })}
               <IconButton 
-                onClick={() => handleScroll('right')}
-                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                onClick={() => scrollMyCard('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'36px'}}>
                 <ArrowForwardIosIcon />
               </IconButton>
             </Grid>
@@ -202,7 +253,7 @@ function HomePage() {
             <Grid container spacing={2}>
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
-              onClick={() => handleScroll('left')}>
+              onClick={() => scrollInterestedCard('left')}>
               <ArrowBackIosIcon />
             </IconButton>
               {/*아래는 테스트*/}
@@ -246,8 +297,8 @@ function HomePage() {
                 );
               })}
               <IconButton 
-                onClick={() => handleScroll('right')}
-                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'16px'}}>
+                onClick={() => scrollInterestedCard('right')}
+                sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'26px'}}>
                 <ArrowForwardIosIcon />
               </IconButton>
             </Grid>
