@@ -60,7 +60,6 @@ const NavigationBar = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
   const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
-  const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   const handleOpenModal = () => {
     setOpenModal(true); // 모달을 엽니다.
@@ -150,10 +149,7 @@ const NavigationBar = () => {
             color="inherit"
             onClick={handleOpenModal} // 아이콘을 클릭하면 모달을 엽니다.
           >
-            <Badge
-              badgeContent={notificationsCount > 0 ? notificationsCount : null}
-              color="secondary"
-            >
+            <Badge>
               <NotificationsIcon />
             </Badge>
           </IconButton>

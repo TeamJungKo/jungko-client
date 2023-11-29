@@ -7,8 +7,8 @@ import NavigationBar from '../components/common/NavigationBar';
 import { getPopularCard, getMyCard, getMyProfile, getInterestedCard } from '../api/axios.custom';
 import { Card } from '../types/types';
 import IconButton from '@mui/material/IconButton';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';;
 
 function HomePage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
@@ -46,7 +46,7 @@ function HomePage() {
       setInterestedCards(response.data.cards);
       console.log(`호출한 관심 카드 개수: ${interestedCards.length}`);
     } catch (error) {
-      console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
+      console.error('관심카드를 가져오는 중 오류가 발생했습니다:', error);
     }
   };
 
@@ -102,7 +102,7 @@ function HomePage() {
     fetchPopularCard();
     fetchMyCards();
     fetchInterestedCard();
-  }, []);
+  }, [popularCardPage, myCardPage, interestedCardPage]);
 
   const fontStyle = {
     fontSize: '44px',
@@ -146,7 +146,7 @@ function HomePage() {
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
               onClick={() => scrollPopularCard('left')}>
-              <ArrowBackIosIcon />
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
             </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
@@ -191,7 +191,7 @@ function HomePage() {
               <IconButton 
                 onClick={() => scrollPopularCard('right')}
                 sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'26px'}}>
-                <ArrowForwardIosIcon />
+                <ArrowCircleRightIcon style={{ fontSize: 60 }} />
               </IconButton>
             </Grid>
 
@@ -200,7 +200,7 @@ function HomePage() {
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
               onClick={() => scrollMyCard('left')}>
-              <ArrowBackIosIcon />
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
             </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
@@ -245,7 +245,7 @@ function HomePage() {
               <IconButton 
                 onClick={() => scrollMyCard('right')}
                 sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'36px'}}>
-                <ArrowForwardIosIcon />
+                <ArrowCircleRightIcon style={{ fontSize: 60 }} />
               </IconButton>
             </Grid>
 
@@ -254,7 +254,7 @@ function HomePage() {
             <IconButton 
               sx={{alignSelf:'center', height:'100px', width:'100px'}}
               onClick={() => scrollInterestedCard('left')}>
-              <ArrowBackIosIcon />
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
             </IconButton>
               {/*아래는 테스트*/}
               <Grid item>
@@ -299,7 +299,7 @@ function HomePage() {
               <IconButton 
                 onClick={() => scrollInterestedCard('right')}
                 sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'26px'}}>
-                <ArrowForwardIosIcon />
+                <ArrowCircleRightIcon style={{ fontSize: 60 }} />
               </IconButton>
             </Grid>
           </Box>

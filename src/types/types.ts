@@ -18,6 +18,7 @@ export interface Card {
   author: Author;
   area: Area;
   category: Category;
+  isSelected?: boolean;
 }
 
 // 상품 api
@@ -129,6 +130,7 @@ export interface KeywordListResponse {
 export interface Keyword {
   keywordId: number;
   keyword: string;
+  isSelected?: boolean;
 }
 
 // 회원 정보
