@@ -34,7 +34,7 @@ function App() {
           <Route path="/" element={<GuestHomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/myProfile" element={<MyProfile />} />
           <Route path="/otherProfile/:id" element={<OtherProfile />} />
           <Route path="/compare" element={<ComparePage />} />

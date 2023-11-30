@@ -8,7 +8,7 @@ import { getPopularCard, getMyCard, getMyProfile, getInterestedCard } from '../a
 import { Card } from '../types/types';
 import IconButton from '@mui/material/IconButton';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';;
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 
 function HomePage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);

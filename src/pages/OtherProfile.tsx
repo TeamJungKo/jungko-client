@@ -12,6 +12,9 @@ import {
   getMemberKeywords, 
   createKeywords } from '../api/axios.custom';
 import { CardResponse, KeywordListResponse } from '../types/types';
+import IconButton from '@mui/material/IconButton';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 
 function OtherProfile() {
   const { id: memberIdString } = useParams<{ id: string }>();
@@ -23,8 +26,26 @@ function OtherProfile() {
   const [isSelectedKeyword, setIsSelectedKeyword] = useState<boolean[]>([]);
   const [nickname, setNickname] = useState('닉네임'); // 닉네임 상태값 추가
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [cardPage, setCardPage] = useState(0);
 
-  const handleCardRightClick = 
+
+  const scrollMemberCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setCardPage(cardPage => cardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (cardPage > 0) {
+        setCardPage(cardPage => cardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",cardPage);
+    // 다른 경우는 무시
+  };
+
+  const selectCard = 
     (index: number) => (event: React.MouseEvent) => {
       event.preventDefault(); // 기본 우클릭 메뉴가 나타나지 않도록 합니다.
       const selectedCards = [...isSelectedCard];
@@ -32,7 +53,7 @@ function OtherProfile() {
       setIsSelectedCard(selectedCards);
   };
 
-  const handleKeywordRightClick =
+  const selectKeyword =
     (index: number) => (event: React.MouseEvent) => {
       event.preventDefault(); // 기본 우클릭 메뉴가 나타나지 않도록 합니다.
       const selectedKeywords = [...isSelectedKeyword];
@@ -71,7 +92,6 @@ function OtherProfile() {
     });
   } 
   
-
   const title_space = {
     display: 'flex',
     alignItems: 'center',
@@ -90,22 +110,23 @@ function OtherProfile() {
   };
 
   useEffect(() => {
-    console.log("멤버아이디",memberId);
     getMembersProfile(memberId)
       .then((res) => {
         console.log(res);
         setNickname(res.data.nickname);
         setImageUrl(res.data.imageUrl);
+        console.log("이 멤버의 프로필: ", res.data);
       })
       .catch((err) => {
         console.log(err);
       });
 
-    getMemberCard(memberId)
+    getMemberCard(memberId,cardPage,6)
       .then((res) => {
         setCards(res.data.cards);
         // 카드의 개수와 동일한 크기의 isSelected 상태를 생성
         setIsSelectedCard(new Array(res.data.cards.length).fill(false));
+        console.log("이 멤버의 카드개수: ", res.data.cards.length);
       })
       .catch((err) => {
         console.log(err);
@@ -116,12 +137,13 @@ function OtherProfile() {
         setKeywords(res.data.keywordList);
         // 키워드의 개수와 동일한 크기의 isSelected 상태를 생성
         setIsSelectedKeyword(new Array(res.data.keywordList.length).fill(false));
+        console.log("이 멤버의 키워드 개수: ", res.data.keywordList.length);
       })
       .catch((err) => {
         console.log(err);
       });
     
-  }, [memberId]);
+  }, [memberId, cardPage]);
 
   return (
     <div
@@ -170,24 +192,39 @@ function OtherProfile() {
               gap: '16px'
             }}
           >
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => scrollMemberCard('left')}>
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
+            </IconButton>
+
             {/* 타 유저가 만든 카드들 */}
-            {cards.length > 0 && cards.map((card, index) => (
-              <CardMaker
-                cardId={card.cardId}
-                onContextMenu={handleCardRightClick(index)}
-                isSelected={isSelectedCard[index]}
-              />
-            ))}
+
             <CardMaker
                 cardId={1}
-                onContextMenu={handleCardRightClick(1)}
+                onContextMenu={selectCard(1)}
                 isSelected={isSelectedCard[1]}
             />
             <CardMaker
               cardId={2}
-              onContextMenu={handleCardRightClick(2)}
+              onContextMenu={selectCard(2)}
               isSelected={isSelectedCard[2]}
             />
+
+            {cards.length > 0 && cards.map((card, index) => (
+              <CardMaker
+                cardId={card.cardId}
+                onContextMenu={selectCard(index)}
+                isSelected={isSelectedCard[index]}
+              />
+            ))}
+
+            <IconButton 
+              onClick={() => scrollMemberCard('right')}
+              sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'26px'}}>
+              <ArrowCircleRightIcon style={{ fontSize: 60 }} />
+            </IconButton>
+
           </Box>
           <Divider />
 
@@ -220,28 +257,30 @@ function OtherProfile() {
             }}
           >
             {/* 키워드 박스들 */}
-            {keywords && keywords.length > 0 && keywords.map((keyword, index) => (
-              <KeywordMaker 
-                keyword={keyword.keyword}
-                onContextMenu={handleKeywordRightClick(index)}
-                isSelected={isSelectedKeyword[index]}
-              />
-            ))}
+
             <KeywordMaker
-              onContextMenu={handleKeywordRightClick(0)}
+              onContextMenu={selectKeyword(0)}
               isSelected={isSelectedKeyword[0]}
               keyword="검정바지"
             />
             <KeywordMaker
-              onContextMenu={handleKeywordRightClick(1)}
+              onContextMenu={selectKeyword(1)}
               isSelected={isSelectedKeyword[1]}
               keyword="흰둥이"
             />
             <KeywordMaker
-              onContextMenu={handleKeywordRightClick(2)}
+              onContextMenu={selectKeyword(2)}
               isSelected={isSelectedKeyword[2]}
               keyword="당근"
             />
+
+            {keywords && keywords.length > 0 && keywords.map((keyword, index) => (
+              <KeywordMaker 
+                keyword={keyword.keyword}
+                onContextMenu={selectKeyword(index)}
+                isSelected={isSelectedKeyword[index]}
+              />
+            ))}
           </Box>
         </Box>
       </Box>

@@ -35,6 +35,10 @@ import {
   requestFCMAndGetDeviceToken,
   deleteFCMToken
 } from '../firebase-messaging-sw';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+
+
 
 // 추후 interested -> myInterested
 //      cards -> myCard
@@ -47,13 +51,49 @@ function MyProfile() {
   const [isNotificationOn, setIsNotificationOn] = useState(false);
   const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
   const [myInterestedCards, setMyInterestedCards] = useState<Card[]>([]); // api로 받은 내 관심카드
-  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 관심카드
+  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 키워드
+
+  const [interestedCardPage, setInterestedCardPage] = useState(0);
+  const [myCardPage, setMyCardPage] = useState(0);
 
   const [nickname, setNickname] = useState('닉네임'); // 닉네임 상태값 추가
   const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태값 추가
   const [email, setEmail] = useState('이메일'); // 기존 이메일
 
   const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드 상태값 추가
+
+  const scrollMyCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setMyCardPage(myCardPage => myCardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (myCardPage > 0) {
+        setMyCardPage(myCardPage => myCardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",myCardPage);
+    // 다른 경우는 무시
+  };
+
+  const scrollInterestedCard = (direction: string) => {
+    // direction이 'right'일 경우
+    if (direction === 'right') {
+      setInterestedCardPage(interestedCardPage => interestedCardPage + 1);
+    }
+    // direction이 'left'일 경우
+    else if (direction === 'left') {
+      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+      if (interestedCardPage > 0) {
+        setInterestedCardPage(interestedCardPage => interestedCardPage - 1);
+      }
+    }
+    console.log("받은 방향: ",direction," 이전 페이지: ",interestedCardPage);
+    // 다른 경우는 무시
+  };
+
 
   const handleNotificationToggle = async () => {
     // 알림이 비동의 상태일 때 동의로 바꾸는 함수
@@ -171,7 +211,7 @@ function MyProfile() {
     );
   }; // 관심 카드 선택 토글러
 
-  const deleteInterestedCards = () => {
+  const unlikeInterestedCards = () => {
     const selectedCardIds = myInterestedCards
       .filter((card) => card.isSelected)
       .map((card) => card.cardId);
@@ -207,23 +247,6 @@ function MyProfile() {
     setNewKeyword(event.target.value);
   }; // 새 키워드 작성 핸들러
 
-  const addKeyword = () => {
-    setMyKeywords((prevKeywords) => [
-      ...prevKeywords,
-      {
-        id:
-          prevKeywords.length > 0
-            ? prevKeywords[prevKeywords.length - 1].id + 1
-            : 1,
-        text: newKeyword,
-        isSelected: false,
-        isOpen: false
-      }
-    ]);
-    createKeywords([newKeyword]);
-    setNewKeyword('');
-  }; // 키워드에 추가 속성을 부여하는 함수
-
   const handleUnregister = () => {
     if (window.confirm('정말 탈퇴하시겠습니까?')) {
       unregisterUser();
@@ -239,7 +262,7 @@ function MyProfile() {
         setEmail(res.data.email);
         setImageUrl(res.data.imageUrl);
         setIsNotificationOn(res.data.notificationAgreement);
-        getInterestedCard(res.data.memberId)
+        getInterestedCard(res.data.memberId,interestedCardPage,6)
           .then((response) => {
             const completeCards = response.data.cards.map((card: any) => ({
               ...card,
@@ -256,7 +279,7 @@ function MyProfile() {
         console.log(err);
       });
 
-    getMyCard()
+    getMyCard(myCardPage,6)
       .then((res) => {
         const completeCards = res.data.cards.map((card: any) => ({
           ...card,
@@ -274,7 +297,6 @@ function MyProfile() {
         const completeKeywords = res.data.keywordList.map((keyword: any) => ({
           ...keyword,
           isSelected: false,
-          isOpen: false
         }));
         setMyKeywords(completeKeywords);
         console.log("가져온 키워드 개수: ",res.data.keywordList.length);
@@ -299,7 +321,7 @@ function MyProfile() {
     return () => {
       document.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [myCardPage, interestedCardPage]);
 
   const title_space = {
     display: 'flex',
@@ -456,7 +478,22 @@ function MyProfile() {
               gap: '16px'
             }}
           >
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => scrollMyCard('left')}>
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
+            </IconButton>
             {/* 생성한 카드들 */}
+
+            <CardMaker
+                  cardId={1}
+                  isOpen={"public"}
+                  isSelected={false}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectCard(1);
+                  }}
+            />
 
             {myCards.map(
               (
@@ -473,6 +510,11 @@ function MyProfile() {
                 />
               )
             )}
+            <IconButton 
+              onClick={() => scrollMyCard('right')}
+              sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'36px'}}>
+              <ArrowCircleRightIcon style={{ fontSize: 60 }} />
+            </IconButton>
           </Box>
           <Divider className="divider" />
 
@@ -488,7 +530,7 @@ function MyProfile() {
                 borderColor: 'red',
                 background: 'white'
               }}
-              onClick={deleteInterestedCards}
+              onClick={unlikeInterestedCards}
             >
               선택삭제
             </Button>
@@ -501,6 +543,12 @@ function MyProfile() {
               gap: '16px'
             }}
           >
+            <IconButton 
+              sx={{alignSelf:'center', height:'100px', width:'100px'}}
+              onClick={() => scrollInterestedCard('left')}>
+              <ArrowCircleLeftIcon style={{ fontSize: 60 }} />
+            </IconButton>
+
             {/* 관심 카드들 */}
             <CardMaker
               onContextMenu={(event: React.MouseEvent) => {
@@ -523,6 +571,12 @@ function MyProfile() {
                 />
               )
             )}
+
+            <IconButton 
+              onClick={() => scrollInterestedCard('right')}
+              sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'36px'}}>
+              <ArrowCircleRightIcon style={{ fontSize: 60 }} />
+            </IconButton>
           </Box>
           <Divider className="divider" />
 
@@ -535,7 +589,6 @@ function MyProfile() {
                 variant="outlined"
                 sx={{
                   color: 'darkred',
-                  marginRight: '15px',
                   fontFamily: 'Noto Sans KR',
                   borderColor: 'red',
                   background: 'white'
@@ -545,46 +598,6 @@ function MyProfile() {
                 선택삭제
               </Button>
 
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeKeywordsPublic}
-              >
-                공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'red',
-                  background: 'white'
-                }}
-                onClick={makeKeywordsPrivate}
-              >
-                비공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeAllKeywordsPublic}
-              >
-                전체공개
-              </Button>
             </Box>
           </Box>
           <Box
@@ -596,21 +609,23 @@ function MyProfile() {
             }}
           >
             {/* 키워드 박스들 */}
-            {myKeywords.map(
-              (
-                keyword // 샘플임
-              ) => (
-                <KeywordMaker
-                  keyword={keyword.text}
-                  isSelected={keyword.isSelected}
-                  isOpen={keyword.isOpen}
+            <KeywordMaker
+                  keyword={"가나다"}
+                  isSelected={false}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
-                    toggleSelectKeyword(keyword.text);
+                    toggleSelectKeyword("가나다");
                   }}
-                />
-              )
-            )}
+            />
+            <KeywordMaker
+                  keyword={"aaa"}
+                  isSelected={false}
+                  onContextMenu={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    toggleSelectKeyword("aaa");
+                  }}
+            />
+
             {myKeywords.map(
               (
                 keyword // 실제 api로부터 가져오는 키워드
@@ -618,7 +633,6 @@ function MyProfile() {
                 <KeywordMaker
                   keyword={keyword.keyword}
                   isSelected={false}
-                  isOpen={false}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
                     toggleSelectKeyword(keyword.keyword);
@@ -631,7 +645,7 @@ function MyProfile() {
               onChange={handleNewKeywordChange}
               placeholder="새 키워드"
             />
-            <IconButton sx={{ marginLeft: '10px' }} onClick={addKeyword}>
+            <IconButton sx={{ marginLeft: '10px' }} onClick={() => createKeywords([newKeyword])}>
               <Add sx={{ color: 'Black' }} />
             </IconButton>
           </Box>

@@ -55,7 +55,7 @@ const Category = (): React.ReactElement => {
     fetchCategories();
   }, []);
 
-  const getCategoryUrl = (categoryId: number) => `/categories/${categoryId}`;
+  const getCategoryUrl = (categoryId: number) => `/category/${categoryId}`;
 
   return (
     <Draggable>

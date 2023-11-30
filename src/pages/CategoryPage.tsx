@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-//import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Category from '../components/common/Category';
@@ -10,14 +10,13 @@ import { Card } from '../types/types';
 
 function CategoryPage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
-  //const { categoryId } = useParams();
-  //const categoryIdNumber = Number(categoryId);
-  //const [_, _setMyCards] = useState<Card[]>([]);
+  const { id } = useParams();
+  const categoryId = Number(id);
 
   useEffect(() => {
     const fetchPopularCard = async () => {
       try {
-        const response = await getPopularCard(0, 5); // categoryIdNumber 파라미터 추가
+        const response = await getPopularCard(0, 30, categoryId); // categoryIdNumber 파라미터 추가
         const { cards } = response.data;
         console.log(cards); //지울것 (테스트용)
         setPopularCards(cards);
@@ -27,7 +26,7 @@ function CategoryPage() {
     };
 
     fetchPopularCard();
-  }, []);
+  }, [categoryId]);
 
   const fontStyle = {
     fontSize: '44px',
