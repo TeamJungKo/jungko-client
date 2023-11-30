@@ -17,15 +17,19 @@ instance.interceptors.request.use(async (config) => {
   return config;
 });
 
+let isAuthErrorAlertShown = false;
+
 instance.interceptors.response.use(
   (response) => {
+    isAuthErrorAlertShown = false;
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !isAuthErrorAlertShown) {
+      isAuthErrorAlertShown = true;
       removeCookie(COOKIE_NAME);
-      window.location.href = 'login';
-      alert(error.response.data.message);
+      alert('로그인이 필요합니다.');
+      window.location.href = '/';
     }
   }
 );

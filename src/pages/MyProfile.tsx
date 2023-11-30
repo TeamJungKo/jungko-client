@@ -111,23 +111,22 @@ function MyProfile() {
     console.log(isNotificationOn);
   };
 
-  const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNicknameChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newNickname = event.target.value;
     setNickname(newNickname);
-    updateMyProfile(newNickname, email, null);
+    await updateMyProfile(newNickname, null);
   };
 
-  const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImageUrl(base64String);
-        updateMyProfile(nickname, email, base64String);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleProfileImageChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    const file = event.target.files[0];
+    await updateMyProfile(null, file);
+    const imageUrl = URL.createObjectURL(file);
+    setImageUrl(imageUrl);
   };
 
   const handleProfileImageClick = () => {
