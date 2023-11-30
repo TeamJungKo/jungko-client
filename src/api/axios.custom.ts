@@ -11,15 +11,15 @@ export const getMyProfile = async () => {
 };
 
 export const updateMyProfile = async (
-  nickname: string,
-  email: string,
-  imageData: string | null
+  nickname: string | null,
+  imageData: File | null
 ) => {
   const url = '/api/v1/members/me/profile';
   const formData = new FormData();
 
-  formData.append('nickname', nickname);
-  formData.append('email', email);
+  if (nickname) {
+    formData.append('nickname', nickname);
+  }
   if (imageData) {
     formData.append('imageData', imageData);
   }
