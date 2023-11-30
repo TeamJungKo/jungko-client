@@ -8,39 +8,28 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import { getAllProductCategory } from '../../api/axios.custom';
 import Draggable from 'react-draggable';
-
-// interface Props {
-//   url?: string;
-// }
-
-interface ProductCategory {
-  categoryId: number;
-  name: string;
-  level: number;
-  subCategory: ProductCategory[];
-}
+import { Category } from '../../types/types';
 
 const Category = (): React.ReactElement => {
   const navigate = useNavigate();
 
-  const [categories, setCategories] = React.useState<ProductCategory[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [isHovered, setIsHovered] = React.useState(false);
 
-  // const goToUrl = () => {
-  //   navigate(url);
-  // };
 
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAllProductCategory();
         if (response.data.productCategories) {
-          const productCategories: ProductCategory[] =
+          const productCategories: Category[] =
             response.data.productCategories.map(
-              (category: ProductCategory): ProductCategory => ({
+              (category: Category): Category => ({
                 categoryId: category.categoryId,
                 name: category.name,
                 level: category.level,
-                subCategory: category.subCategory
+                subCategory: category.subCategory,
+                imageUrl: category.imageUrl
               })
             );
           setCategories(productCategories);
@@ -63,7 +52,7 @@ const Category = (): React.ReactElement => {
         sx={{
           cursor: 'grab',
           width: '100%',
-          maxWidth: 280,
+          maxWidth: isHovered ? 560 : 280,
           bgcolor: '#E0E7E9',
           border: '3px solid black',
           borderRadius: 3,
@@ -89,8 +78,11 @@ const Category = (): React.ReactElement => {
         <Box
           sx={{
             maxHeight: 'calc(70vh - 36px)', // 카테고리 제목의 높이를 뺀 만큼의 높이를 설정
-            overflowY: 'scroll' // 세로 스크롤 적용
+            overflowY: 'scroll', // 세로 스크롤 적용
+            display: 'flex'
           }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <nav aria-label="secondary mailbox folders">
             <List>
@@ -108,6 +100,14 @@ const Category = (): React.ReactElement => {
               ))}
             </List>
           </nav>
+          {isHovered && (
+            <Box // 오른쪽 빈 칸
+              sx={{
+                flex: '1 1 auto',
+                width: '100%'
+              }}
+            />
+          )}
         </Box>
       </Box>
     </Draggable>

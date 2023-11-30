@@ -500,6 +500,7 @@ function MyProfile() {
                 card //이부분이 api에서 가져온 "내 카드"들임
               ) => (
                 <CardMaker
+                  imageUrl={card.category.imageUrl}
                   cardId={card.cardId}
                   isOpen={card.scope}
                   isSelected={false}
@@ -562,6 +563,7 @@ function MyProfile() {
               ) => (
                 <CardMaker
                   cardId={card.cardId}
+                  imageUrl={card.category.imageUrl}
                   isOpen={'default'}
                   isSelected={false}
                   onContextMenu={(event: React.MouseEvent) => {

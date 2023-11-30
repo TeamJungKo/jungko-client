@@ -182,7 +182,7 @@ function HomePage() {
                     <CardMaker
                       cardId={card.cardId}
                       title={card.title}
-                      imageUrl={card.author.imageUrl}
+                      imageUrl={card.category.imageUrl}
                       description={description}
                     />
                   </Grid>
@@ -236,7 +236,7 @@ function HomePage() {
                     <CardMaker
                       cardId={card.cardId}
                       title={card.title}
-                      imageUrl={card.author.imageUrl}
+                      imageUrl={card.category.imageUrl}
                       description={description}
                     />
                   </Grid>
@@ -290,7 +290,7 @@ function HomePage() {
                     <CardMaker
                       cardId={card.cardId}
                       title={card.title}
-                      imageUrl={card.author.imageUrl}
+                      imageUrl={card.category.imageUrl}
                       description={description}
                     />
                   </Grid>

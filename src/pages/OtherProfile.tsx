@@ -214,6 +214,7 @@ function OtherProfile() {
             {cards.length > 0 && cards.map((card, index) => (
               <CardMaker
                 cardId={card.cardId}
+                imageUrl={card.category.imageUrl}
                 onContextMenu={selectCard(index)}
                 isSelected={isSelectedCard[index]}
               />

@@ -101,15 +101,16 @@ export interface ProductCategoriesResponse {
 }
 
 // 카테고리 정보
-interface Category {
+export interface Category {
   categoryId: number;
   name: string;
   level: number;
   subCategory?: SubCategory;
+  imageUrl: string;
 }
 
 // 카테고리의 하위 카테고리
-interface SubCategory {
+export interface SubCategory {
   categoryId: number;
   name: string;
   level: number;
