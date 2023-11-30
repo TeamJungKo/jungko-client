@@ -69,10 +69,12 @@ function MyProfile() {
     }
     // direction이 'left'일 경우
     else if (direction === 'left') {
-      // 페이지 번호가 음수가 되지 않도록 조건을 추가할 수 있습니다.
+
       if (myCardPage > 0) {
         setMyCardPage(myCardPage => myCardPage - 1);
+        console.log("살려주세요",myCardPage);
       }
+      console.log("살려ㅇㅈ어",myCardPage);
     }
     console.log("받은 방향: ",direction," 이전 페이지: ",myCardPage);
     // 다른 경우는 무시
@@ -145,6 +147,14 @@ function MyProfile() {
   const toggleSelectCard = (id: number) => {
     setMyCards(
       myCards.map((card) =>
+        card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
+      )
+    );
+  }; //카드 선택 토글러
+
+  const toggleSelectInterestedCard = (id: number) => {
+    setMyInterestedCards(
+      myInterestedCards.map((card) =>
         card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
@@ -255,6 +265,11 @@ function MyProfile() {
   };
 
   useEffect(() => {
+
+    setMyInterestedCards([]);
+    setMyCards([]);
+    setMyKeywords([]);
+
     getMyProfile()
       .then((res) => {
         setNickname(res.data.nickname);
@@ -285,6 +300,7 @@ function MyProfile() {
           isSelected: false
         }));
         setMyCards(completeCards);
+        console.log("페이지넘버: ",myCardPage);
         console.log("가져온 내카드 개수: ",res.data.totalResources);
       })
       .catch((err) => {
@@ -494,13 +510,36 @@ function MyProfile() {
                   }}
             />
 
-            {myCards.map(
-              (
-                card //이부분이 api에서 가져온 "내 카드"들임
-              ) => (
+            {myCards.map((card) => {
+              // 모든 카테고리 이름을 가져옵니다.
+              let category = card.category.name;
+              let subCategory = card.category.subCategory;
+              while (subCategory) {
+                category += ' > ' + subCategory.name;
+                subCategory = subCategory.subCategory;
+              }
+
+              // 모든 지역 이름을 가져옵니다.
+              let area = card.area.sido.name;
+              const sigg = card.area.sido.sigg;
+              if (sigg) {
+                area += ' > ' + sigg.name;
+                if (sigg.emd) {
+                  area += ' > ' + sigg.emd.name;
+                }
+              }
+
+              // description을 설정합니다.
+              const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+              카테고리: ${category}
+              지역: ${area}`;
+
+              return (
                 <CardMaker
-                  imageUrl={card.category.imageUrl}
                   cardId={card.cardId}
+                  imageUrl={card.category.imageUrl}
+                  title={card.title}
+                  description={description}
                   isOpen={card.scope}
                   isSelected={false}
                   onContextMenu={(event: React.MouseEvent) => {
@@ -508,8 +547,9 @@ function MyProfile() {
                     toggleSelectCard(card.cardId);
                   }}
                 />
-              )
-            )}
+              );
+            })} 
+
             <IconButton 
               onClick={() => scrollMyCard('right')}
               sx={{alignSelf:'center', height:'100px', width:'100px', marginLeft:'36px'}}>
@@ -556,22 +596,45 @@ function MyProfile() {
               }}
             />
             
-            {myInterestedCards.map(
-              (
-                card //api에서 호출한 관심카드
-              ) => (
+            {myInterestedCards.map((card) => {
+              // 모든 카테고리 이름을 가져옵니다.
+              let category = card.category.name;
+              let subCategory = card.category.subCategory;
+              while (subCategory) {
+                category += ' > ' + subCategory.name;
+                subCategory = subCategory.subCategory;
+              }
+
+              // 모든 지역 이름을 가져옵니다.
+              let area = card.area.sido.name;
+              const sigg = card.area.sido.sigg;
+              if (sigg) {
+                area += ' > ' + sigg.name;
+                if (sigg.emd) {
+                  area += ' > ' + sigg.emd.name;
+                }
+              }
+
+              // description을 설정합니다.
+              const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+              카테고리: ${category}
+              지역: ${area}`;
+
+              return (
                 <CardMaker
                   cardId={card.cardId}
                   imageUrl={card.category.imageUrl}
-                  isOpen={'default'}
+                  title={card.title}
+                  description={description}
+                  isOpen={card.scope}
                   isSelected={false}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
-                    SelectInterestedCard(card.cardId);
+                    toggleSelectInterestedCard(card.cardId);
                   }}
                 />
-              )
-            )}
+              );
+            })} 
 
             <IconButton 
               onClick={() => scrollInterestedCard('right')}
