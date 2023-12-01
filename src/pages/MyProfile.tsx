@@ -150,7 +150,40 @@ function MyProfile() {
         card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
-  }; //카드 선택 토글러
+  }; //내 카드 선택 토글러
+
+  const selectAllCards = (type: string) => {
+    if (type === 'myCards') {
+      setMyCards(
+        myCards.map((card) =>
+          ({ ...card, isSelected: true })
+        )
+      );
+    } else if (type === 'interestedCards') {
+      setMyInterestedCards(
+        myInterestedCards.map((card) =>
+          ({ ...card, isSelected: true })
+        )
+      );
+    }
+  };//전체 카드 선택
+  
+  const deselectAllCards = (type: string) => {
+    if (type === 'myCards') {
+      setMyCards(
+        myCards.map((card) =>
+          ({ ...card, isSelected: false })
+        )
+      );
+    } else if (type === 'interestedCards') {
+      setMyInterestedCards(
+        myInterestedCards.map((card) =>
+          ({ ...card, isSelected: false })
+        )
+      );
+    }
+  };//전체 카드 선택 해제
+  
 
   const toggleSelectInterestedCard = (id: number) => {
     setMyInterestedCards(
@@ -158,7 +191,7 @@ function MyProfile() {
         card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
-  }; //카드 선택 토글러
+  }; //관심 카드 선택 토글러
 
   const deleteSelectedCards = () => {
     const selectedCardIds = myCards
@@ -265,77 +298,56 @@ function MyProfile() {
   };
 
   useEffect(() => {
-
-    setMyInterestedCards([]);
-    setMyCards([]);
-    setMyKeywords([]);
-
     getMyProfile()
-      .then((res) => {
-        setNickname(res.data.nickname);
-        setEmail(res.data.email);
-        setImageUrl(res.data.imageUrl);
-        setIsNotificationOn(res.data.notificationAgreement);
-        getInterestedCard(res.data.memberId,interestedCardPage,6)
-          .then((response) => {
-            const completeCards = response.data.cards.map((card: any) => ({
-              ...card,
-              isSelected: false
-            }));
-            setMyInterestedCards(completeCards);
-            console.log("가져온 관심카드 개수: ",response.data.totalResources);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((res) => {
+      setNickname(res.data.nickname);
+      setEmail(res.data.email);
+      setImageUrl(res.data.imageUrl);
+      setIsNotificationOn(res.data.notificationAgreement);
+      getInterestedCard(res.data.memberId,interestedCardPage,6)
+        .then((response) => {
+          const completeCards = response.data.cards.map((card: any) => ({
+            ...card,
+            isSelected: false
+          }));
+          setMyInterestedCards(completeCards);
+          console.log("가져온 관심카드 개수: ",response.data.totalResources);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
     getMyCard(myCardPage,6)
-      .then((res) => {
-        const completeCards = res.data.cards.map((card: any) => ({
-          ...card,
-          isSelected: false
-        }));
-        setMyCards(completeCards);
-        console.log("페이지넘버: ",myCardPage);
-        console.log("가져온 내카드 개수: ",res.data.totalResources);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((res) => {
+      const completeCards = res.data.cards.map((card: any) => ({
+        ...card,
+        isSelected: false
+      }));
+      setMyCards(completeCards);
+      console.log("페이지넘버: ",myCardPage);
+      console.log("가져온 내카드 개수: ",res.data.totalResources);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
     getMyKeywords()
-      .then((res) => {
-        const completeKeywords = res.data.keywordList.map((keyword: any) => ({
-          ...keyword,
-          isSelected: false,
-        }));
-        setMyKeywords(completeKeywords);
-        console.log("가져온 키워드 개수: ",res.data.keywordList.length);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((res) => {
+      const completeKeywords = res.data.keywordList.map((keyword: any) => ({
+        ...keyword,
+        isSelected: false,
+      }));
+      setMyKeywords(completeKeywords);
+      console.log("가져온 키워드 개수: ",res.data.keywordList.length);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-    // 다른 영역 클릭 시 모든 카드 선택 해제
-    const handleClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.divider')) {
-        // 클릭한 요소가 Divider 내부인지 확인
-        setMyCards(myCards.map((card) => ({ ...card, isSelected: false })));
-      }
-    };
-
-    // 클릭 이벤트 리스너 등록
-    document.addEventListener('click', handleClick);
-
-    // 컴포넌트 unmount 시 클릭 이벤트 리스너 해제
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
   }, [myCardPage, interestedCardPage]);
 
   const title_space = {
@@ -350,7 +362,7 @@ function MyProfile() {
   const default_space = {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginTop: '50px',
     marginBottom: '35px'
   };
@@ -425,65 +437,86 @@ function MyProfile() {
           <Divider className="divider" />
 
           <Box sx={default_space}>
-            <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
+            <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top'}}>
               내가 생성한 카드
             </Typography>
-            <Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                gap: '16px'
+              }}
+            >
+              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'darkgreen',
+                    marginRight: '15px',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'green',
+                    background: 'white',
+                  }}
+                  onClick={() => selectAllCards("myCards")}
+                >
+                  전체선택
+                </Button>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'darkred',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'red',
+                    background: 'white',
+                  }}
+                  onClick={() => myCards.forEach(card => toggleSelectCard(card.cardId))}
+                >
+                  전체해제
+                </Button>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'darkgreen',
+                    marginRight: '15px',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'green',
+                    background: 'white',
+                  }}
+                  onClick={() => deselectAllCards("myCards")}
+                >
+                  공개
+                </Button>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'darkred',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'red',
+                    background: 'white',
+                  }}
+                  onClick={makeCardsPrivate}
+                >
+                  비공개
+                </Button>
+              </Box>
               <Button
                 variant="outlined"
                 sx={{
                   color: 'darkred',
-                  marginRight: '15px',
                   fontFamily: 'Noto Sans KR',
                   borderColor: 'red',
-                  background: 'white'
+                  background: 'white',
                 }}
                 onClick={deleteSelectedCards}
               >
-                선택삭제
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeCardsPublic}
-              >
-                공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'red',
-                  background: 'white'
-                }}
-                onClick={makeCardsPrivate}
-              >
-                비공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeAllCardsPublic}
-              >
-                전체공개
+                삭제
               </Button>
             </Box>
+
           </Box>
           <Box
             sx={{
@@ -541,7 +574,7 @@ function MyProfile() {
                   title={card.title}
                   description={description}
                   isOpen={card.scope}
-                  isSelected={false}
+                  isSelected={card.isSelected}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
                     toggleSelectCard(card.cardId);
@@ -627,7 +660,7 @@ function MyProfile() {
                   title={card.title}
                   description={description}
                   isOpen={card.scope}
-                  isSelected={false}
+                  isSelected={card.isSelected}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
                     toggleSelectInterestedCard(card.cardId);
@@ -696,7 +729,7 @@ function MyProfile() {
               ) => (
                 <KeywordMaker
                   keyword={keyword.keyword}
-                  isSelected={false}
+                  isSelected={keyword.isSelected}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
                     toggleSelectKeyword(keyword.keyword);
