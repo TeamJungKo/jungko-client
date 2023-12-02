@@ -143,6 +143,23 @@ export interface MemberResponse {
   notificationAgreement: boolean;
 }
 
+// 알림 정보
+export interface Notice {
+  noticeId: number;
+  title: string;
+  content: string;
+  productId: number;
+  createdAt: string;
+  isRead: boolean;
+}
+
+//알림 api
+export interface NoticeResponse {
+  keywordNotices: Notice[];
+  totalResources: number;
+}
+
+
 // 여기서부턴 Request 입니다.
 
 // 카드 생성

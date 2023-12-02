@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Pagination from '@mui/material/Pagination';
 import Category from '../components/common/Category';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
@@ -10,15 +13,28 @@ import { Card } from '../types/types';
 
 function CategoryPage() {
   const [popularCards, setPopularCards] = useState<Card[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(0);
   const { id } = useParams();
   const categoryId = Number(id);
+  const [sort, setSort] = useState<string | null>(null);
+  const [order, setOrder] = useState<string | null>(null);
+
+
+  const pageChange = (page: number) => {
+    setPage(page - 1); //인덱스는 0부터이므로
+  };
 
   useEffect(() => {
     const fetchPopularCard = async () => {
       try {
-        const response = await getPopularCard(0, 30, categoryId); // categoryIdNumber 파라미터 추가
+        const response = await getPopularCard(page, 48, categoryId);
+        console.log("소트:",sort,", 오더:",order)
+
+        setTotalPages(Math.ceil(response.data.totalResources/48));
         const { cards } = response.data;
-        console.log(cards); //지울것 (테스트용)
+
+        console.log(cards);
         setPopularCards(cards);
       } catch (error) {
         console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
@@ -26,13 +42,11 @@ function CategoryPage() {
     };
 
     fetchPopularCard();
-  }, [categoryId]);
+  }, [categoryId, page, order]);
 
   const fontStyle = {
     fontSize: '44px',
-    fontFamily: 'Gugi',
-    marginTop: '60px',
-    marginBottom: '30px'
+    fontFamily: 'Gugi'
   };
 
   return (
@@ -54,23 +68,53 @@ function CategoryPage() {
               position: 'fixed',
               top: 200,
               left: 80,
-              width: '20%',
+              width: '280px',
               height: 'calc(100vh - 100px)'
             }}
           >
             <Category />
           </Box>
         </Grid>
+
         <Grid item xs={9}>
           {/* 카드 목록 */}
-          <Box sx={{ marginTop: '200px', marginBottom: '50%' }}>
-            <div style={fontStyle}>인기 카드 목록</div>
+          <Box 
+            sx={{ 
+              marginTop: '200px', 
+              marginBottom: '10%',
+              minHeight: `calc(100vh - 297px)`
+            }}>
+            <Box 
+              display="flex"
+              alignItems="center"
+              marginBottom={2}
+            >
+              <div style={fontStyle}>인기 카드 목록</div>
+              <Select
+                displayEmpty
+                value={sort ? `${sort}-${order}` : ""}
+                onChange={(event) => {
+                  const [newSort, newOrder] = event.target.value.split("-");
+                  setSort(newSort);
+                  setOrder(newOrder);
+                }}
+                style={{ marginLeft: '40px'}}
+              >
+                <MenuItem value="" disabled>정렬순</MenuItem>
+                <MenuItem value={"title-ASC"}>제목 오름차순</MenuItem>
+                <MenuItem value={"title-DESC"}>제목 내림차순</MenuItem>
+                <MenuItem value={"keyword-ASC"}>키워드 오름차순</MenuItem>
+                <MenuItem value={"keyword-DESC"}>키워드 내림차순</MenuItem>
+                <MenuItem value={"minprice-ASC"}>낮은가격순</MenuItem>
+                <MenuItem value={"maxprice-DESC"}>높은가격순</MenuItem>
+                <MenuItem value={"createdAt-DESC"}>최신순</MenuItem>
+                <MenuItem value={"createdAt-ASC"}>오래된순</MenuItem>
+              </Select>
+            </Box>
+
             <Grid container spacing={2}>
-              {' '}
-              {/*아래는 테스트*/}
-              <Grid item>
-                <CardMaker />
-              </Grid>
+
+              {/*해당 카테고리의 인기카드*/}
               {popularCards.map((card) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
@@ -96,16 +140,29 @@ function CategoryPage() {
                 지역: ${area}`;
 
                 return (
-                  <Grid item key={card.cardId}>
+                  <Grid item 
+                    key={card.cardId}
+                    style={{ marginTop: '20px', marginBottom: '20px' }}>
                     <CardMaker
                       title={card.title}
-                      imageUrl={card.author.imageUrl}
+                      imageUrl={card.category.imageUrl}
                       description={description}
                     />
                   </Grid>
                 );
               })}
             </Grid>
+            <Box 
+              display="flex" 
+              justifyContent="center" 
+              marginTop={4} 
+            >
+              <Pagination 
+                count={totalPages} 
+                page={page + 1} 
+                onChange={(_, page) => pageChange(page)} 
+              />
+            </Box>
           </Box>
         </Grid>
       </Grid>

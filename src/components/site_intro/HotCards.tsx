@@ -19,7 +19,7 @@ const HotCards = (): React.ReactElement => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getPopularCard(0, 6);
+        const response = await getPopularCard(0, 8);
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {
@@ -30,7 +30,6 @@ const HotCards = (): React.ReactElement => {
       }
       console.log(`호출된 인기카드 개수: ${cards.length}`);
       console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
-
     };
 
     fetchCards();
@@ -43,16 +42,16 @@ const HotCards = (): React.ReactElement => {
           <WhatshotIcon style={{ fontSize: '60px' }} /> 지금 가장 인기 많은 카드
         </p>
         <div className="hot_card_container">
-          {cards.map((card, index) => (
-            <div key={index} className="hot_card_wrapper" onClick={goToUrl}>
+          {cards.map((card) => (
               <CardMaker
+                key={card.cardId}
                 imageUrl={jungkoIcon}
                 title={card.title}
                 description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
                 imageHeight="50%"
                 contentHeight="50%"
+                onClick={goToUrl}
               />
-            </div>
           ))}
           <CardMaker //이부분은 샘플이니 지워도무관
             imageUrl={jungkoIcon}
@@ -60,6 +59,7 @@ const HotCards = (): React.ReactElement => {
             description="카드설명"
             imageHeight="50%"
             contentHeight="50%"
+            onClick={goToUrl}
           />
         </div>
       </div>
