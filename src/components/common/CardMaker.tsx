@@ -16,31 +16,36 @@ interface Props {
   contentHeight?: string;
   isOpen?: string;
   onContextMenu?: (event: React.MouseEvent) => void;
+  onClick?: () => void; 
   style?: React.CSSProperties;
   isSelected?: boolean;
 }
 
-function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 'default', onContextMenu, isSelected=false }: Props) {
+function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 'DEFAULT', onContextMenu, onClick, isSelected=false }: Props) {
 
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/card/${cardId}`);
-  }  
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/card/${cardId}`);
+    }
+  }
 
   let border;
   if (isSelected) {
-    border = '4px dashed black';
+    border = '5px dashed black';
   } else {
     switch (isOpen) {
-      case 'default':
+      case 'DEFAULT':
         border = '5px outset lightgrey';
         break;
-      case 'public':
+      case 'PUBLIC':
         border = '5px outset lightgreen';
         break;
-      case 'private':
-        border = '5px outset rgb(255, 102, 102)';
+      case 'PRIVATE':
+        border = '5px outset darkred';
         break;
       default:
         border = '5px outset lightgrey';

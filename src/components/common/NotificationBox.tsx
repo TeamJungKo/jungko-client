@@ -8,13 +8,14 @@ interface NotificationBoxProps {
   title: string;
   content: string;
   time: string;
-  index: number; // 인덱스 prop 추가
-  onDelete: (index: number) => void; // 삭제 함수 prop 추가
+  index: number;
+  onDelete: (index: number) => void; // 삭제 함수
+  onClick: () => void; //클릭시 실행될 함수
 }
 
-const NotificationBox: React.FC<NotificationBoxProps> = ({ imageAlt='', imageUrl, title, content, time, index, onDelete }) => {
+const NotificationBox: React.FC<NotificationBoxProps> = ({ imageAlt='', imageUrl, title, content, time, index, onDelete, onClick }) => {
   return (
-    <ButtonBase style={{display: 'block', width: '100%'}}>
+    <ButtonBase style={{display: 'block', width: '100%'}} onClick={onClick}>
       <Box display="flex" flexDirection="column"  sx={{width: '100%'}}>
         <Box display="flex" alignItems="center" justifyContent="space-between" marginTop="16px" marginBottom="16px">
           <Avatar alt={imageAlt} src={imageUrl} />

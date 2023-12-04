@@ -5,32 +5,21 @@ import jungkoIcon from '../../assets/images/jungkoIcon.png';
 import CardMaker from '../common/CardMaker.tsx';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import { getPopularCard } from '../../api/axios.custom.ts';
+import { Card } from '../../types/types.ts';
 
-interface Props {
-  url: string;
-}
-
-interface Card {
-  cardId: number;
-  title: string;
-  keyword: string;
-  minPrice: number;
-  maxPrice: number;
-}
-
-const HotCards = ({ url }: Props): React.ReactElement => {
+const HotCards = (): React.ReactElement => {
   const [cards, setCards] = useState<Card[]>([]);
 
   const navigate = useNavigate();
 
   const goToUrl = () => {
-    navigate(url);
+    navigate('/login');
   };
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getPopularCard();
+        const response = await getPopularCard(0, 8);
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {
@@ -39,6 +28,8 @@ const HotCards = ({ url }: Props): React.ReactElement => {
       } catch (error) {
         console.error(error);
       }
+      console.log(`호출된 인기카드 개수: ${cards.length}`);
+      console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
     };
 
     fetchCards();
@@ -51,16 +42,16 @@ const HotCards = ({ url }: Props): React.ReactElement => {
           <WhatshotIcon style={{ fontSize: '60px' }} /> 지금 가장 인기 많은 카드
         </p>
         <div className="hot_card_container">
-          {cards.map((card, index) => (
-            <div key={index} className="hot_card_wrapper" onClick={goToUrl}>
+          {cards.map((card) => (
               <CardMaker
+                key={card.cardId}
                 imageUrl={jungkoIcon}
                 title={card.title}
                 description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
                 imageHeight="50%"
                 contentHeight="50%"
+                onClick={goToUrl}
               />
-            </div>
           ))}
           <CardMaker //이부분은 샘플이니 지워도무관
             imageUrl={jungkoIcon}
@@ -68,6 +59,7 @@ const HotCards = ({ url }: Props): React.ReactElement => {
             description="카드설명"
             imageHeight="50%"
             contentHeight="50%"
+            onClick={goToUrl}
           />
         </div>
       </div>
