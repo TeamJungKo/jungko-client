@@ -105,6 +105,7 @@ const SiteGuide = (): React.ReactElement => {
                 description="설명테스트"
                 imageHeight="70%"
                 contentHeight="30%"
+                onClick={() => {}}
               />
             </Box>
           ))}

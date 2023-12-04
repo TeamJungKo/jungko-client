@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Button, Divider, Avatar} from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Pagination from '@mui/material/Pagination';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import KeywordMaker from '../components/common/KeywordMaker';
@@ -21,20 +22,27 @@ function OtherProfile() {
   const [keywords, setKeywords] = useState<KeywordListResponse['keywordList']>([]);
   const [isSelectedCard, setIsSelectedCard] = useState<boolean[]>([]);
   const [isSelectedKeyword, setIsSelectedKeyword] = useState<boolean[]>([]);
-  const [nickname, setNickname] = useState('닉네임'); // 닉네임 상태값 추가
+  const [nickname, setNickname] = useState('닉네임');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [cardPage, setCardPage] = useState(0);
+  const [totalCardPage, setTotalCardPage] = useState(0);
+  const [keywordsForAddition, setKeywordsForAddition] = useState<string[]>([]);
 
-  const handleCardRightClick = 
+  const cardPageChange = (page: number) => {
+    setCardPage(page - 1); //인덱스는 0부터이므로
+  };
+
+  const selectCard = 
     (index: number) => (event: React.MouseEvent) => {
-      event.preventDefault(); // 기본 우클릭 메뉴가 나타나지 않도록 합니다.
+      event.preventDefault();
       const selectedCards = [...isSelectedCard];
       selectedCards[index] = !selectedCards[index];
       setIsSelectedCard(selectedCards);
   };
 
-  const handleKeywordRightClick =
+  const selectKeyword =
     (index: number) => (event: React.MouseEvent) => {
-      event.preventDefault(); // 기본 우클릭 메뉴가 나타나지 않도록 합니다.
+      event.preventDefault();
       const selectedKeywords = [...isSelectedKeyword];
       selectedKeywords[index] = !selectedKeywords[index];
       setIsSelectedKeyword(selectedKeywords);
@@ -43,35 +51,82 @@ function OtherProfile() {
   const addToInterestedCard = () => {
     const selectedCardExists = isSelectedCard.some(isSelected => isSelected);
     if (!selectedCardExists) {
-      alert("선택된 카드가 없습니다.");
-      return;
+        alert("선택된 카드가 없습니다.");
+        return;
     }
-    isSelectedCard.forEach((isSelected, index) => {
-      if (isSelected) {
-        likeCard(cards[index].cardId)
-          .then(() => alert(`관심카드에 추가성공! 보내진 카드id: ${cards[index].cardId}`))
-          .catch((error) => console.error(error));
-      }
-    });
-  } 
-  
+
+    const promises = isSelectedCard
+        .filter((isSelected) => isSelected)
+        .map((_, index) => likeCard(cards[index].cardId));
+
+    Promise.all(promises)
+        .then(() => alert(`관심 카드에 추가되었습니다.`))
+        .catch((error) => console.error(error));
+  };
+
   const addToMyKeyword = () => {
-    const selectedKeywordExists = isSelectedKeyword.some(isSelected => isSelected);
+    const selectedKeywordExists = isSelectedKeyword.some((isSelected) => isSelected);
     if (!selectedKeywordExists) {
       alert("선택된 키워드가 없습니다.");
       return;
     }
+  
     isSelectedKeyword.forEach((isSelected, index) => {
       if (isSelected) {
-        createKeywords([keywords[index].keyword])
-          .then(() => 
-            alert(`관심키워드에 추가성공! 보내진 키워드: ${keywords[index].keyword}`))
-          .catch((error) => console.error(error));
+        setKeywordsForAddition((prevKeywords) => [...prevKeywords, keywords[index].keyword]);
       }
     });
-  } 
-  
+  };
 
+  useEffect(() => {
+    if (keywordsForAddition.length > 0) {
+      createKeywords(keywordsForAddition)
+        .then(() =>
+          alert(`관심키워드에 추가되었습니다.`)
+        )
+        .catch((error) => console.error(error));
+    }
+  }, [keywordsForAddition]);
+
+  useEffect(() => {
+    getMembersProfile(memberId)
+      .then((res) => {
+        console.log(res);
+        setNickname(res.data.nickname);
+        setImageUrl(res.data.imageUrl);
+        console.log("이 멤버의 프로필: ", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });    
+  }, [memberId]);
+
+  useEffect(() => {
+    getMemberCard(memberId,cardPage,8)
+      .then((res) => {
+        setTotalCardPage(Math.ceil(res.data.totalResources/8));
+        setCards(res.data.cards);
+        setIsSelectedCard(new Array(res.data.cards.length).fill(false));
+        console.log("이 멤버의 카드개수: ", res.data.cards.length);
+      })
+      .catch((err) => {
+        console.log(err);
+      });    
+  }, [memberId, cardPage]);
+
+  useEffect(() => {
+    getMemberKeywords(memberId)
+      .then((res) => {
+        setKeywords(res.data.keywordList);
+        setIsSelectedKeyword(new Array(res.data.keywordList.length).fill(false));
+        console.log("이 멤버의 키워드 개수: ", res.data.keywordList.length);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    
+  }, [memberId]);
+  
   const title_space = {
     display: 'flex',
     alignItems: 'center',
@@ -88,39 +143,6 @@ function OtherProfile() {
     marginTop: '50px',
     marginBottom: '35px'
   };
-
-  useEffect(() => {
-    getMembersProfile(10)
-      .then((res) => {
-        console.log(res);
-        setNickname(res.data.nickname);
-        setImageUrl(res.data.imageUrl);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    getMemberCard(memberId)
-      .then((res) => {
-        setCards(res.data.cards);
-        // 카드의 개수와 동일한 크기의 isSelected 상태를 생성
-        setIsSelectedCard(new Array(res.data.cards.length).fill(false));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    getMemberKeywords(memberId)
-      .then((res) => {
-        setKeywords(res.data.keywordList);
-        // 키워드의 개수와 동일한 크기의 isSelected 상태를 생성
-        setIsSelectedKeyword(new Array(res.data.keywordList.length).fill(false));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    
-  }, [memberId]);
 
   return (
     <div
@@ -169,23 +191,57 @@ function OtherProfile() {
               gap: '16px'
             }}
           >
+
             {/* 타 유저가 만든 카드들 */}
-            {cards.length > 0 && cards.map((card, index) => (
-              <CardMaker
-                cardId={card.cardId}
-                onContextMenu={handleCardRightClick(index)}
-                isSelected={isSelectedCard[index]}
-              />
-            ))}
-            <CardMaker
-                cardId={1}
-                onContextMenu={handleCardRightClick(1)}
-                isSelected={isSelectedCard[1]}
-            />
-            <CardMaker
-              cardId={2}
-              onContextMenu={handleCardRightClick(2)}
-              isSelected={isSelectedCard[2]}
+
+            {cards.map((card, index) => {
+              // 모든 카테고리 이름을 가져옵니다.
+              let category = card.category.name;
+              let subCategory = card.category.subCategory;
+              while (subCategory) {
+                category += ' > ' + subCategory.name;
+                subCategory = subCategory.subCategory;
+              }
+
+              // 모든 지역 이름을 가져옵니다.
+              let area = card.area.sido.name;
+              const sigg = card.area.sido.sigg;
+              if (sigg) {
+                area += ' > ' + sigg.name;
+                if (sigg.emd) {
+                  area += ' > ' + sigg.emd.name;
+                }
+              }
+
+              // description을 설정합니다.
+              const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+              카테고리: ${category}
+              지역: ${area}`;
+
+              return (
+                <CardMaker
+                  key={card.cardId}
+                  cardId={card.cardId}
+                  title={card.title}
+                  imageUrl={card.category.imageUrl}
+                  description={description}
+                  onContextMenu={selectCard(index)}
+                  isSelected={isSelectedCard[index]}
+                />
+              );
+            })}
+
+          </Box>
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            marginTop={4} 
+            marginBottom={2}
+          >
+            <Pagination 
+              count={totalCardPage} 
+              page={cardPage + 1} 
+              onChange={(_, page) => cardPageChange(page)} 
             />
           </Box>
           <Divider />
@@ -215,32 +271,20 @@ function OtherProfile() {
               display: 'flex',
               alignItems: 'center',
               gap: '16px',
-              paddingBottom: '200px'
+              paddingBottom: '200px',
+              flexWrap: 'wrap'
             }}
           >
             {/* 키워드 박스들 */}
-            {keywords && keywords.length > 0 && keywords.map((keyword, index) => (
+
+            {keywords.map((keyword, index) => (
               <KeywordMaker 
+                key={keyword.keywordId}
                 keyword={keyword.keyword}
-                onContextMenu={handleKeywordRightClick(index)}
+                onContextMenu={selectKeyword(index)}
                 isSelected={isSelectedKeyword[index]}
               />
             ))}
-            <KeywordMaker
-              onContextMenu={handleKeywordRightClick(0)}
-              isSelected={isSelectedKeyword[0]}
-              keyword="검정바지"
-            />
-            <KeywordMaker
-              onContextMenu={handleKeywordRightClick(1)}
-              isSelected={isSelectedKeyword[1]}
-              keyword="흰둥이"
-            />
-            <KeywordMaker
-              onContextMenu={handleKeywordRightClick(2)}
-              isSelected={isSelectedKeyword[2]}
-              keyword="당근"
-            />
           </Box>
         </Box>
       </Box>

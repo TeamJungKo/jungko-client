@@ -11,15 +11,15 @@ export const getMyProfile = async () => {
 };
 
 export const updateMyProfile = async (
-  nickname: string,
-  email: string,
-  imageData: string | null
+  nickname: string | null,
+  imageData: File | null
 ) => {
   const url = '/api/v1/members/me/profile';
   const formData = new FormData();
 
-  formData.append('nickname', nickname);
-  formData.append('email', email);
+  if (nickname) {
+    formData.append('nickname', nickname);
+  }
   if (imageData) {
     formData.append('imageData', imageData);
   }
@@ -66,9 +66,7 @@ export const changeCardOption = async (
   cardId: number,
   cardChangeRequest: FormData
 ): Promise<any> => {
-  const response = await instance.patch(`/api/v1/cards/${cardId}`, {
-    cardChangeRequest
-  });
+  const response = await instance.patch(`/api/v1/cards/${cardId}`, cardChangeRequest);
   return response;
 };
 
@@ -88,15 +86,21 @@ export const getCardInfo = async (
 export const getPopularCard = async (
   page = 0,
   size = 10,
-  categoryId?: number
+  categoryId?: number,
+  sort?: string,
+  order?: string
 ) => {
-  const params = { page, size, categoryId };
+  let url = `/api/v1/cards/popular?page=${page}&size=${size}`;
+
   if (categoryId) {
-    params.categoryId = categoryId;
+    url += `&categoryId=${categoryId}`;
   }
-  const response = await instance.get(
-    '/api/v1/cards/popular?page=${page}&size=${size}&categoryId={categoryId}'
-  );
+
+  if (sort && order) {
+    url += `&sort=${sort}&order=${order}`;
+  }
+
+  const response = await instance.get(url);
   return response;
 };
 
@@ -183,10 +187,8 @@ export const getAllArea = async () => {
 };
 
 // Keyword
-export const createKeywords = async (keyword: string[]) => {
-  const response = await instance.put('/api/v1/keywords', {
-    keyword
-  });
+export const createKeywords = async (keywords: string[]) => {
+  const response = await instance.put('/api/v1/keywords/', { keywords });
   return response;
 };
 
@@ -215,8 +217,10 @@ export const deleteKeywords = async (keywordId: number) => {
 
 // Notification
 
-export const changeNoticeSetting = async () => {
-  const response = await instance.put('/api/v1/notices/settings');
+export const changeNoticeSetting = async (deviceToken: string | null) => {
+  const response = await instance.put('/api/v1/notices/setting', {
+    deviceToken
+  });
   return response;
 };
 
@@ -225,19 +229,14 @@ export const changeKeywordNoticeSetting = async (keywordId: number) => {
   return response;
 };
 
-export const getNoticeKeywords = async (page = 0, size = 10): Promise<any> => {
+export const getNotices = async (page = 0, size = 10): Promise<any> => {
   const response = await instance.get(
     `/api/v1/notices/keywords?page=${page}&size=${size}`
   );
   return response;
 };
 
-export const deleteAllNoticeKeywords = async () => {
-  const response = await instance.delete(`/api/v1/notices/keywords`);
-  return response;
-};
-
-export const deleteNotice = async (noticeId: number) => {
-  const response = await instance.delete(`/api/v1/notices/${noticeId}`);
+export const deleteNotices = async (noticeIds: number[]) => {
+  const response = await instance.delete(`/api/v1/notices/`, { data: { noticeIds } });
   return response;
 };

@@ -18,6 +18,7 @@ export interface Card {
   author: Author;
   area: Area;
   category: Category;
+  isSelected?: boolean;
 }
 
 // 상품 api
@@ -110,6 +111,7 @@ export interface Category {
   name: string;
   level: number;
   subCategory?: SubCategory[];
+  imageUrl: string;
 }
 
 // 카테고리의 하위 카테고리
@@ -134,6 +136,7 @@ export interface KeywordListResponse {
 export interface Keyword {
   keywordId: number;
   keyword: string;
+  isSelected?: boolean;
 }
 
 // 회원 정보
@@ -142,7 +145,25 @@ export interface MemberResponse {
   nickname: string;
   imageUrl: string;
   email: string;
+  notificationAgreement: boolean;
 }
+
+// 알림 정보
+export interface Notice {
+  noticeId: number;
+  title: string;
+  content: string;
+  productId: number;
+  createdAt: string;
+  isRead: boolean;
+}
+
+//알림 api
+export interface NoticeResponse {
+  keywordNotices: Notice[];
+  totalResources: number;
+}
+
 
 // 여기서부턴 Request 입니다.
 
