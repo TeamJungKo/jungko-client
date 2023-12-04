@@ -4,7 +4,9 @@ import instance from './axios.instance';
 // Member
 
 export const getMyProfile = async () => {
-  const response = await instance.get<types.MemberResponse>(`/api/v1/members/me/profile`);
+  const response = await instance.get<types.MemberResponse>(
+    `/api/v1/members/me/profile`
+  );
   return response;
 };
 
@@ -32,15 +34,12 @@ export const updateMyProfile = async (
   return response;
 };
 
-export const getMembersProfile = async (
-  memberId: number
-)=> {
+export const getMembersProfile = async (memberId: number) => {
   const response = await instance.get<types.MemberResponse>(
     `/api/v1/members/${memberId}/profile`
   );
   return response;
 };
-
 
 export const unregisterUser = async () => {
   const response = await instance.delete(`/api/v1/auth/unregister`);
@@ -71,6 +70,19 @@ export const changeCardOption = async (
     cardChangeRequest
   });
   return response;
+};
+
+export const getCardInfo = async (
+  cardId: number,
+  page = 0,
+  size = 10,
+  sort: string,
+  order: 'ASC' | 'DESC'
+) => {
+  const response = await instance.get(
+    `/api/v1/cards/${cardId}/products?page=${page}&size=${size}&sort=${sort}&order=${order}`
+  );
+  return response.data;
 };
 
 export const getPopularCard = async (
@@ -144,12 +156,10 @@ export const getProductDetail = async (productId: number) => {
 export const searchProduct = async (
   productSearchRequest: types.ProductSearchRequest,
   page = 0,
-  size = 10,
-  sort: string,
-  order: 'ASC' | 'DESC'
+  size = 2
 ) => {
   const response = await instance.post(
-    `/api/v1/products/search?keyword=${productSearchRequest.keyword}&minPrice=${productSearchRequest.minPrice}&maxPrice=${productSearchRequest.maxPrice}&categoryId=${productSearchRequest.categoryId}&areaId=${productSearchRequest.areaId}&page=${page}&size=${size}&sort=${sort}&order=${order}`,
+    `/api/v1/products/search?keyword=${productSearchRequest.keyword}&minPrice=${productSearchRequest.minPrice}&maxPrice=${productSearchRequest.maxPrice}&categoryId=${productSearchRequest.categoryId}&areaId=${productSearchRequest.areaId}&page=${page}&size=${size}&sort=${productSearchRequest.sort}&order=${productSearchRequest.order}`,
     productSearchRequest
   );
   return response;

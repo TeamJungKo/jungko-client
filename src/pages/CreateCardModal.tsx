@@ -1,29 +1,70 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
+  Modal,
   Box,
+  Checkbox,
   TextField,
   Button,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
-  Chip,
+  FormControlLabel,
   Grid,
-  SelectChangeEvent,
-  Checkbox,
-  FormControlLabel
+  SelectChangeEvent
 } from '@mui/material';
-import { createCard } from '../api/axios.custom.ts';
+import { useTheme } from '@mui/material/styles';
+import {
+  getAllProductCategory,
+  getAllArea,
+  createCard
+} from '../api/axios.custom.ts';
+import { Category, SubCategory, Sido, Sigg } from '../types/types.ts';
 
-const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+interface CreateCardPageProps {
+  open: boolean;
+  handleClose: () => void;
+}
+
+const CreateCardPage: React.FC<CreateCardPageProps> = ({
+  open,
+  handleClose
+}) => {
+  const [newCardTitle, setNewCardTitle] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [category, setCategory] = useState('');
-  const [region, setRegion] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [category, setCategory] = useState<Category[]>([]);
+  const [subCategory, setSubCategory] = useState<SubCategory[]>([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [area, setArea] = useState<Sido[]>([]);
+  const [selectedSido, setSelectedSido] = useState<Sido>();
+  const [selectedSigg, setSelectedSigg] = useState<Sigg>();
+  const [selectedEmd, setSelectedEmd] = useState<number>();
   const [isPublic, setIsPublic] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategoriesAndAreas = async () => {
+      try {
+        const response = await getAllProductCategory();
+        setCategory(response.data.productCategories);
+        const response2 = await getAllArea();
+        setArea(response2.data.areas[0].sido);
+      } catch (error) {
+        console.error('카테고리 데이터를 불러오는데 실패했습니다.', error);
+      }
+    };
+    fetchCategoriesAndAreas();
+  }, []);
+
+  const handleNewCardTitleChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewCardTitle(event.target.value);
+  };
 
   const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -40,31 +81,51 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-    const newCategory = event.target.value;
-    if (!selectedCategories.includes(newCategory)) {
-      setSelectedCategories((prev) => [...prev, newCategory]);
-      setCategory('');
+    const categoryId = event.target.value as string;
+    setSelectedCategory(categoryId);
+    const foundCategory = category.find(
+      (c) => c.categoryId === Number(categoryId)
+    );
+    setSubCategory(foundCategory?.subCategory || []);
+    setSelectedSubCategory('default');
+  };
+
+  const handleSubCategoryChange = (event: SelectChangeEvent<string>) => {
+    const subCategoryId = event.target.value as string;
+    setSelectedSubCategory(subCategoryId);
+    if (subCategoryId !== 'default') {
+      setSelectedCategory(subCategoryId);
+    } else {
+      const currentCategoryId = category
+        .find(
+          (c) =>
+            c.subCategory?.some(
+              (subCat) => subCat.categoryId === Number(subCategoryId)
+            )
+        )
+        ?.categoryId.toString();
+      setSelectedCategory(currentCategoryId || '');
     }
   };
 
-  const handleRegionChange = (event: SelectChangeEvent<string>) => {
-    const newRegion = event.target.value;
-    if (!selectedRegions.includes(newRegion)) {
-      setSelectedRegions((prev) => [...prev, newRegion]);
-      setRegion('');
-    }
+  const handleSidoSelect = (event: SelectChangeEvent) => {
+    const sidoId = event.target.value; // ID 추출
+    const selected = area.find((sido) => sido.id === Number(sidoId));
+    setSelectedSido(selected);
+    setSelectedEmd(undefined);
   };
 
-  const handleDeleteCategory = (categoryToDelete: string) => {
-    setSelectedCategories((prev) =>
-      prev.filter((category) => category !== categoryToDelete)
+  const handleSiggSelect = (event: SelectChangeEvent) => {
+    const siggId = event.target.value; // ID 추출
+    const selected = selectedSido?.sigg.find(
+      (sigg) => sigg.id === Number(siggId)
     );
+    setSelectedSigg(selected);
   };
 
-  const handleDeleteRegion = (regionToDelete: string) => {
-    setSelectedRegions((prev) =>
-      prev.filter((region) => region !== regionToDelete)
-    );
+  const handleEmdClick = (event: SelectChangeEvent) => {
+    const emdId = event.target.value; // ID 추출
+    setSelectedEmd(Number(emdId));
   };
 
   const handlePublicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,37 +134,73 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handleCreate = async () => {
     const formData = new FormData();
-    formData.append('categoryId', selectedCategories.toString());
-    formData.append('areaId', selectedRegions.toString());
+    formData.append('categoryId', selectedCategory);
+    if (selectedEmd !== undefined) {
+      formData.append('areaId', selectedEmd.toString());
+    }
     formData.append('title', searchTerm);
+    formData.append('keyword', newCardTitle);
     formData.append('minPrice', minPrice);
     formData.append('maxPrice', maxPrice);
-    formData.append('scope', isPublic.toString());
+    if (isPublic == true) {
+      formData.append('scope', 'PUBLIC');
+    } else {
+      formData.append('scope', 'PRIVATE');
+    }
     try {
       const response = await createCard(formData);
       if (response.status === 201) {
         console.log('생성 완료'); //생성 완료 alert
+        navigate(`/Card/${response.data.cardId}`);
       }
     } catch (error) {
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
       console.log('에러'); //에러 모달 혹은 페이지
     }
   };
 
+  const handleCancel = () => {
+    handleClose();
+  };
+
+  const theme = useTheme();
+
   return (
-    <>
-      <div
-        style={{
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="search-modal-title"
+      aria-describedby="search-modal-description"
+    >
+      <Box
+        sx={{
           position: 'absolute',
-          top: 64,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: '#f0f0f0',
-          padding: '20px'
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70%',
+          bgcolor: 'background.paper',
+          boxShadow: theme.shadows[5],
+          p: 4
         }}
       >
         <Box sx={{ mt: 3, width: '100%' }}>
           <Grid container spacing={2}>
+            <Grid item xs={12} sm={12}>
+              <TextField
+                value={newCardTitle}
+                onChange={handleNewCardTitleChange}
+                autoComplete="given-name"
+                name="newCardTitle"
+                required
+                fullWidth
+                id="newCardTitle"
+                label="카드 제목"
+                autoFocus
+              />
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 value={searchTerm}
@@ -113,7 +210,7 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 required
                 fullWidth
                 id="searchTerm"
-                label="카드 제목"
+                label="검색어"
                 autoFocus
               />
             </Grid>
@@ -128,7 +225,7 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 }
                 label="공개 여부"
               />
-            </Grid>
+            </Grid>{' '}
             <Grid item xs={12} sm={6}>
               <TextField
                 value={minPrice}
@@ -138,7 +235,7 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 id="minPrice"
                 label="최소 가격"
                 name="minPrice"
-                autoComplete="off"
+                autoComplete="family-name"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -150,7 +247,7 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 id="maxPrice"
                 label="최대 가격"
                 name="maxPrice"
-                autoComplete="off"
+                autoComplete="family-name"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -159,78 +256,118 @@ const CreateCardPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <Select
                   labelId="category-select-label"
                   id="category-select"
-                  value={category}
+                  value={selectedCategory}
                   label="카테고리"
                   onChange={handleCategoryChange}
                 >
-                  <MenuItem value="tech">기술</MenuItem>
-                  <MenuItem value="books">도서</MenuItem>
-                  {/* 추가 카테고리 */}
+                  {category.map((category) => (
+                    <MenuItem
+                      value={category.categoryId}
+                      key={category.categoryId}
+                    >
+                      {category.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-              <Box sx={{ mt: 1 }}>
-                {selectedCategories.map((category) => (
-                  <Chip
-                    label={category}
-                    onDelete={() => handleDeleteCategory(category)}
-                    key={category}
-                  />
-                ))}
-              </Box>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id="region-select-label">지역</InputLabel>
+                <InputLabel id="sub-category-select-label">
+                  서브 카테고리
+                </InputLabel>
                 <Select
-                  labelId="region-select-label"
-                  id="region-select"
-                  value={region}
-                  label="지역"
-                  onChange={handleRegionChange}
+                  labelId="sub-category-select-label"
+                  id="sub-category-select"
+                  value={selectedSubCategory}
+                  label="서브 카테고리"
+                  onChange={handleSubCategoryChange}
                 >
-                  <MenuItem value="seoul">서울</MenuItem>
-                  <MenuItem value="busan">부산</MenuItem>
-                  {/* 추가 지역 */}
+                  <MenuItem value="default">---------------</MenuItem>
+                  {subCategory.map((subCat) => (
+                    <MenuItem key={subCat.categoryId} value={subCat.categoryId}>
+                      {subCat.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-              <Box sx={{ mt: 1 }}>
-                {selectedRegions.map((region) => (
-                  <Chip
-                    label={region}
-                    onDelete={() => handleDeleteRegion(region)}
-                    key={region}
-                  />
-                ))}
-              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="area-select-label">지역</InputLabel>
+                <Select
+                  labelId="area-select-label"
+                  id="area-select"
+                  value={selectedSido ? selectedSido.id.toString() : ''}
+                  label="지역"
+                  onChange={handleSidoSelect}
+                >
+                  {area.map((sido) => (
+                    <MenuItem key={sido.id} value={sido.id}>
+                      {sido.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="sigg-select-label">시군구</InputLabel>
+                <Select
+                  labelId="sigg-select-label"
+                  id="sigg-select"
+                  value={selectedSigg ? selectedSigg.id.toString() : ''}
+                  label="시군구"
+                  onChange={handleSiggSelect}
+                >
+                  {selectedSido?.sigg.map((sigg) => (
+                    <MenuItem key={sigg.id} value={sigg.id}>
+                      {sigg.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="emd-select-label">읍면동</InputLabel>
+                <Select
+                  labelId="emd-select-label"
+                  id="emd-select"
+                  value={selectedEmd ? selectedEmd.toString() : ''}
+                  label="읍면동"
+                  onChange={handleEmdClick}
+                >
+                  {selectedSigg?.emd.map((emd) => (
+                    <MenuItem key={emd.id} value={emd.id}>
+                      {emd.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
-          <Box
-            sx={{
-              paddingTop: '50px',
-              display: 'flex',
-              justifyContent: 'center',
-              mt: 3
-            }}
-          >
-            <div>
-              {/* ...기존 코드... */}
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ marginRight: '20px' }}
-                onClick={handleCreate}
-              >
-                생성
-              </Button>
-              <Button variant="outlined" color="primary" onClick={onClose}>
-                취소
-              </Button>
-              {/* ...기존 코드... */}
-            </div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleCreate}
+            >
+              카드 생성
+            </Button>
+            <Button
+              type="button"
+              variant="outlined"
+              sx={{ mt: 3, mb: 2, ml: 2 }}
+              onClick={handleCancel}
+            >
+              취소
+            </Button>
           </Box>
         </Box>
-      </div>
-    </>
+      </Box>
+    </Modal>
   );
 };
 

@@ -8,21 +8,13 @@ import {
   Box,
   Chip
 } from '@mui/material';
-
-export interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: string;
-  keywords: string[];
-  image: string;
-}
+import { Product } from '../../types/types.tsx';
 
 interface ProductProps {
   product: Product;
   onCheck: (product: Product) => void;
   isChecked: boolean;
-  onCardClick: (product: Product) => void;
+  onCardClick: (productId: number) => void;
 }
 
 export const ProductComponent: React.FC<ProductProps> = ({
@@ -34,7 +26,7 @@ export const ProductComponent: React.FC<ProductProps> = ({
   return (
     <Box>
       <Card
-        onClick={() => onCardClick(product)}
+        onClick={() => onCardClick(product.productId)}
         sx={{
           display: 'flex',
           width: 900,
@@ -54,7 +46,7 @@ export const ProductComponent: React.FC<ProductProps> = ({
         <CardMedia
           component="img"
           sx={{ width: 151, objectFit: 'cover', height: '100%' }}
-          image={product.image}
+          image={product.productImageUrl}
           alt={product.title}
         />
         <Box
@@ -71,12 +63,12 @@ export const ProductComponent: React.FC<ProductProps> = ({
               {product.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {product.description}
+              {product.content}
             </Typography>
             <Typography variant="body2">{`${product.price}원`}</Typography>
             <Box sx={{ display: 'flex', mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
-              {product.keywords.map((keyword, index) => (
-                <Chip key={index} label={keyword} size="small" />
+              {product.KeywordList.map((keyword, index) => (
+                <Chip key={index} label={keyword.keyword} size="small" />
               ))}
             </Box>
           </CardContent>

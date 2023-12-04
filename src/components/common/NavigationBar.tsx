@@ -63,24 +63,21 @@ const NavigationBar = () => {
   const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   const handleOpenModal = () => {
-    setOpenModal(true); // 모달을 엽니다.
+    setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false); // 모달을 닫습니다.
+    setOpenModal(false);
   };
 
   const handleOpenSearchModal = () => {
-    // SearchModal을 여는 함수를 추가합니다.
     setSearchModalOpen(true);
   };
 
   const handleCloseSearchModal = () => {
-    // SearchModal을 닫는 함수를 추가합니다.
     setSearchModalOpen(false);
   };
 
-  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -157,7 +154,11 @@ const NavigationBar = () => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <NotificationModal nickname={nickname} open={openModal} onClose={handleCloseModal} />
+          <NotificationModal
+            nickname={nickname}
+            open={openModal}
+            onClose={handleCloseModal}
+          />
 
           {/*여기에 링크 달았음*/}
           <Link

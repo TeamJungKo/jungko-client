@@ -14,6 +14,7 @@ import ComparePage from './pages/ComparePage.tsx';
 import CardDetail from './pages/CardDetail.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
 import ProductDetail from './pages/ProductDetail.tsx';
+import SearchResultPage from './pages/SearchResult.tsx';
 //import './firebase-messaging-sw.ts';
 
 function ScrollToTop() {
@@ -28,7 +29,7 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <div style={{ minWidth: '1280px'}}>
+    <div style={{ minWidth: '1280px' }}>
       <Router>
         <ScrollToTop />
         <Routes>
@@ -37,24 +38,11 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/myProfile" element={<MyProfile />} />
-          <Route
-            path="/otherProfile/:id"
-            element={<OtherProfile/>}
-          />
+          <Route path="/otherProfile/:id" element={<OtherProfile />} />
           <Route path="/compare" element={<ComparePage />} />
-          <Route
-            path="/myCard"
-            element={<CardDetail cardStatus="myCard" cardId={1} />}
-          />
-          <Route
-            path="/interestedCard"
-            element={<CardDetail cardStatus="interestedCard" cardId={2} />}
-          />
-          <Route
-            path="/otherCard"
-            element={<CardDetail cardStatus="otherCard" cardId={3} />}
-          />
-          <Route path="/productDetail/:id" element={<ProductDetail/>}/>
+          <Route path="/Card/:cardId" element={<CardDetail />} />
+          <Route path="/productDetail/:id" element={<ProductDetail />} />
+          <Route path="/searchresult" element={<SearchResultPage />} />
         </Routes>
       </Router>
     </div>

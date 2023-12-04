@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Chip, Button, Divider } from '@mui/material';
+import { Modal, Box, Typography, Chip, Button, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { createKeywords, getProductDetail } from '../api/axios.custom';
-import NavigationBar from '../components/common/NavigationBar';
-import { useParams } from 'react-router-dom';
-import testImg from '../assets/images/jungkoIcon.png';
-import { ProductDetailData, Area, Keyword } from '../types/types';
+import { createKeywords, getProductDetail } from '../../api/axios.custom';
+import testImg from '../../assets/images/jungkoIcon.png';
+import { ProductDetailData, Area, Keyword } from '../../types/types';
 
 const style = {
   width: '100%',
@@ -41,11 +39,20 @@ const KeywordChip = styled(Chip)(({ theme, color }) => ({
 //     '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.'
 // };
 
-const ProductDetail = () => {
+interface ProductDetailModalProps {
+  productId: number;
+  open: boolean;
+  onClose: () => void;
+}
+
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+  productId,
+  open,
+  onClose
+}) => {
   const [productData, setProductData] = useState<ProductDetailData | null>(
     null
   );
-  const { productId } = useParams();
   const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
   //const navigate = useNavigate();
 
@@ -76,9 +83,8 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const id = Number(productId);
-        if (!isNaN(id)) {
-          const response = await getProductDetail(id);
+        if (productId) {
+          const response = await getProductDetail(productId);
           setProductData(response.data.productDetail);
         }
       } catch (error) {
@@ -90,7 +96,7 @@ const ProductDetail = () => {
   }, [productId]);
 
   const formatLocation = (area: Area) => {
-    return `${area.sido.name} ${area.sido.sigg.name} ${area.sido.sigg.emd.name}`;
+    return `${area.sido[0].name} ${area.sido[0].sigg[0].name} ${area.sido[0].sigg[0].emd[0].name}`;
   };
 
   const renderKeywords = (keywords: Keyword[]) => {
@@ -107,8 +113,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <>
-      <NavigationBar />
+    <Modal open={open} onClose={onClose}>
       <div
         style={{
           position: 'absolute',
@@ -232,8 +237,8 @@ const ProductDetail = () => {
           </Typography>
         </Box>
       </div>
-    </>
+    </Modal>
   );
 };
 
-export default ProductDetail;
+export default ProductDetailModal;

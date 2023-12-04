@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -9,58 +9,36 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Chip from '@mui/material/Chip';
 import NavigationBar from '../components/common/NavigationBar';
-
-const productData = [
-  //dummy for testing
-  {
-    id: '1',
-    imageUrl: 'path-to-your-image-1.png',
-    title: '반려동물존',
-    price: '150,000',
-    location: '서울',
-    description:
-      '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.',
-    keywords: ['반려동물존', '애완용품']
-  },
-  {
-    id: '2',
-    imageUrl: 'path-to-your-image-2.png',
-    title: '강아지 집',
-    price: '50,000',
-    location: '서울',
-    description: '사랑합니다, 귀여워요',
-    keywords: ['반려동물존', '애완용품']
-  },
-  {
-    id: '3',
-    imageUrl: 'path-to-your-image-3.png',
-    title: '강아지 장난감',
-    price: '20,000',
-    location: '서울',
-    description: '아이들이 좋아해요',
-    keywords: ['반려동물존', '애완용품']
-  },
-  {
-    id: '4',
-    imageUrl: 'path-to-your-image-4.png',
-    title: '고양이 캣타워',
-    price: '80,000',
-    location: '서울',
-    description: '고양이가 놀기 좋은 캣타워입니다.',
-    keywords: ['반려동물존', '애완용품']
-  }
-];
+import { compareProduct } from '../api/axios.custom.ts';
+import { Product } from '../types/types.tsx';
 
 const ComparePage = () => {
-
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [products, setProducts] = useState<Product[]>([]);
   const handleBack = () => {
     navigate(-1);
   };
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    // URL에서 상품 ID 추출
+    const queryParams = new URLSearchParams(location.search);
+    const productIds = queryParams.get('products')?.split(',').map(Number);
+    if (productIds && productIds.length > 0) {
+      // API 호출
+      compareProduct(productIds)
+        .then((response) => {
+          // API 응답으로 받은 상품 데이터 설정
+          setProducts(response.data.products);
+        })
+        .catch((error) => {
+          console.error('Error fetching product comparison', error);
+        });
+    }
+  }, [location]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,6 +58,10 @@ const ComparePage = () => {
     }
   };
 
+  const handleProductClick = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
+
   const arrowWidth = 50;
   const marginBetweenCards = 8 * 2;
   const totalMargin = marginBetweenCards * (3 - 1);
@@ -88,8 +70,11 @@ const ComparePage = () => {
   return (
     <>
       <NavigationBar />
-      <IconButton onClick={handleBack} style={{ position: 'absolute', top: 80, zIndex: 2 }}>
-        <ArrowBackIcon style={{fontSize: '40px'}} />
+      <IconButton
+        onClick={handleBack}
+        style={{ position: 'absolute', top: 80, zIndex: 2 }}
+      >
+        <ArrowBackIcon style={{ fontSize: '40px' }} />
       </IconButton>
       <div
         style={{
@@ -128,9 +113,10 @@ const ComparePage = () => {
               maxWidth: `${windowWidth - arrowWidth * 2}px`
             }}
           >
-            {productData.map((product) => (
+            {products.map((product) => (
               <Paper
-                key={product.id}
+                key={product.productId}
+                onClick={() => handleProductClick(product.productId)}
                 elevation={3}
                 sx={{
                   width: `${cardWidth}px`,
@@ -143,7 +129,7 @@ const ComparePage = () => {
               >
                 <Box
                   component="img"
-                  src={product.imageUrl}
+                  src={product.productImageUrl}
                   alt={product.title}
                   sx={{ width: '100%', height: 'auto', objectFit: 'cover' }}
                 />
@@ -151,10 +137,10 @@ const ComparePage = () => {
                   <Typography variant="h5" gutterBottom>
                     {product.title}
                   </Typography>
-                  {product.keywords.map((keyword) => (
+                  {product.KeywordList.map((keyword) => (
                     <Chip
-                      key={keyword}
-                      label={`#${keyword}`}
+                      key={keyword.keywordId}
+                      label={`#${keyword.keyword}`}
                       variant="outlined"
                       sx={{ mr: 1, mb: 1 }}
                     />
@@ -163,10 +149,15 @@ const ComparePage = () => {
                     Price: {product.price}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    Location: {product.location}
+                    Location:{' '}
+                    {product.area.sido.name +
+                      ' ' +
+                      product.area.sido.sigg.name +
+                      ' ' +
+                      product.area.sido.sigg.emd.name}
                   </Typography>
                   <Typography variant="body2">
-                    Description: {product.description}
+                    Description: {product.content}
                   </Typography>
                 </Box>
               </Paper>
