@@ -80,20 +80,18 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         setProducts(response.products);
         setTotalResources(response.totalResources);
         setAuthor({
-          nickname: response.Author.nickname,
-          imageUrl: response.Author.imageUrl,
-          memberId: response.Author.memberId,
-          email: response.Author.email
+          nickname: response.author.nickname,
+          imageUrl: response.author.imageUrl,
+          memberId: response.author.memberId,
+          email: response.author.email
         });
+        console.log('멤버 정보', author);
       } catch (error) {
         console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
       }
     };
 
     fetchProducts();
-  }, [cardId, page, productsPerPage, sortOrder, sortDirection]);
-
-  useEffect(() => {
     const fetchCards = async () => {
       try {
         const memberId = author.memberId;
@@ -110,7 +108,14 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     };
 
     fetchCards();
-  }, [cardId, author.memberId]);
+  }, [
+    cardId,
+    page,
+    productsPerPage,
+    sortOrder,
+    sortDirection,
+    author.memberId
+  ]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
