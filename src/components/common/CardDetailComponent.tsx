@@ -17,6 +17,7 @@ import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
 import SearchModal from '../../pages/SearchModal.tsx';
+import EditCardOptionModal from './EditCardOptionModal.tsx';
 import {
   deleteCard,
   getCardInfo,
@@ -63,6 +64,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     setShowProductDetail(productId);
     setIsProductDetailOpen(true);
   };
+  const [isEditCardOptionOpen, setIsEditCardOptionOpen] = useState(false);
 
   const handleCloseProductDetail = () => {
     setIsProductDetailOpen(false);
@@ -199,6 +201,14 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     }
   };
 
+  const handleOpenEditCardOption = () => {
+    setIsEditCardOptionOpen(true);
+  };
+
+  const handleCloseEditCardOption = () => {
+    setIsEditCardOptionOpen(false);
+  };
+
   const RenderButtons: React.FC = () => {
     switch (cardStatus) {
       case 'myCard':
@@ -215,8 +225,8 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
                     카드 삭제
                   </Button>
                 )}
-                <Button variant="contained" onClick={handleOpenCardOption}>
-                  카드 옵션
+                <Button variant="contained" onClick={handleOpenEditCardOption}>
+                  카드 옵션 수정
                 </Button>
               </>
             }
@@ -233,7 +243,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
               관심 해제
             </Button>
             <Button variant="contained" onClick={handleOpenCardOption}>
-              카드 옵션
+              검색 옵션
             </Button>
           </>
         );
@@ -248,7 +258,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
               관심 추가
             </Button>
             <Button variant="contained" onClick={handleOpenCardOption}>
-              카드 옵션
+              검색 옵션
             </Button>
           </>
         );
@@ -396,6 +406,13 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         open={isProductDetailOpen}
         onClose={handleCloseProductDetail}
       />
+      {isEditCardOptionOpen && (
+        <EditCardOptionModal
+          open={isEditCardOptionOpen}
+          handleClose={handleCloseEditCardOption}
+          cardId={cardId}
+        />
+      )}
     </>
   );
 };
