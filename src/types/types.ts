@@ -44,6 +44,7 @@ interface BaseProduct {
   marketName: string;
   marketProductId: string;
   area: Area;
+  KeywordList: Keyword[]; //API 변경으로 추가
 }
 
 // 상품 일반 정보
@@ -71,7 +72,7 @@ export interface AreasResponse {
 }
 
 // 시도
-interface Area {
+export interface Area {
   sido: Sido;
 }
 
@@ -91,6 +92,39 @@ interface Sigg {
 
 // 읍면동
 interface Emd {
+  name: string;
+  code: string;
+}
+
+// 전체 지역 api getAllAreas용 response
+export interface AllAreasResponse {
+  areas: AllArea[];
+}
+
+// 시도
+export interface AllArea {
+  sido: AllSido[];
+}
+
+// 시도
+export interface AllSido {
+  id: number;
+  name: string;
+  code: string;
+  sigg: AllSigg[];
+}
+
+// 시군구
+export interface AllSigg {
+  id: number;
+  name: string;
+  code: string;
+  emd: AllEmd[];
+}
+
+// 읍면동
+export interface AllEmd {
+  id: number;
   name: string;
   code: string;
 }
@@ -115,6 +149,23 @@ export interface SubCategory {
   name: string;
   level: number;
   subCategory?: SubCategory;
+}
+
+// 모든 카테고리 정보
+export interface AllCategory {
+  categoryId: number;
+  name: string;
+  level: number;
+  subCategory?: AllSubCategory[];
+  imageUrl: string;
+}
+
+// 모든 카테고리의 모든 하위 카테고리
+export interface AllSubCategory {
+  categoryId: number;
+  name: string;
+  level: number;
+  subCategory?: AllSubCategory[];
 }
 
 // 연관검색어 api
@@ -158,7 +209,6 @@ export interface NoticeResponse {
   keywordNotices: Notice[];
   totalResources: number;
 }
-
 
 // 여기서부턴 Request 입니다.
 
@@ -229,12 +279,12 @@ export interface ProductSearchRequest {
   keyword: string;
   minPrice?: number;
   maxPrice?: number;
-  categoryId: number;
-  areaId: number;
-  page: number;
-  size: number;
-  sort?: number;
-  order?: number;
+  categoryId?: number;
+  areaId?: number;
+  page?: number;
+  size?: number;
+  sort?: string;
+  order?: string;
 }
 
 // 검색 결과에 대한 연관 검색어 조회
@@ -286,4 +336,13 @@ export interface InterestedCardListRequest {
 // 특정 회원의 프로필 조회 (내 프로필은 파라미터없이 가능)
 export interface MembersProfileRequest {
   memberId: number;
+}
+
+// 카드 내 매물 검색(카드ID), response는 ProductResponse 이용
+export interface getCardInfoRequest {
+  cardId: number;
+  page: number;
+  size: number;
+  sort?: string;
+  order?: string;
 }
