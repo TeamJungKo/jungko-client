@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Box,
   Toolbar,
@@ -59,14 +59,30 @@ interface Prop {
   reload?: boolean;
 }
 
-const NavigationBar = ({reload=false}:Prop) => {
+const NavigationBar = ({ reload = false }: Prop) => {
   const [nickname, setNickname] = useState('닉네임');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
   const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const navigate = useNavigate();
 
   const handleOpenModal = () => {
     setOpenModal(true); // 모달을 엽니다.
+  };
+
+  const handleSearch = () => {
+    if (searchKeyword.trim()) {
+      navigate(
+        `/searchresult?keyword=${encodeURIComponent(searchKeyword.trim())}`
+      );
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   const handleCloseModal = () => {
@@ -83,7 +99,6 @@ const NavigationBar = ({reload=false}:Prop) => {
     setSearchModalOpen(false);
   };
 
-  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -129,12 +144,15 @@ const NavigationBar = ({reload=false}:Prop) => {
           <StyledInputBase
             placeholder="Search…"
             inputProps={{ 'aria-label': 'search' }}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onKeyPress={handleKeyPress}
           />
         </Search>
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <div style={{ textDecoration: 'none', marginLeft: '16px' }}>
-            <Button variant="outlined" /*onClick={handleOpenSearchModal}*/>
+            <Button variant="outlined" onClick={handleSearch}>
               검색
             </Button>{' '}
             {/* onClick 이벤트를 추가하여 버튼 클릭 시 검색결과로 이어지게 함. */}
@@ -157,10 +175,14 @@ const NavigationBar = ({reload=false}:Prop) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <NotificationModal nickname={nickname} open={openModal} onClose={handleCloseModal} />
+          <NotificationModal
+            nickname={nickname}
+            open={openModal}
+            onClose={handleCloseModal}
+          />
 
           {/*여기에 링크 달았음*/}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Link
               to="/myProfile"
               style={{ textDecoration: 'none', color: 'inherit' }}
@@ -178,41 +200,41 @@ const NavigationBar = ({reload=false}:Prop) => {
               />
             </Link>
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  ml: 2
-                }}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                ml: 2
+              }}
+            >
+              <Typography
+                sx={{ padding: '0px' }}
+                variant="subtitle1"
+                align="left"
+                noWrap
               >
-                <Typography
-                  sx={{ padding: '0px' }}
-                  variant="subtitle1"
-                  align="left"
-                  noWrap
-                >
-                  {nickname}
-                </Typography>
+                {nickname}
+              </Typography>
 
-                  <Button
-                    startIcon={<Logout />}
-                    sx={{
-                      my: 1,
-                      py: 0,
-                      minWidth: 'none',
-                      color: 'red',
-                      margin: '0px',
-                      padding: '0px'
-                    }}
-                    size="small"
-                    component={Link}
-                    to="/"
-                  >
-                    Logout
-                  </Button>
-              </Box>
+              <Button
+                startIcon={<Logout />}
+                sx={{
+                  my: 1,
+                  py: 0,
+                  minWidth: 'none',
+                  color: 'red',
+                  margin: '0px',
+                  padding: '0px'
+                }}
+                size="small"
+                component={Link}
+                to="/"
+              >
+                Logout
+              </Button>
             </Box>
+          </Box>
         </Box>
       </Toolbar>
       <SearchModal
