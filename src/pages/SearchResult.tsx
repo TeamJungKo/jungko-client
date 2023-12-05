@@ -38,12 +38,18 @@ const SearchResult: React.FC = () => {
 
   const searchOptions = getSearchOptionsFromURL();
 
+  const handleRemoveProduct = (product: Product) => {
+    setSelectedProducts((prevSelected) =>
+      prevSelected.filter((p) => p.productId !== product.productId)
+    );
+  };
   return (
     <SearchResultComponent
       SearchOption={searchOptions}
       selectedProducts={selectedProducts}
       onCheck={handleCheck}
       setSelectedProducts={setSelectedProducts}
+      onRemoveProduct={handleRemoveProduct}
     />
   );
 };

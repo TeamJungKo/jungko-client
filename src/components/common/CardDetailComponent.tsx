@@ -9,8 +9,10 @@ import {
   Divider,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
@@ -30,13 +32,15 @@ interface CardDetailComponentProps {
   selectedProducts: Product[];
   onCheck: (product: Product) => void;
   setSelectedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  onRemoveProduct: (product: Product) => void;
 }
 
 const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   cardStatus,
   cardId,
   selectedProducts,
-  setSelectedProducts
+  setSelectedProducts,
+  onRemoveProduct
 }) => {
   const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림여부
   const [author, setAuthor] = useState<Author>({
@@ -108,14 +112,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     };
 
     fetchCards();
-  }, [
-    cardId,
-    page,
-    productsPerPage,
-    sortOrder,
-    sortDirection,
-    author.memberId
-  ]);
+  }, [cardId, page, productsPerPage, sortOrder, sortDirection, author]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
@@ -229,7 +226,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           <>
             <Button
               variant="outlined"
-              onClick={() => handleLikeCard(cardId)}
+              onClick={() => handleUnlikeCard(cardId)}
               sx={{ mr: 1 }}
             >
               관심 해제
@@ -244,7 +241,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           <>
             <Button
               variant="outlined"
-              onClick={() => handleUnlikeCard(cardId)}
+              onClick={() => handleLikeCard(cardId)}
               sx={{ mr: 1 }}
             >
               관심 추가
@@ -357,12 +354,30 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
             }}
           >
             {selectedProducts.map((product) => (
-              <img
-                key={product.productId}
-                src={product.productImageUrl}
-                alt={product.title}
-                style={{ width: '100px', height: '100px', marginRight: '8px' }}
-              />
+              <Box key={product.productId} sx={{ position: 'relative' }}>
+                <img
+                  src={product.productImageUrl}
+                  alt={product.title}
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    marginRight: '8px'
+                  }}
+                />
+                <IconButton
+                  onClick={() => onRemoveProduct(product)}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    borderRadius: '50%'
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
             ))}
           </Box>
         </Box>
