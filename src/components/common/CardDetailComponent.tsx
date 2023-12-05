@@ -19,9 +19,10 @@ import {
   deleteCard,
   getCardInfo,
   likeCard,
-  unlikeCard
+  unlikeCard,
+  getMemberCard
 } from '../../api/axios.custom.ts';
-import { Product, ProductResponse } from '../../types/types.ts';
+import { Card, Author, Product, CardInfoResponse } from '../../types/types.ts';
 
 interface CardDetailComponentProps {
   cardStatus: 'myCard' | 'interestedCard' | 'otherCard';
@@ -37,14 +38,21 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   selectedProducts,
   setSelectedProducts
 }) => {
-  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림?
+  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림여부
+  const [author, setAuthor] = useState<Author>({
+    nickname: '',
+    imageUrl: '',
+    memberId: 0,
+    email: ''
+  });
+  const [cardTitle, setCardTitle] = useState<string>('Loading...');
   const [products, setProducts] = useState<Product[]>([]); //화면에 표시할 상품 목록
   const [totalResources, setTotalResources] = useState(0); //총 상품 목록 설정
   const [page, setPage] = useState(1); //페이지 설정
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달
   const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
-  const [sortOrder, setSortOrder] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('uploadedAt');
   const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
   const handleProductClick = (productId: number) => {
     setShowProductDetail(productId);
@@ -55,18 +63,14 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     setIsProductDetailOpen(false);
   };
 
+  const navigateToOtherProfile = () => {
+    navigate(`/otherProfile/${author.memberId}`);
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response: ProductResponse = await getCardInfo(
-          cardId,
-          page - 1,
-          productsPerPage,
-          sortOrder,
-          sortDirection
-        );
-        console.log(
-          'request',
+        const response: CardInfoResponse = await getCardInfo(
           cardId,
           page - 1,
           productsPerPage,
@@ -75,13 +79,38 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         );
         setProducts(response.products);
         setTotalResources(response.totalResources);
+        setAuthor({
+          nickname: response.Author.nickname,
+          imageUrl: response.Author.imageUrl,
+          memberId: response.Author.memberId,
+          email: response.Author.email
+        });
       } catch (error) {
-        console.error('Error fetching products', error);
+        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
       }
     };
 
     fetchProducts();
   }, [cardId, page, productsPerPage, sortOrder, sortDirection]);
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const memberId = author.memberId;
+        const response = await getMemberCard(memberId);
+        const matchingCard = response.data.cards.find(
+          (card: Card) => card.cardId === cardId
+        );
+        if (matchingCard) {
+          setCardTitle(matchingCard.title);
+        }
+      } catch (error) {
+        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다: ', error);
+      }
+    };
+
+    fetchCards();
+  }, [cardId, author.memberId]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
@@ -95,11 +124,11 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         setSortDirection('ASC');
         break;
       case 'recentAsc':
-        setSortOrder('createdAt');
+        setSortOrder('uploadedAt');
         setSortDirection('ASC');
         break;
       default:
-        setSortOrder('createdAt');
+        setSortOrder('uploadedAt');
         setSortDirection('DESC');
         break;
     }
@@ -124,9 +153,12 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
 
   const handleCompareClick = () => {
     if (selectedProducts.length > 0) {
-      navigate('/compare?products=${productIds}');
+      const productIds = selectedProducts
+        .map((product) => product.productId)
+        .join(',');
+      navigate(`/compare?productIds=${productIds}`);
     } else {
-      console.log('비교할 상품을 선택해주세요.');
+      alert('비교할 상품을 선택해주세요.');
     }
   };
 
@@ -142,7 +174,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     try {
       await unlikeCard(cardId);
     } catch (error) {
-      console.error('Error unliking card', error);
+      console.log('관심 카드를 해제하는 도중 오류가 발생했습니다: ', error);
     }
   };
 
@@ -151,7 +183,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     try {
       await deleteCard(cardId);
     } catch (error) {
-      console.log('카드 삭제 error');
+      console.log('카드를 삭제하는 도중 오류가 발생했습니다: ', error);
     }
   };
 
@@ -160,7 +192,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     try {
       await likeCard(cardId);
     } catch (error) {
-      console.error('Error liking card', error);
+      console.log('관심 카드를 등록하는 도중 오류가 발생했습니다: ', error);
     }
   };
 
@@ -247,14 +279,17 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar sx={{ marginRight: 2 }} />
+              <Avatar
+                src={author.imageUrl}
+                onClick={navigateToOtherProfile}
+                sx={{ marginRight: 2, cursor: 'pointer' }}
+              />
               <Typography variant="h4" gutterBottom component="div">
-                {'CardTitle'}
+                {cardTitle}
               </Typography>
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {/* 드롭다운 박스 */}
               <Select
                 value={
                   sortOrder === 'created_at' && sortDirection === 'DESC'

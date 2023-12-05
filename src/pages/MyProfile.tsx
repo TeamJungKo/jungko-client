@@ -37,7 +37,6 @@ import {
   deleteFCMToken
 } from '../firebase-messaging-sw';
 
-
 function MyProfile() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -59,9 +58,10 @@ function MyProfile() {
   const [interestedCardTotalPages, setInterestedCardTotalPages] = useState(0);
 
   const [allMyCardsSelected, setAllMyCardsSelected] = useState(false);
-  const [allInterestedCardsSelected, setAllInterestedCardsSelected] = useState(false);
+  const [allInterestedCardsSelected, setAllInterestedCardsSelected] =
+    useState(false);
   const [allKeywordsSelected, setAllKeywordsSelected] = useState(false);
-  
+
   const [myProfileReload, setMyProfileReload] = useState(false);
   const [myCardReload, setMyCardReload] = useState(false);
   const [interestedCardReload, setInterestedCardReload] = useState(false);
@@ -70,7 +70,7 @@ function MyProfile() {
   const myCardPageChange = (page: number) => {
     setMyCardPage(page - 1); //인덱스는 0부터이므로
   };
-  
+
   const interestedCardPageChange = (page: number) => {
     setInterestedCardPage(page - 1); //인덱스는 0부터이므로
   };
@@ -88,7 +88,6 @@ function MyProfile() {
       alert('알림 수신 동의가 취소되었습니다.');
     }
     setIsNotificationOn(!isNotificationOn);
-    console.log(isNotificationOn);
   };
 
   const handleNicknameChange = async (
@@ -106,7 +105,7 @@ function MyProfile() {
     await updateMyProfile(null, file);
     const imageUrl = URL.createObjectURL(file);
     setImageUrl(imageUrl);
-    setMyProfileReload(prevState => !prevState);
+    setMyProfileReload((prevState) => !prevState);
   };
 
   const handleProfileImageClick = () => {
@@ -116,7 +115,7 @@ function MyProfile() {
   const toggleEdit = async () => {
     if (isEditing) {
       await updateMyProfile(nickname, null);
-      setMyProfileReload(prevState => !prevState);
+      setMyProfileReload((prevState) => !prevState);
     }
     setIsEditing(!isEditing); // 닉네임 수정 토글 핸들러
   };
@@ -132,73 +131,53 @@ function MyProfile() {
 
   const selectAllObjects = (type: string) => {
     if (type === 'myCards') {
-      setMyCards(
-        myCards.map((card) =>
-          ({ ...card, isSelected: true })
-        )
-      );
+      setMyCards(myCards.map((card) => ({ ...card, isSelected: true })));
       setAllMyCardsSelected(true);
-    } 
-    else if (type === 'interestedCards') {
+    } else if (type === 'interestedCards') {
       setMyInterestedCards(
-        myInterestedCards.map((card) =>
-          ({ ...card, isSelected: true })
-        )
+        myInterestedCards.map((card) => ({ ...card, isSelected: true }))
       );
       setAllInterestedCardsSelected(true);
-    }
-    else if (type === 'keywords') {
+    } else if (type === 'keywords') {
       setMyKeywords(
-        myKeywords.map((keyword) =>
-          ({ ...keyword, isSelected: true })
-        )
+        myKeywords.map((keyword) => ({ ...keyword, isSelected: true }))
       );
       setAllKeywordsSelected(true);
     }
-  };//전체 카드/키워드 선택
-  
+  }; //전체 카드/키워드 선택
+
   const deselectAllObjects = (type: string) => {
     if (type === 'myCards') {
-      setMyCards(
-        myCards.map((card) =>
-          ({ ...card, isSelected: false })
-        )
-      );
+      setMyCards(myCards.map((card) => ({ ...card, isSelected: false })));
       setAllMyCardsSelected(false);
-    } 
-    else if (type === 'interestedCards') {
+    } else if (type === 'interestedCards') {
       setMyInterestedCards(
-        myInterestedCards.map((card) =>
-          ({ ...card, isSelected: false })
-        )
+        myInterestedCards.map((card) => ({ ...card, isSelected: false }))
       );
       setAllInterestedCardsSelected(false);
-    }
-    else if (type === 'keywords') {
+    } else if (type === 'keywords') {
       setMyKeywords(
-        myKeywords.map((keyword) =>
-          ({ ...keyword, isSelected: false })
-        )
+        myKeywords.map((keyword) => ({ ...keyword, isSelected: false }))
       );
       setAllKeywordsSelected(false);
     }
-  };//전체 카드/키워드 선택 해제
+  }; //전체 카드/키워드 선택 해제
 
   const deleteSelectedCards = async () => {
     const selectedCardIds = myCards
       .filter((card) => card.isSelected)
       .map((card) => card.cardId);
-      
-    const promises = selectedCardIds.map((id) => deleteCard(id)); 
-  
+
+    const promises = selectedCardIds.map((id) => deleteCard(id));
+
     try {
       await Promise.all(promises); // 선택한 모든 카드가 삭제될 때까지 기다림
       setAllMyCardsSelected(false);
-      setMyCardReload(prevState => !prevState);
+      setMyCardReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('선택한 카드를 삭제하는 도중 오류가 발생했습니다:', error);
     }
-  };// 선택 카드 삭제
+  }; // 선택 카드 삭제
 
   const makeCardsPublic = async () => {
     const selectedCardIds = myCards
@@ -211,13 +190,13 @@ function MyProfile() {
     });
     try {
       await Promise.all(promises);
-      setMyCardReload(prevState => !prevState);
+      setMyCardReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('선택한 카드의 공개 전환중 오류가 발생했습니다:', error);
     }
     setAllMyCardsSelected(false);
-  };  // 선택 카드 공개 전환
-  
+  }; // 선택 카드 공개 전환
+
   const makeCardsPrivate = async () => {
     const selectedCardIds = myCards
       .filter((card) => card.isSelected)
@@ -227,35 +206,33 @@ function MyProfile() {
       formData.append('scope', 'PRIVATE');
       return await changeCardOption(id, formData);
     });
-  
+
     try {
       await Promise.all(promises);
-      setMyCardReload(prevState => !prevState);
+      setMyCardReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('선택한 카드의 비공개 전환중 오류가 발생했습니다:', error);
     }
     setAllMyCardsSelected(false);
-  };  // 선택 카드 비공개 전환
-  
+  }; // 선택 카드 비공개 전환
 
   useEffect(() => {
-    getMyCard(myCardPage,8)
-    .then((res) => {
-      setMyCardTotalPages(Math.ceil(res.data.totalResources/8));
-      const completeCards = res.data.cards.map((card: any) => ({
-        ...card,
-        isSelected: false
-      }));
-      setMyCards(completeCards);
-      console.log("페이지넘버: ",myCardPage);
-      console.log("가져온 내카드 개수: ",res.data.totalResources);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
+    getMyCard(myCardPage, 8)
+      .then((res) => {
+        setMyCardTotalPages(Math.ceil(res.data.totalResources / 8));
+        const completeCards = res.data.cards.map((card: any) => ({
+          ...card,
+          isSelected: false
+        }));
+        setMyCards(completeCards);
+      })
+      .catch((error) => {
+        console.log(
+          '내가 생성한 카드를 가져오는 도중 오류가 발생했습니다: ',
+          error
+        );
+      });
   }, [myProfileReload, myCardReload, myCardPage]);
-
 
   const toggleSelectInterestedCard = (id: number) => {
     setMyInterestedCards(
@@ -270,44 +247,46 @@ function MyProfile() {
     const selectedCardIds = myInterestedCards
       .filter((card) => card.isSelected)
       .map((card) => card.cardId);
-    
+
     const promises = selectedCardIds.map((id) => unlikeCard(id));
-  
+
     try {
       await Promise.all(promises);
-      setInterestedCardReload(prevState => !prevState);
+      setInterestedCardReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('관심 카드를 해제하는 도중 오류가 발생했습니다: ', error);
     }
     setAllInterestedCardsSelected(false);
   }; // 선택한 관심 카드 해제
 
   useEffect(() => {
     getMyProfile()
-    .then((res) => {
-      setNickname(res.data.nickname);
-      setImageUrl(res.data.imageUrl);
-      setIsNotificationOn(res.data.notificationAgreement);
-      getInterestedCard(res.data.memberId,interestedCardPage,8)
-        .then((response) => {
-          setInterestedCardTotalPages(Math.ceil(response.data.totalResources/8));
-          const completeCards = response.data.cards.map((card: any) => ({
-            ...card,
-            isSelected: false
-          }));
-          setMyInterestedCards(completeCards);
-          console.log("가져온 관심카드 개수: ",response.data.totalResources);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
+      .then((res) => {
+        setNickname(res.data.nickname);
+        setImageUrl(res.data.imageUrl);
+        setIsNotificationOn(res.data.notificationAgreement);
+        getInterestedCard(res.data.memberId, interestedCardPage, 8)
+          .then((response) => {
+            setInterestedCardTotalPages(
+              Math.ceil(response.data.totalResources / 8)
+            );
+            const completeCards = response.data.cards.map((card: any) => ({
+              ...card,
+              isSelected: false
+            }));
+            setMyInterestedCards(completeCards);
+          })
+          .catch((error) => {
+            console.log(
+              '관심 카드를 가져오는 도중 오류가 발생했습니다: ',
+              error
+            );
+          });
+      })
+      .catch((error) => {
+        console.log('내 프로필을 가져오는 도중 오류가 발생했습니다: ', error);
+      });
   }, [interestedCardReload, interestedCardPage]);
-
 
   const toggleSelectKeyword = (text: string) => {
     setMyKeywords(
@@ -324,34 +303,31 @@ function MyProfile() {
     const selectedKeywordIds = myKeywords
       .filter((keyword) => keyword.isSelected)
       .map((keyword) => keyword.keywordId);
-    
-    const promises = selectedKeywordIds.map(id => deleteKeywords(id));
-  
+
+    const promises = selectedKeywordIds.map((id) => deleteKeywords(id));
+
     try {
       await Promise.all(promises);
-      setKeywordReload(prevState => !prevState);
+      setKeywordReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('키워드를 삭제하는 도중 오류가 발생했습니다: ', error);
     }
     setAllKeywordsSelected(false);
-  };  // 선택한 키워드를 삭제하는 함수
+  }; // 선택한 키워드를 삭제하는 함수
 
-  const writeNewKeyword = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const writeNewKeyword = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewKeyword(event.target.value);
   }; // 작성한 키워드를 newKeyword에저장
 
   const addKeyword = async () => {
     try {
       await createKeywords([newKeyword]);
-      setKeywordReload(prevState => !prevState);
+      setKeywordReload((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.log('키워드를 생성하는 도중 오류가 발생했습니다: ', error);
     }
     setAllKeywordsSelected(false);
-  } // newKeyword를 바탕으로 키워드 생성
-  
+  }; // newKeyword를 바탕으로 키워드 생성
 
   const handleUnregister = () => {
     if (window.confirm('정말 탈퇴하시겠습니까?')) {
@@ -363,18 +339,16 @@ function MyProfile() {
 
   useEffect(() => {
     getMyKeywords()
-    .then((res) => {
-      const completeKeywords = res.data.keywordList.map((keyword: any) => ({
-        ...keyword,
-        isSelected: false,
-      }));
-      setMyKeywords(completeKeywords);
-      console.log("가져온 키워드 개수: ",res.data.keywordList.length);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
+      .then((res) => {
+        const completeKeywords = res.data.keywordList.map((keyword: any) => ({
+          ...keyword,
+          isSelected: false
+        }));
+        setMyKeywords(completeKeywords);
+      })
+      .catch((error) => {
+        console.log('키워드를 가져오는 도중 오류가 발생했습니다: ', error);
+      });
   }, [keywordReload]);
 
   const title_space = {
@@ -412,7 +386,7 @@ function MyProfile() {
       }}
     >
       <Box>
-        <NavigationBar reload={myProfileReload}/>
+        <NavigationBar reload={myProfileReload} />
         <Box sx={{ marginTop: '160px' }}>
           <Box sx={title_space}>
             <input
@@ -449,10 +423,7 @@ function MyProfile() {
               </Avatar>
             </ButtonBase>
             {isEditing ? (
-              <TextField
-                value={nickname}
-                onChange={handleNicknameChange}
-              />
+              <TextField value={nickname} onChange={handleNicknameChange} />
             ) : (
               <Typography fontSize={'50px'} fontFamily={'Jua'}>
                 {nickname}
@@ -465,7 +436,9 @@ function MyProfile() {
           <Divider className="divider" />
 
           <Box sx={default_space}>
-            <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top'}}>
+            <Typography
+              sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top' }}
+            >
               내가 생성한 카드
             </Typography>
             <Box
@@ -477,29 +450,42 @@ function MyProfile() {
                 gap: '16px'
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginBottom: '15px'
+                }}
+              >
                 <Button
                   variant="outlined"
                   sx={{
                     color: allMyCardsSelected ? 'darkred' : 'green',
                     fontFamily: 'Noto Sans KR',
                     borderColor: allMyCardsSelected ? 'darkred' : 'green',
-                    background: 'white',
+                    background: 'white'
                   }}
                   onClick={() => {
                     if (allMyCardsSelected) {
-                      deselectAllObjects("myCards");
+                      deselectAllObjects('myCards');
                     } else {
-                      selectAllObjects("myCards");
+                      selectAllObjects('myCards');
                     }
                   }}
                 >
-                  {allMyCardsSelected ? '페이지내 전체 해제' : '페이지내 전체 선택'}
+                  {allMyCardsSelected
+                    ? '페이지내 전체 해제'
+                    : '페이지내 전체 선택'}
                 </Button>
               </Box>
 
-              
-              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginBottom: '15px'
+                }}
+              >
                 <Button
                   variant="outlined"
                   sx={{
@@ -507,7 +493,7 @@ function MyProfile() {
                     marginRight: '15px',
                     fontFamily: 'Noto Sans KR',
                     borderColor: 'green',
-                    background: 'white',
+                    background: 'white'
                   }}
                   onClick={makeCardsPublic}
                 >
@@ -520,7 +506,7 @@ function MyProfile() {
                     marginRight: '15px',
                     fontFamily: 'Noto Sans KR',
                     borderColor: 'darkred',
-                    background: 'white',
+                    background: 'white'
                   }}
                   onClick={makeCardsPrivate}
                 >
@@ -533,7 +519,7 @@ function MyProfile() {
                     color: 'red',
                     fontFamily: 'Noto Sans KR',
                     borderColor: 'red',
-                    background: 'white',
+                    background: 'white'
                   }}
                   onClick={deleteSelectedCards}
                 >
@@ -541,7 +527,6 @@ function MyProfile() {
                 </Button>
               </Box>
             </Box>
-
           </Box>
           <Box
             sx={{
@@ -551,7 +536,6 @@ function MyProfile() {
               gap: '16px'
             }}
           >
-
             {/* 생성한 카드들 */}
 
             {myCards.map((card, index) => {
@@ -580,7 +564,7 @@ function MyProfile() {
 
               return (
                 <div
-                  key={card.cardId} 
+                  key={card.cardId}
                   style={index === 0 ? { marginLeft: '16px' } : {}}
                 >
                   <CardMaker
@@ -597,20 +581,19 @@ function MyProfile() {
                   />
                 </div>
               );
-            })} 
-
+            })}
           </Box>
-            
-          <Box 
-            display="flex" 
-            justifyContent="center" 
+
+          <Box
+            display="flex"
+            justifyContent="center"
             marginTop={4}
             marginBottom={2}
           >
-            <Pagination 
-              count={myCardTotalPages} 
-              page={myCardPage + 1} 
-              onChange={(_, page) => myCardPageChange(page)} 
+            <Pagination
+              count={myCardTotalPages}
+              page={myCardPage + 1}
+              onChange={(_, page) => myCardPageChange(page)}
             />
           </Box>
           <Divider className="divider" />
@@ -619,25 +602,33 @@ function MyProfile() {
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
               관심 카드
             </Typography>
-            
-            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginBottom: '15px'
+              }}
+            >
               <Button
                 variant="outlined"
                 sx={{
                   color: allInterestedCardsSelected ? 'darkred' : 'green',
                   fontFamily: 'Noto Sans KR',
                   borderColor: allInterestedCardsSelected ? 'darkred' : 'green',
-                  background: 'white',
+                  background: 'white'
                 }}
                 onClick={() => {
                   if (allInterestedCardsSelected) {
-                    deselectAllObjects("interestedCards");
+                    deselectAllObjects('interestedCards');
                   } else {
-                    selectAllObjects("interestedCards");
+                    selectAllObjects('interestedCards');
                   }
                 }}
               >
-                {allInterestedCardsSelected ? '페이지내 전체 해제' : '페이지내 전체 선택'}
+                {allInterestedCardsSelected
+                  ? '페이지내 전체 해제'
+                  : '페이지내 전체 선택'}
               </Button>
 
               <Button
@@ -653,7 +644,7 @@ function MyProfile() {
               >
                 관심 해제
               </Button>
-            </Box>  
+            </Box>
           </Box>
           <Box
             sx={{
@@ -663,9 +654,8 @@ function MyProfile() {
               gap: '16px'
             }}
           >
-
             {/* 관심 카드들 */}
-            
+
             {myInterestedCards.map((card, index) => {
               // 모든 카테고리 이름을 가져옵니다.
               let category = card.category.name;
@@ -691,7 +681,7 @@ function MyProfile() {
               지역: ${area}`;
 
               return (
-                <div 
+                <div
                   key={card.cardId}
                   style={index === 0 ? { marginLeft: '16px' } : {}}
                 >
@@ -709,20 +699,19 @@ function MyProfile() {
                   />
                 </div>
               );
-            })} 
-
+            })}
           </Box>
 
-          <Box 
-            display="flex" 
-            justifyContent="center" 
-            marginTop={4} 
+          <Box
+            display="flex"
+            justifyContent="center"
+            marginTop={4}
             marginBottom={2}
           >
-            <Pagination 
-              count={interestedCardTotalPages} 
-              page={interestedCardPage + 1} 
-              onChange={(_, page) => interestedCardPageChange(page)} 
+            <Pagination
+              count={interestedCardTotalPages}
+              page={interestedCardPage + 1}
+              onChange={(_, page) => interestedCardPageChange(page)}
             />
           </Box>
           <Divider className="divider" />
@@ -731,20 +720,26 @@ function MyProfile() {
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
               내가 추가한 키워드
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
-            <Button
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginBottom: '15px'
+              }}
+            >
+              <Button
                 variant="outlined"
                 sx={{
                   color: allKeywordsSelected ? 'darkred' : 'green',
                   fontFamily: 'Noto Sans KR',
                   borderColor: allKeywordsSelected ? 'darkred' : 'green',
-                  background: 'white',
+                  background: 'white'
                 }}
                 onClick={() => {
                   if (allKeywordsSelected) {
-                    deselectAllObjects("keywords");
+                    deselectAllObjects('keywords');
                   } else {
-                    selectAllObjects("keywords");
+                    selectAllObjects('keywords');
                   }
                 }}
               >
@@ -763,7 +758,6 @@ function MyProfile() {
               >
                 삭제
               </Button>
-
             </Box>
           </Box>
           <Box
@@ -779,7 +773,7 @@ function MyProfile() {
 
             {myKeywords.map((keyword, index) => (
               <div
-                key={keyword.keywordId} 
+                key={keyword.keywordId}
                 style={index === 0 ? { marginLeft: '16px' } : {}}
               >
                 <KeywordMaker
@@ -791,18 +785,14 @@ function MyProfile() {
                   }}
                 />
               </div>
-              )
-            )}
+            ))}
             <TextField
               value={newKeyword}
               onChange={writeNewKeyword}
               placeholder="새 키워드"
-              sx={{marginLeft: '16px'}}
+              sx={{ marginLeft: '16px' }}
             />
-            <IconButton 
-              sx={{ marginLeft: '10px' }} 
-              onClick={addKeyword}
-            >
+            <IconButton sx={{ marginLeft: '10px' }} onClick={addKeyword}>
               <Add sx={{ color: 'Black' }} />
             </IconButton>
           </Box>

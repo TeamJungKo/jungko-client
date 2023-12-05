@@ -7,7 +7,12 @@ import Pagination from '@mui/material/Pagination';
 import Category from '../components/common/Category';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
-import { getPopularCard, getMyCard, getMyProfile, getInterestedCard } from '../api/axios.custom';
+import {
+  getPopularCard,
+  getMyCard,
+  getMyProfile,
+  getInterestedCard
+} from '../api/axios.custom';
 import { Card } from '../types/types';
 
 function HomePage() {
@@ -29,11 +34,11 @@ function HomePage() {
   const popularCardPageChange = (page: number) => {
     setPopularCardPage(page - 1); //인덱스는 0부터이므로
   };
-  
+
   const myCardPageChange = (page: number) => {
     setMyCardPage(page - 1); //인덱스는 0부터이므로
   };
-  
+
   const interestedCardPageChange = (page: number) => {
     setInterestedCardPage(page - 1); //인덱스는 0부터이므로
   };
@@ -41,26 +46,22 @@ function HomePage() {
   const fetchPopularCard = useCallback(async () => {
     try {
       const response = await getPopularCard(popularCardPage, 12);
-      console.log(response.data)
       setPopularCards(response.data.cards);
-      setPopularCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 인기카드 개수: ${response.data.cards.length}`);
+      setPopularCardTotalPages(Math.ceil(response.data.totalResources / 12));
     } catch (error) {
-      console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
+      console.log('인기카드를 가져오는 도중 오류가 발생했습니다: ', error);
     }
-  },[popularCardPage]);
+  }, [popularCardPage]);
 
   const fetchMyCards = useCallback(async () => {
     try {
       const response = await getMyCard(myCardPage, 12);
       setMyCards(response.data.cards);
-      setMyCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 내 카드 개수: ${response.data.cards.length}`);
-      console.log(`호출한 내 카드:`, response.data.cards);
+      setMyCardTotalPages(Math.ceil(response.data.totalResources / 12));
     } catch (error) {
       console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
     }
-  },[myCardPage]);
+  }, [myCardPage]);
 
   const fetchInterestedCard = useCallback(async () => {
     try {
@@ -68,12 +69,11 @@ function HomePage() {
       const myId = myProfile.data.memberId;
       const response = await getInterestedCard(myId, interestedCardPage, 12);
       setInterestedCards(response.data.cards);
-      setInterestedCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 관심 카드 개수: ${response.data.cards.length}`);
+      setInterestedCardTotalPages(Math.ceil(response.data.totalResources / 12));
     } catch (error) {
       console.error('관심카드를 가져오는 중 오류가 발생했습니다:', error);
     }
-  },[interestedCardPage]);
+  }, [interestedCardPage]);
 
   useEffect(() => {
     fetchPopularCard();
@@ -90,7 +90,7 @@ function HomePage() {
   const fontStyle = {
     fontSize: '44px',
     fontFamily: 'Gugi',
-    marginBottom: '40px',
+    marginBottom: '40px'
   };
 
   return (
@@ -121,33 +121,32 @@ function HomePage() {
         </Grid>
         <Grid item xs={9}>
           {/* 카드 목록 */}
-          <Box sx={{ marginTop: '200px'}}>
-            <Box 
-              display="flex"
-              alignItems="center"
-            >
+          <Box sx={{ marginTop: '200px' }}>
+            <Box display="flex" alignItems="center">
               <div style={fontStyle}>인기 카드 목록</div>
               <Select
                 displayEmpty
-                value={sort ? `${sort}-${order}` : ""}
+                value={sort ? `${sort}-${order}` : ''}
                 onChange={(event) => {
-                  const [newSort, newOrder] = event.target.value.split("-");
+                  const [newSort, newOrder] = event.target.value.split('-');
                   setSort(newSort);
                   setOrder(newOrder);
                 }}
-                style={{ 
-                  marginLeft: '40px', 
-                  marginBottom: '40px'}}
+                style={{
+                  marginLeft: '40px',
+                  marginBottom: '40px'
+                }}
               >
-                <MenuItem value="" disabled>정렬순</MenuItem>
-                <MenuItem value={"minprice-ASC"}>낮은가격순</MenuItem>
-                <MenuItem value={"maxprice-DESC"}>높은가격순</MenuItem>
-                <MenuItem value={"createdAt-DESC"}>최신순</MenuItem>
-                <MenuItem value={"createdAt-ASC"}>오래된순</MenuItem>
+                <MenuItem value="" disabled>
+                  정렬순
+                </MenuItem>
+                <MenuItem value={'minprice-ASC'}>낮은가격순</MenuItem>
+                <MenuItem value={'maxprice-DESC'}>높은가격순</MenuItem>
+                <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
+                <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>
             </Box>
             <Grid container spacing={2}>
-
               {/*아래는 인기 카드*/}
 
               {popularCards.map((card) => {
@@ -186,23 +185,22 @@ function HomePage() {
                 );
               })}
             </Grid>
-            <Box 
-              display="flex" 
-              justifyContent="center" 
+            <Box
+              display="flex"
+              justifyContent="center"
               marginTop="40px"
               marginBottom="60px"
             >
-              <Pagination 
-                count={popularCardTotalPages} 
-                page={popularCardPage + 1} 
-                onChange={(_, page) => popularCardPageChange(page)} 
+              <Pagination
+                count={popularCardTotalPages}
+                page={popularCardPage + 1}
+                onChange={(_, page) => popularCardPageChange(page)}
               />
             </Box>
 
             <div style={fontStyle}>내 카드 목록</div>
             <Grid container spacing={2}>
-
-              {/*아래는 내 카드 가져오기*/}
+              {/*아래는 내가 생성한 카드 가져오기*/}
 
               {myCards.map((card) => {
                 // 모든 카테고리 이름을 가져옵니다.
@@ -240,24 +238,23 @@ function HomePage() {
                 );
               })}
             </Grid>
-            <Box 
-              display="flex" 
-              justifyContent="center" 
+            <Box
+              display="flex"
+              justifyContent="center"
               marginTop="40px"
               marginBottom="60px"
             >
-              <Pagination 
-                count={myCardTotalPages} 
-                page={myCardPage + 1} 
-                onChange={(_, page) => myCardPageChange(page)} 
+              <Pagination
+                count={myCardTotalPages}
+                page={myCardPage + 1}
+                onChange={(_, page) => myCardPageChange(page)}
               />
             </Box>
 
             <div style={fontStyle}>관심 카드 목록</div>
             <Grid container spacing={2}>
-
               {/*아래는 관심카드 가져오기*/}
-              
+
               {interestedCards.map((card) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
@@ -294,16 +291,16 @@ function HomePage() {
                 );
               })}
             </Grid>
-            <Box 
-              display="flex" 
-              justifyContent="center" 
-              marginTop="40px" 
+            <Box
+              display="flex"
+              justifyContent="center"
+              marginTop="40px"
               marginBottom="60px"
             >
-              <Pagination 
-                count={interestedCardTotalPages} 
-                page={interestedCardPage + 1} 
-                onChange={(_, page) => interestedCardPageChange(page)} 
+              <Pagination
+                count={interestedCardTotalPages}
+                page={interestedCardPage + 1}
+                onChange={(_, page) => interestedCardPageChange(page)}
               />
             </Box>
           </Box>

@@ -24,18 +24,18 @@ const ComparePage = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    // URL에서 상품 ID 추출
-    const queryParams = new URLSearchParams(location.search);
-    const productIds = queryParams.get('products')?.split(',').map(Number);
-    if (productIds && productIds.length > 0) {
-      // API 호출
+    const queryParams = new URLSearchParams(location.search); // URL에서 상품 ID 추출
+    const productIdsString = queryParams.get('productIds'); // 'productIds' 파라미터 추출
+    const productIds = productIdsString
+      ? productIdsString.split(',').map(Number)
+      : [];
+    if (productIds.length > 0) {
       compareProduct(productIds)
         .then((response) => {
-          // API 응답으로 받은 상품 데이터 설정
           setProducts(response.data.products);
         })
         .catch((error) => {
-          console.error('Error fetching product comparison', error);
+          console.error('동일상품 비교 중 오류가 발생했습니다:', error); // 에러 로그
         });
     }
   }, [location]);
@@ -102,7 +102,6 @@ const ComparePage = () => {
             <ArrowBackIosIcon />
           </IconButton>
 
-          {/* Product cards container */}
           <Box
             ref={scrollContainerRef}
             sx={{
@@ -137,14 +136,16 @@ const ComparePage = () => {
                   <Typography variant="h5" gutterBottom>
                     {product.title}
                   </Typography>
-                  {product.KeywordList.map((keyword) => (
-                    <Chip
-                      key={keyword.keywordId}
-                      label={`#${keyword.keyword}`}
-                      variant="outlined"
-                      sx={{ mr: 1, mb: 1 }}
-                    />
-                  ))}
+                  {product.KeywordList &&
+                    Array.isArray(product.KeywordList) &&
+                    product.KeywordList.map((keyword) => (
+                      <Chip
+                        key={keyword.keywordId}
+                        label={`#${keyword.keyword}`}
+                        variant="outlined"
+                        sx={{ mr: 1, mb: 1 }}
+                      />
+                    ))}
                   <Typography variant="body1" gutterBottom>
                     Price: {product.price}
                   </Typography>

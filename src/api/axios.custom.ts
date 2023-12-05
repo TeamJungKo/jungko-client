@@ -151,7 +151,7 @@ export const unlikeCard = async (cardId: number) => {
 
 export const compareProduct = async (productIds: number[]) => {
   const response = await instance.post('/api/v1/products/compare', {
-    productIds
+    productIds: productIds
   });
   return response;
 };

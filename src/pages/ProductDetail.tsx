@@ -27,27 +27,11 @@ const KeywordChip = styled(Chip)(({ theme, color }) => ({
   }
 }));
 
-// const dummyData = {
-//   imageUrl: testImg,
-//   marketLogoUrl: '/path-to-market-logo.png',
-//   date: 'YYYY-MM-DD',
-//   title: 'Product Title',
-//   price: '8000원',
-//   location: '서울시 동대문구',
-//   keywords: [
-//     { id: '1', name: '반려동물존' },
-//     { id: '2', name: '애견용품' }
-//   ],
-//   productDescription:
-//     '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.'
-// };
-
 const ProductDetail = () => {
   const [productData, setProductData] = useState<ProductDetail | null>(null);
   const { productId } = useParams();
   const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
-  //const navigate = useNavigate();
-
+  const [marketProductUrl, setMarketProductUrl] = useState<string>(''); //상품 페이지로 이동 버튼 클릭 시 이동할 URL
   const toggleKeyword = (keywordId: number) => {
     const keywordIdStr = keywordId.toString();
     setSelectedKeywordIds((prevSelectedKeywords) => {
@@ -64,10 +48,10 @@ const ProductDetail = () => {
     if (selectedKeywordIds.length > 0) {
       try {
         const response = await createKeywords(selectedKeywordIds);
-        console.log('Keywords added:', response);
+        console.log('키워드 추가 완료', response);
         setSelectedKeywordIds([]);
       } catch (error) {
-        console.error('Error creating keywords:', error);
+        console.error('키워드 추가 중 에러가 발생했습니다.', error);
       }
     }
   };
@@ -75,14 +59,17 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        console.log('productId:', productId);
         const id = Number(productId);
         if (!isNaN(id)) {
           const response = await getProductDetail(id);
           setProductData(response.data.productDetail);
+          setMarketProductUrl(response.data.productDetail.marketProductUrl);
         }
       } catch (error) {
-        console.error('Failed to fetch product detail:', error);
+        console.log(
+          '상품 상세정보를 가져오는 도중 오류가 발생했습니다 :',
+          error
+        );
       }
     };
 
@@ -146,16 +133,6 @@ const ProductDetail = () => {
                 marginLeft: 3
               }}
             >
-              {/* <Box
-                component="img"
-                src={
-                  productData
-                    ? productData.marketLogoUrl
-                    : '/path-to-default-market-logo.png' //기본 로고 이미지 추가 시 수정
-                }
-                alt="Market Logo"
-                sx={{ width: 100, height: 30, marginBottom: 2 }}
-              /> */}
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -186,9 +163,7 @@ const ProductDetail = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() =>
-                  window.open('http://실제 상품페이지 주소', '_blank')
-                }
+                onClick={() => window.open(marketProductUrl)}
                 sx={{ width: 200 }}
               >
                 상품 페이지로 이동
