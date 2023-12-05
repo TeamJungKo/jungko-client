@@ -23,13 +23,11 @@ const HotCards = (): React.ReactElement => {
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {
-          console.error(response.data.message);
+          console.log(response.data.message);
         }
       } catch (error) {
-        console.error(error);
+        console.log('인기카드를 가져오는 중 오류가 발생했습니다 :', error);
       }
-      console.log(`호출된 인기카드 개수: ${cards.length}`);
-      console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
     };
 
     fetchCards();
@@ -43,24 +41,16 @@ const HotCards = (): React.ReactElement => {
         </p>
         <div className="hot_card_container">
           {cards.map((card) => (
-              <CardMaker
-                key={card.cardId}
-                imageUrl={jungkoIcon}
-                title={card.title}
-                description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
-                imageHeight="50%"
-                contentHeight="50%"
-                onClick={goToUrl}
-              />
+            <CardMaker
+              key={card.cardId}
+              imageUrl={jungkoIcon}
+              title={card.title}
+              description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
+              imageHeight="50%"
+              contentHeight="50%"
+              onClick={goToUrl}
+            />
           ))}
-          <CardMaker //이부분은 샘플이니 지워도무관
-            imageUrl={jungkoIcon}
-            title="카드제목"
-            description="카드설명"
-            imageHeight="50%"
-            contentHeight="50%"
-            onClick={goToUrl}
-          />
         </div>
       </div>
     </>

@@ -32,6 +32,11 @@ export interface ProductDetailResponse {
   productDetail: ProductDetail;
 }
 
+// 카드 내 매물 검색 api
+export interface CardInfoResponse extends ProductResponse {
+  Author: Author;
+}
+
 // 앞으로 쓸 상품 정보들에서 겹치는 것만 추출해놓음
 interface BaseProduct {
   productId: number;
@@ -59,7 +64,7 @@ export interface ProductDetail extends BaseProduct {
 }
 
 // 카드 생성자 혹은 상품 판매자
-interface Author {
+export interface Author {
   memberId: number;
   nickname: string;
   imageUrl: string;

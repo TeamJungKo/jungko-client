@@ -20,7 +20,6 @@ function CategoryPage() {
   const [sort, setSort] = useState<string | null>(null);
   const [order, setOrder] = useState<string | null>(null);
 
-
   const pageChange = (page: number) => {
     setPage(page - 1); //인덱스는 0부터이므로
   };
@@ -29,12 +28,10 @@ function CategoryPage() {
     const fetchPopularCard = async () => {
       try {
         const response = await getPopularCard(page, 48, categoryId);
-        console.log("소트:",sort,", 오더:",order)
 
-        setTotalPages(Math.ceil(response.data.totalResources/48));
+        setTotalPages(Math.ceil(response.data.totalResources / 48));
         const { cards } = response.data;
 
-        console.log(cards);
         setPopularCards(cards);
       } catch (error) {
         console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
@@ -78,39 +75,37 @@ function CategoryPage() {
 
         <Grid item xs={9}>
           {/* 카드 목록 */}
-          <Box 
-            sx={{ 
-              marginTop: '200px', 
+          <Box
+            sx={{
+              marginTop: '200px',
               marginBottom: '10%',
               minHeight: `calc(100vh - 297px)`
-            }}>
-            <Box 
-              display="flex"
-              alignItems="center"
-              marginBottom={2}
-            >
+            }}
+          >
+            <Box display="flex" alignItems="center" marginBottom={2}>
               <div style={fontStyle}>인기 카드 목록</div>
               <Select
                 displayEmpty
-                value={sort ? `${sort}-${order}` : ""}
+                value={sort ? `${sort}-${order}` : ''}
                 onChange={(event) => {
-                  const [newSort, newOrder] = event.target.value.split("-");
+                  const [newSort, newOrder] = event.target.value.split('-');
                   setSort(newSort);
                   setOrder(newOrder);
                 }}
-                style={{ marginLeft: '40px'}}
+                style={{ marginLeft: '40px' }}
               >
-                <MenuItem value="" disabled>정렬순</MenuItem>
-                <MenuItem value={"minprice-ASC"}>낮은가격순</MenuItem>
-                <MenuItem value={"maxprice-DESC"}>높은가격순</MenuItem>
-                <MenuItem value={"createdAt-DESC"}>최신순</MenuItem>
-                <MenuItem value={"createdAt-ASC"}>오래된순</MenuItem>
+                <MenuItem value="" disabled>
+                  정렬순
+                </MenuItem>
+                <MenuItem value={'minprice-ASC'}>낮은가격순</MenuItem>
+                <MenuItem value={'maxprice-DESC'}>높은가격순</MenuItem>
+                <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
+                <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>
             </Box>
 
             <Grid container spacing={2}>
-
-              {/*해당 카테고리의 인기카드*/}
+              {/*해당 카테고리의 카드*/}
               {popularCards.map((card) => {
                 // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
@@ -136,9 +131,11 @@ function CategoryPage() {
                 지역: ${area}`;
 
                 return (
-                  <Grid item 
+                  <Grid
+                    item
                     key={card.cardId}
-                    style={{ marginTop: '20px', marginBottom: '20px' }}>
+                    style={{ marginTop: '20px', marginBottom: '20px' }}
+                  >
                     <CardMaker
                       title={card.title}
                       imageUrl={card.category.imageUrl}
@@ -148,15 +145,11 @@ function CategoryPage() {
                 );
               })}
             </Grid>
-            <Box 
-              display="flex" 
-              justifyContent="center" 
-              marginTop={4} 
-            >
-              <Pagination 
-                count={totalPages} 
-                page={page + 1} 
-                onChange={(_, page) => pageChange(page)} 
+            <Box display="flex" justifyContent="center" marginTop={4}>
+              <Pagination
+                count={totalPages}
+                page={page + 1}
+                onChange={(_, page) => pageChange(page)}
               />
             </Box>
           </Box>

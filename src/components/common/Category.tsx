@@ -35,7 +35,7 @@ export default function Category() {
           console.error(response.data.message);
         }
       } catch (error) {
-        console.error(error);
+        console.log('카테고리를 가져오는 도중 오류가 발생했습니다: ', error);
       }
     };
 
@@ -47,9 +47,9 @@ export default function Category() {
   };
 
   const getMoreCategory = (categoryId: number) => {
-    setOpen(prevOpen => ({
+    setOpen((prevOpen) => ({
       ...prevOpen,
-      [categoryId]: !prevOpen[categoryId],
+      [categoryId]: !prevOpen[categoryId]
     }));
   };
 
@@ -63,74 +63,78 @@ export default function Category() {
           border: '3px solid black',
           borderRadius: 3,
           boxShadow: '8px 8px 8px rgba(0, 0, 0, 0.25)',
-          overflow: "hidden",
+          overflow: 'hidden',
           maxHeight: 'calc(100vh - 100px)'
         }}
       >
         <Box
-            sx={{
-              position: 'sticky',
-              backgroundColor: 'black',
-              color: 'white',
-              textAlign: 'center',
-              padding: '12px',
-              top: 0,
-              zIndex: 2,
-              fontSize: '20px',
-              fontFamily: 'gugi'
-            }}
-          >
-            카테고리
+          sx={{
+            position: 'sticky',
+            backgroundColor: 'black',
+            color: 'white',
+            textAlign: 'center',
+            padding: '12px',
+            top: 0,
+            zIndex: 2,
+            fontSize: '20px',
+            fontFamily: 'gugi'
+          }}
+        >
+          카테고리
         </Box>
         <List
-          sx={{ 
-            width: '100%', 
+          sx={{
+            width: '100%',
             background: '#DCDCDC',
             maxHeight: 'calc(70vh - 36px)',
-            overflowY: 'scroll', // 세로 스크롤 적용
+            overflowY: 'scroll'
           }}
           component="nav"
           aria-labelledby="nested-list-subheader"
         >
           {categories.map((category) => (
             <React.Fragment key={category.categoryId}>
-              <ListItemButton
-                sx={{ padding: 0 }}
-              >
-                <ListItemText 
+              <ListItemButton sx={{ padding: 0 }}>
+                <ListItemText
                   sx={{ padding: '8px 0px 8px 16px', margin: '0' }}
-                  primary={category.name} 
-                  onClick={() => linkCategoryPage(category.categoryId)}/>
-                {open[category.categoryId] ? 
-                  <ExpandLess 
+                  primary={category.name}
+                  onClick={() => linkCategoryPage(category.categoryId)}
+                />
+                {open[category.categoryId] ? (
+                  <ExpandLess
                     onClick={() => getMoreCategory(category.categoryId)}
                     sx={{ paddingRight: '16px' }}
-                  /> 
-                  : 
-                  <ExpandMore 
+                  />
+                ) : (
+                  <ExpandMore
                     onClick={() => getMoreCategory(category.categoryId)}
-                    sx={{ paddingRight: '16px' }}  
-                  />}
+                    sx={{ paddingRight: '16px' }}
+                  />
+                )}
               </ListItemButton>
-              <Collapse in={!!open[category.categoryId]} timeout="auto" unmountOnExit>
+              <Collapse
+                in={!!open[category.categoryId]}
+                timeout="auto"
+                unmountOnExit
+              >
                 <List component="div" disablePadding>
-                  {category.subCategory && Array.isArray(category.subCategory) ? 
-                    category.subCategory.map((subCategory: SubCategory) => (
-                      <ListItemButton 
-                        sx={{ pl: 4 }} 
-                        key={subCategory.categoryId} 
-                        onClick={() => linkCategoryPage(subCategory.categoryId)}
-                      >
-                        <ListItemText 
-                          primary={subCategory.name} 
-                        />
-                      </ListItemButton>
-                    )) : null}
+                  {category.subCategory && Array.isArray(category.subCategory)
+                    ? category.subCategory.map((subCategory: SubCategory) => (
+                        <ListItemButton
+                          sx={{ pl: 4 }}
+                          key={subCategory.categoryId}
+                          onClick={() =>
+                            linkCategoryPage(subCategory.categoryId)
+                          }
+                        >
+                          <ListItemText primary={subCategory.name} />
+                        </ListItemButton>
+                      ))
+                    : null}
                 </List>
               </Collapse>
             </React.Fragment>
           ))}
-
         </List>
       </Box>
     </Draggable>

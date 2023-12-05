@@ -31,14 +31,14 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   setSelectedProducts
 }) => {
   const [SearchOptions, setSearchOptions] = useState({ SearchOption });
-  const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성모달열림?
-  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림?
+  const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성 모달이 열렸는지 여부
+  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 모달이 열렸는지 여부
   const [products, setProducts] = useState<Product[]>([]); //화면에 표시할 상품 목록
-  const [totalResources, setTotalResources] = useState(0); //총 상품 목록 설정
-  const [page, setPage] = useState(1); //페이지 설정
+  const [totalResources, setTotalResources] = useState(0); //총 상품 목록
+  const [page, setPage] = useState(1);
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
-  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달
-  const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
+  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달 열렸는지 여부
+  const [showProductDetail, setShowProductDetail] = useState<number>(0);
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [sortDirection, setSortDirection] = useState('price');
   const handleProductClick = (productId: number) => {
@@ -71,12 +71,10 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
       try {
         const response = await searchProduct(updatedSearchOptions);
-        console.log('request', updatedSearchOptions);
         setProducts(response.data.products);
         setTotalResources(response.data.totalResources);
-        console.log('response', response.data);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.log('상품 정보를 가져오는 도중 오류가 발생했습니다 :', error);
       }
     };
 
@@ -125,7 +123,10 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
   const handleCompareClick = () => {
     if (selectedProducts.length > 0) {
-      navigate('/compare?products=${productIds}');
+      const productIds = selectedProducts
+        .map((product) => product.productId)
+        .join(',');
+      navigate(`/compare?productIds=${productIds}`);
     } else {
       console.log('비교할 상품을 선택해주세요.');
     }
@@ -184,7 +185,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {/* 드롭다운 박스 */}
               <Select
                 value={
                   sortOrder === 'DESC' && sortDirection === 'uploadedAt'

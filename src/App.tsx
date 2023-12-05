@@ -41,7 +41,7 @@ function App() {
           <Route path="/otherProfile/:id" element={<OtherProfile />} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/card/:cardId" element={<CardDetail />} />
-          <Route path="/productDetail/:productId" element={<ProductDetail />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/searchresult" element={<SearchResultPage />} />
         </Routes>
       </Router>

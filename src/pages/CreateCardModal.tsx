@@ -114,14 +114,14 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   };
 
   const handleSidoSelect = (event: SelectChangeEvent) => {
-    const sidoId = event.target.value; // ID 추출
+    const sidoId = event.target.value;
     const selected = area.find((sido) => sido.id === Number(sidoId));
     setSelectedSido(selected);
     setSelectedEmd(undefined);
   };
 
   const handleSiggSelect = (event: SelectChangeEvent) => {
-    const siggId = event.target.value; // ID 추출
+    const siggId = event.target.value;
     const selected = selectedSido?.sigg.find(
       (sigg) => sigg.id === Number(siggId)
     );
@@ -129,7 +129,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   };
 
   const handleEmdClick = (event: SelectChangeEvent) => {
-    const emdId = event.target.value; // ID 추출
+    const emdId = event.target.value;
     setSelectedEmd(Number(emdId));
   };
 
@@ -155,14 +155,10 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
     try {
       const response = await createCard(formData);
       if (response.status === 201) {
-        console.log('생성 완료'); //생성 완료 alert
         navigate(`/Card/${response.data.cardId}`);
       }
     } catch (error) {
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-      console.log('에러'); //에러 모달 혹은 페이지
+      console.log('생성 도중 오류가 발생했습니다: ', error);
     }
   };
 

@@ -47,7 +47,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
         const response2 = await getAllArea();
         setArea(response2.data.areas[0].sido);
       } catch (error) {
-        console.error('카테고리 데이터를 불러오는데 실패했습니다.', error);
+        console.log('카테고리 데이터를 불러오는데 실패했습니다.', error);
       }
     };
     fetchCategoriesAndAreas();
@@ -95,14 +95,14 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   };
 
   const handleSidoSelect = (event: SelectChangeEvent) => {
-    const sidoId = event.target.value; // ID 추출
+    const sidoId = event.target.value;
     const selected = area.find((sido) => sido.id === Number(sidoId));
     setSelectedSido(selected);
     setSelectedEmd(undefined);
   };
 
   const handleSiggSelect = (event: SelectChangeEvent) => {
-    const siggId = event.target.value; // ID 추출
+    const siggId = event.target.value;
     const selected = selectedSido?.sigg.find(
       (sigg) => sigg.id === Number(siggId)
     );
@@ -110,13 +110,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   };
 
   const handleEmdClick = (event: SelectChangeEvent) => {
-    const emdId = event.target.value; // ID 추출
+    const emdId = event.target.value;
     setSelectedEmd(Number(emdId));
   };
 
   const handleSearch = () => {
-    // 검색 조건을 URL 쿼리 파라미터로 변환
-    const searchParams = new URLSearchParams();
+    const searchParams = new URLSearchParams(); // 검색 조건을 URL 쿼리 파라미터로 변환
     searchParams.append('keyword', encodeURIComponent(searchTerm));
     if (minPrice) searchParams.append('minPrice', minPrice);
     if (maxPrice) searchParams.append('maxPrice', maxPrice);

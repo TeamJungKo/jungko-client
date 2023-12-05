@@ -63,7 +63,7 @@ const NavigationBar = ({ reload = false }: Prop) => {
   const [nickname, setNickname] = useState('닉네임');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
-  const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
+  const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘
   const [searchKeyword, setSearchKeyword] = useState('');
   const navigate = useNavigate();
 
@@ -106,11 +106,9 @@ const NavigationBar = ({ reload = false }: Prop) => {
         if (response.data) {
           setNickname(response.data.nickname);
           setImageUrl(response.data.imageUrl);
-        } else {
-          console.error('Failed to fetch profile');
         }
       } catch (error) {
-        console.error(error);
+        console.log('프로필을 가져오는 도중 오류가 발생했습니다: ', error);
       }
     };
 
@@ -154,22 +152,20 @@ const NavigationBar = ({ reload = false }: Prop) => {
           <div style={{ textDecoration: 'none', marginLeft: '16px' }}>
             <Button variant="outlined" onClick={handleSearch}>
               검색
-            </Button>{' '}
-            {/* onClick 이벤트를 추가하여 버튼 클릭 시 검색결과로 이어지게 함. */}
+            </Button>
           </div>
 
           <div style={{ textDecoration: 'none', marginLeft: '16px' }}>
             <Button variant="outlined" onClick={handleOpenSearchModal}>
               검색 옵션
-            </Button>{' '}
-            {/* onClick 이벤트를 추가하여 버튼 클릭 시 SearchModal이 열리도록 합니다. */}
+            </Button>
           </div>
 
           <IconButton
             size="large"
             aria-label="show new notifications"
             color="inherit"
-            onClick={handleOpenModal} // 아이콘을 클릭하면 모달을 엽니다.
+            onClick={handleOpenModal}
           >
             <Badge>
               <NotificationsIcon />
@@ -181,7 +177,6 @@ const NavigationBar = ({ reload = false }: Prop) => {
             onClose={handleCloseModal}
           />
 
-          {/*여기에 링크 달았음*/}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Link
               to="/myProfile"
@@ -240,8 +235,7 @@ const NavigationBar = ({ reload = false }: Prop) => {
       <SearchModal
         open={searchModalOpen}
         handleClose={handleCloseSearchModal}
-      />{' '}
-      {/* SearchModal 컴포넌트를 추가하고, open과 handleClose prop을 추가합니다. */}
+      />
     </Box>
   );
 };
