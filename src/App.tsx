@@ -40,8 +40,8 @@ function App() {
           <Route path="/myProfile" element={<MyProfile />} />
           <Route path="/otherProfile/:id" element={<OtherProfile />} />
           <Route path="/compare" element={<ComparePage />} />
-          <Route path="/Card/:cardId" element={<CardDetail />} />
-          <Route path="/productDetail/:id" element={<ProductDetail />} />
+          <Route path="/card/:cardId" element={<CardDetail />} />
+          <Route path="/productDetail/:productId" element={<ProductDetail />} />
           <Route path="/searchresult" element={<SearchResultPage />} />
         </Routes>
       </Router>

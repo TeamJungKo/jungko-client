@@ -67,9 +67,10 @@ export const ProductComponent: React.FC<ProductProps> = ({
             </Typography>
             <Typography variant="body2">{`${product.price}원`}</Typography>
             <Box sx={{ display: 'flex', mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
-              {product.KeywordList.map((keyword, index) => (
-                <Chip key={index} label={keyword.keyword} size="small" />
-              ))}
+              {product.KeywordList &&
+                product.KeywordList.map((keyword, index) => (
+                  <Chip key={index} label={keyword.keyword} size="small" />
+                ))}
             </Box>
           </CardContent>
         </Box>

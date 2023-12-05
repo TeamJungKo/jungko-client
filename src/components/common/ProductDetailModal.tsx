@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Chip, Button, Divider } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { createKeywords, getProductDetail } from '../../api/axios.custom';
 import testImg from '../../assets/images/jungkoIcon.png';
 import { ProductDetail, Area, Keyword } from '../../types/types';
@@ -65,6 +65,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     });
   };
 
+  const theme = useTheme();
+
   const addKeywords = async () => {
     //키워드 추가 API 호출
     if (selectedKeywordIds.length > 0) {
@@ -124,7 +126,18 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           padding: '20px'
         }}
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '40%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '70%',
+            bgcolor: 'background.paper',
+            boxShadow: theme.shadows[5],
+            p: 4
+          }}
+        >
           <Box
             sx={{
               ...style,
@@ -136,7 +149,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               component="img"
               src={productData ? productData.productImageUrl : testImg}
               alt="Product Image"
-              sx={{ width: 400, height: 400 }}
+              sx={{ width: 300, height: 300 }}
             />
 
             <Box

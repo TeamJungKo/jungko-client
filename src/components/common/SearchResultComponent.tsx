@@ -16,11 +16,7 @@ import ProductDetailModal from './ProductDetailModal.tsx';
 import CreateCardPage from '../../pages/CreateCardModal.tsx';
 import SearchModal from '../../pages/SearchModal.tsx';
 import { searchProduct } from '../../api/axios.custom.ts';
-import {
-  ProductSearchRequest,
-  Product,
-  ProductResponse
-} from '../../types/types.ts';
+import { ProductSearchRequest, Product } from '../../types/types.ts';
 
 interface SearchResultComponentProps {
   SearchOption: ProductSearchRequest;
@@ -43,8 +39,8 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달
   const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
-  const [sortOrder, setSortOrder] = useState('created_at');
-  const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+  const [sortDirection, setSortDirection] = useState('price');
   const handleProductClick = (productId: number) => {
     setShowProductDetail(productId);
     setIsProductDetailOpen(true);
@@ -63,35 +59,49 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
     setSearchOptions(updatedSearchOptions);
   };
 
-  const fetchProducts = async (options: ProductSearchRequest) => {
-    try {
-      const response = await searchProduct(options);
-      const responseData: ProductResponse = response.data;
-      setProducts(responseData.products);
-      setTotalResources(responseData.totalResources);
-    } catch (error) {
-      console.error('Error fetching products', error);
-    }
-  };
-
   useEffect(() => {
-    fetchProducts(SearchOptions.SearchOption); // SearchOptions를 인자로 전달
-  }, [SearchOptions]);
+    const fetchProducts = async () => {
+      const updatedSearchOptions = {
+        ...SearchOption,
+        page: page - 1,
+        size: productsPerPage,
+        order: sortOrder,
+        sort: sortDirection
+      };
+
+      try {
+        const response = await searchProduct(updatedSearchOptions);
+        console.log('request', updatedSearchOptions);
+        setProducts(response.data.products);
+        setTotalResources(response.data.totalResources);
+        console.log('response', response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, [page, productsPerPage, sortOrder, sortDirection, SearchOption]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
-    if (value === 'priceDesc') {
-      setSortOrder('price');
-      setSortDirection('DESC');
-    } else if (value === 'priceAsc') {
-      setSortOrder('price');
-      setSortDirection('ASC');
-    } else if (value === 'recentDesc') {
-      setSortOrder('created_at');
-      setSortDirection('DESC');
-    } else {
-      setSortOrder('created_at');
-      setSortDirection('ASC');
+    switch (value) {
+      case 'priceDesc':
+        setSortOrder('DESC');
+        setSortDirection('price');
+        break;
+      case 'priceAsc':
+        setSortOrder('ASC');
+        setSortDirection('price');
+        break;
+      case 'recentAsc':
+        setSortOrder('ASC');
+        setSortDirection('uploadedAt');
+        break;
+      default:
+        setSortOrder('DESC');
+        setSortDirection('uploadedAt');
+        break;
     }
   };
 
@@ -177,7 +187,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
               {/* 드롭다운 박스 */}
               <Select
                 value={
-                  sortOrder === 'created_at' && sortDirection === 'DESC'
+                  sortOrder === 'DESC' && sortDirection === 'uploadedAt'
                     ? 'recentDesc'
                     : sortOrder
                 }

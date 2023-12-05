@@ -164,10 +164,19 @@ export const getProductDetail = async (productId: number) => {
 export const searchProduct = async (
   productSearchRequest: types.ProductSearchRequest
 ) => {
-  const response = await instance.post(
-    `/api/v1/products/search?keyword=${productSearchRequest.keyword}&minPrice=${productSearchRequest.minPrice}&maxPrice=${productSearchRequest.maxPrice}&categoryId=${productSearchRequest.categoryId}&areaId=${productSearchRequest.areaId}&page=${productSearchRequest.page}&size=${productSearchRequest.size}&sort=${productSearchRequest.sort}&order=${productSearchRequest.order}`,
-    productSearchRequest
-  );
+  const response = await instance.get(`/api/v1/products/search`, {
+    params: {
+      keyword: productSearchRequest.keyword,
+      minPrice: productSearchRequest.minPrice,
+      maxPrice: productSearchRequest.maxPrice,
+      categoryId: productSearchRequest.categoryId,
+      areaId: productSearchRequest.areaId,
+      page: productSearchRequest.page,
+      size: productSearchRequest.size,
+      sort: productSearchRequest.sort,
+      order: productSearchRequest.order
+    }
+  });
   return response;
 };
 

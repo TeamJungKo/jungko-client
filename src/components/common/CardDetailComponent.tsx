@@ -44,7 +44,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달
   const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
-  const [sortOrder, setSortOrder] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState('createdAt');
   const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
   const handleProductClick = (productId: number) => {
     setShowProductDetail(productId);
@@ -57,20 +57,26 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (typeof cardId === 'number') {
-        try {
-          const response: ProductResponse = await getCardInfo(
-            cardId,
-            page - 1,
-            productsPerPage,
-            sortOrder,
-            sortDirection
-          );
-          setProducts(response.products);
-          setTotalResources(response.totalResources);
-        } catch (error) {
-          console.error('Error fetching products', error);
-        }
+      try {
+        const response: ProductResponse = await getCardInfo(
+          cardId,
+          page - 1,
+          productsPerPage,
+          sortOrder,
+          sortDirection
+        );
+        console.log(
+          'request',
+          cardId,
+          page - 1,
+          productsPerPage,
+          sortOrder,
+          sortDirection
+        );
+        setProducts(response.products);
+        setTotalResources(response.totalResources);
+      } catch (error) {
+        console.error('Error fetching products', error);
       }
     };
 
@@ -79,21 +85,25 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
-    if (value === 'priceDesc') {
-      setSortOrder('price');
-      setSortDirection('DESC');
-    } else if (value === 'priceAsc') {
-      setSortOrder('price');
-      setSortDirection('ASC');
-    } else if (value === 'recentDesc') {
-      setSortOrder('created_at');
-      setSortDirection('DESC');
-    } else {
-      setSortOrder('created_at');
-      setSortDirection('ASC');
+    switch (value) {
+      case 'priceDesc':
+        setSortOrder('price');
+        setSortDirection('DESC');
+        break;
+      case 'priceAsc':
+        setSortOrder('price');
+        setSortDirection('ASC');
+        break;
+      case 'recentAsc':
+        setSortOrder('createdAt');
+        setSortDirection('ASC');
+        break;
+      default:
+        setSortOrder('createdAt');
+        setSortDirection('DESC');
+        break;
     }
   };
-
   const navigate = useNavigate();
 
   const handleOpenCardOption = () => {

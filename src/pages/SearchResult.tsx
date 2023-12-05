@@ -17,15 +17,23 @@ const SearchResult: React.FC = () => {
 
   const getSearchOptionsFromURL = (): ProductSearchRequest => {
     const queryParams = new URLSearchParams(location.search);
-    return {
-      keyword: decodeURIComponent(queryParams.get('keyword') || 'asdf'),
-      minPrice: Number(queryParams.get('minPrice') || ''),
-      maxPrice: Number(queryParams.get('maxPrice') || ''),
-      categoryId: Number(queryParams.get('categoryId') || ''),
-      areaId: Number(queryParams.get('areaId') || ''),
-      sort: queryParams.get('sort') || '',
-      order: queryParams.get('order') || ''
+    const options: ProductSearchRequest = {
+      keyword: decodeURIComponent(queryParams.get('keyword') || 'asdf')
     };
+
+    if (queryParams.has('minPrice')) {
+      options.minPrice = Number(queryParams.get('minPrice'));
+    }
+    if (queryParams.has('maxPrice')) {
+      options.maxPrice = Number(queryParams.get('maxPrice'));
+    }
+    if (queryParams.has('category')) {
+      options.categoryId = Number(queryParams.get('categoryId'));
+    }
+    if (queryParams.has('areaId')) {
+      options.areaId = Number(queryParams.get('areaId'));
+    }
+    return options;
   };
 
   const searchOptions = getSearchOptionsFromURL();

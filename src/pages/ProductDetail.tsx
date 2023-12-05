@@ -75,6 +75,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
+        console.log('productId:', productId);
         const id = Number(productId);
         if (!isNaN(id)) {
           const response = await getProductDetail(id);
