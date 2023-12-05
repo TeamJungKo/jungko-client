@@ -17,6 +17,10 @@
   width: 700px;
 }
 
+.main_illust_text {
+  line-height: 2;
+}
+
 .main_illust.illust_worried{
   transform: scale(0.6);
 }

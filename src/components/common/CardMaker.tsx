@@ -69,7 +69,8 @@ function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', t
           </Typography>
           <Typography variant="body2" 
             color="text.secondary"
-            sx={{ fontFamily: 'Noto Sans KR', whiteSpace: 'pre-line' }} 
+            sx={{ fontFamily: 'Noto Sans KR', whiteSpace: 'pre-line', fontSize: '16px' }}
+            width={"95%"}
           >
             {description}
           </Typography>

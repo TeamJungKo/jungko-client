@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Select from '@mui/material/Select';
@@ -38,54 +38,54 @@ function HomePage() {
     setInterestedCardPage(page - 1); //인덱스는 0부터이므로
   };
 
-  const fetchPopularCard = async () => {
+  const fetchPopularCard = useCallback(async () => {
     try {
       const response = await getPopularCard(popularCardPage, 12);
       console.log(response.data)
       setPopularCards(response.data.cards);
       setPopularCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 인기카드 개수: ${popularCards.length}`);
+      console.log(`호출한 인기카드 개수: ${response.data.cards.length}`);
     } catch (error) {
       console.error('인기 카드를 가져오는 중 오류가 발생했습니다:', error);
     }
-  };
+  },[popularCardPage]);
 
-  const fetchMyCards = async () => {
+  const fetchMyCards = useCallback(async () => {
     try {
       const response = await getMyCard(myCardPage, 12);
       setMyCards(response.data.cards);
       setMyCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 내 카드 개수: ${myCards.length}`);
-      console.log(`호출한 내 카드:`, myCards);
+      console.log(`호출한 내 카드 개수: ${response.data.cards.length}`);
+      console.log(`호출한 내 카드:`, response.data.cards);
     } catch (error) {
       console.error('내 카드를 가져오는 중 오류가 발생했습니다:', error);
     }
-  };
+  },[myCardPage]);
 
-  const fetchInterestedCard = async () => {
+  const fetchInterestedCard = useCallback(async () => {
     try {
       const myProfile = await getMyProfile();
       const myId = myProfile.data.memberId;
       const response = await getInterestedCard(myId, interestedCardPage, 12);
       setInterestedCards(response.data.cards);
       setInterestedCardTotalPages(Math.ceil(response.data.totalResources/12));
-      console.log(`호출한 관심 카드 개수: ${interestedCards.length}`);
+      console.log(`호출한 관심 카드 개수: ${response.data.cards.length}`);
     } catch (error) {
       console.error('관심카드를 가져오는 중 오류가 발생했습니다:', error);
     }
-  };
+  },[interestedCardPage]);
 
   useEffect(() => {
     fetchPopularCard();
-  }, [popularCardPage, order]);
+  }, [fetchPopularCard, popularCardPage, order]);
 
   useEffect(() => {
     fetchMyCards();
-  }, [myCardPage]);
+  }, [fetchMyCards, myCardPage]);
 
   useEffect(() => {
     fetchInterestedCard();
-  }, [interestedCardPage]);
+  }, [fetchInterestedCard, interestedCardPage]);
 
   const fontStyle = {
     fontSize: '44px',
@@ -140,10 +140,6 @@ function HomePage() {
                   marginBottom: '40px'}}
               >
                 <MenuItem value="" disabled>정렬순</MenuItem>
-                <MenuItem value={"title-ASC"}>제목 오름차순</MenuItem>
-                <MenuItem value={"title-DESC"}>제목 내림차순</MenuItem>
-                <MenuItem value={"keyword-ASC"}>키워드 오름차순</MenuItem>
-                <MenuItem value={"keyword-DESC"}>키워드 내림차순</MenuItem>
                 <MenuItem value={"minprice-ASC"}>낮은가격순</MenuItem>
                 <MenuItem value={"maxprice-DESC"}>높은가격순</MenuItem>
                 <MenuItem value={"createdAt-DESC"}>최신순</MenuItem>
