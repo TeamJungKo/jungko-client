@@ -66,8 +66,25 @@ export const changeCardOption = async (
   cardId: number,
   cardChangeRequest: FormData
 ): Promise<any> => {
-  const response = await instance.patch(`/api/v1/cards/${cardId}`, cardChangeRequest);
+  const response = await instance.patch(
+    `/api/v1/cards/${cardId}`,
+    cardChangeRequest
+  );
   return response;
+};
+
+export const getCardInfo = async (
+  //getCardInfo 추가
+  cardId: number,
+  page = 0,
+  size = 10,
+  sort: string,
+  order: 'ASC' | 'DESC'
+) => {
+  const response = await instance.get(
+    `/api/v1/cards/${cardId}/products?page=${page}&size=${size}&sort=${sort}&order=${order}`
+  );
+  return response.data;
 };
 
 export const getPopularCard = async (
@@ -145,16 +162,21 @@ export const getProductDetail = async (productId: number) => {
 };
 
 export const searchProduct = async (
-  productSearchRequest: types.ProductSearchRequest,
-  page = 0,
-  size = 10,
-  sort: string,
-  order: 'ASC' | 'DESC'
+  productSearchRequest: types.ProductSearchRequest
 ) => {
-  const response = await instance.post(
-    `/api/v1/products/search?keyword=${productSearchRequest.keyword}&minPrice=${productSearchRequest.minPrice}&maxPrice=${productSearchRequest.maxPrice}&categoryId=${productSearchRequest.categoryId}&areaId=${productSearchRequest.areaId}&page=${page}&size=${size}&sort=${sort}&order=${order}`,
-    productSearchRequest
-  );
+  const response = await instance.get(`/api/v1/products/search`, {
+    params: {
+      keyword: productSearchRequest.keyword,
+      minPrice: productSearchRequest.minPrice,
+      maxPrice: productSearchRequest.maxPrice,
+      categoryId: productSearchRequest.categoryId,
+      areaId: productSearchRequest.areaId,
+      page: productSearchRequest.page,
+      size: productSearchRequest.size,
+      sort: productSearchRequest.sort,
+      order: productSearchRequest.order
+    }
+  });
   return response;
 };
 
@@ -226,6 +248,8 @@ export const getNotices = async (page = 0, size = 10): Promise<any> => {
 };
 
 export const deleteNotices = async (noticeIds: number[]) => {
-  const response = await instance.delete(`/api/v1/notices/`, { data: { noticeIds } });
+  const response = await instance.delete(`/api/v1/notices/`, {
+    data: { noticeIds }
+  });
   return response;
 };

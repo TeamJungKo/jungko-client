@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Box,
@@ -8,11 +9,17 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  Chip,
   Grid,
   SelectChangeEvent
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { getAllProductCategory, getAllArea } from '../api/axios.custom.ts';
+import {
+  AllCategory,
+  AllSubCategory,
+  AllSido,
+  AllSigg
+} from '../types/types.ts';
 
 interface SearchModalProps {
   open: boolean;
@@ -23,11 +30,28 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [category, setCategory] = useState('');
-  const [region, setRegion] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-
+  const [category, setCategory] = useState<AllCategory[]>([]);
+  const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [area, setArea] = useState<AllSido[]>([]);
+  const [selectedSido, setSelectedSido] = useState<AllSido>();
+  const [selectedSigg, setSelectedSigg] = useState<AllSigg>();
+  const [selectedEmd, setSelectedEmd] = useState<number>();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchCategoriesAndAreas = async () => {
+      try {
+        const response = await getAllProductCategory();
+        setCategory(response.data.productCategories);
+        const response2 = await getAllArea();
+        setArea(response2.data.areas[0].sido);
+      } catch (error) {
+        console.error('카테고리 데이터를 불러오는데 실패했습니다.', error);
+      }
+    };
+    fetchCategoriesAndAreas();
+  }, []);
   const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -43,42 +67,63 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   };
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-    const newCategory = event.target.value;
-    if (!selectedCategories.includes(newCategory)) {
-      setSelectedCategories((prev) => [...prev, newCategory]);
-      setCategory('');
+    const categoryId = event.target.value as string;
+    setSelectedCategory(categoryId);
+    const foundCategory = category.find(
+      (c) => c.categoryId === Number(categoryId)
+    );
+    setSubCategory(foundCategory?.subCategory || []);
+    setSelectedSubCategory('default');
+  };
+
+  const handleSubCategoryChange = (event: SelectChangeEvent<string>) => {
+    const subCategoryId = event.target.value as string;
+    setSelectedSubCategory(subCategoryId);
+    if (subCategoryId !== 'default') {
+      setSelectedCategory(subCategoryId);
+    } else {
+      const currentCategoryId = category
+        .find(
+          (c) =>
+            c.subCategory?.some(
+              (subCat) => subCat.categoryId === Number(subCategoryId)
+            )
+        )
+        ?.categoryId.toString();
+      setSelectedCategory(currentCategoryId || '');
     }
   };
 
-  const handleRegionChange = (event: SelectChangeEvent<string>) => {
-    const newRegion = event.target.value;
-    if (!selectedRegions.includes(newRegion)) {
-      setSelectedRegions((prev) => [...prev, newRegion]);
-      setRegion('');
-    }
+  const handleSidoSelect = (event: SelectChangeEvent) => {
+    const sidoId = event.target.value; // ID 추출
+    const selected = area.find((sido) => sido.id === Number(sidoId));
+    setSelectedSido(selected);
+    setSelectedEmd(undefined);
   };
 
-  const handleDeleteCategory = (categoryToDelete: string) => {
-    setSelectedCategories((prev) =>
-      prev.filter((category) => category !== categoryToDelete)
+  const handleSiggSelect = (event: SelectChangeEvent) => {
+    const siggId = event.target.value; // ID 추출
+    const selected = selectedSido?.sigg.find(
+      (sigg) => sigg.id === Number(siggId)
     );
+    setSelectedSigg(selected);
   };
 
-  const handleDeleteRegion = (regionToDelete: string) => {
-    setSelectedRegions((prev) =>
-      prev.filter((region) => region !== regionToDelete)
-    );
+  const handleEmdClick = (event: SelectChangeEvent) => {
+    const emdId = event.target.value; // ID 추출
+    setSelectedEmd(Number(emdId));
   };
 
   const handleSearch = () => {
-    console.log('검색 정보:', {
-      searchTerm,
-      minPrice,
-      maxPrice,
-      selectedCategories,
-      selectedRegions
-    });
-    // API호출 등 기능 구현 필요
+    // 검색 조건을 URL 쿼리 파라미터로 변환
+    const searchParams = new URLSearchParams();
+    searchParams.append('keyword', encodeURIComponent(searchTerm));
+    if (minPrice) searchParams.append('minPrice', minPrice);
+    if (maxPrice) searchParams.append('maxPrice', maxPrice);
+    if (selectedCategory) searchParams.append('categoryId', selectedCategory);
+    if (selectedEmd) searchParams.append('areaId', selectedEmd.toString());
+    navigate(`/searchresult?${searchParams.toString()}`);
+    handleClose();
   };
 
   const handleCancel = () => {
@@ -152,49 +197,95 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
                 <Select
                   labelId="category-select-label"
                   id="category-select"
-                  value={category}
+                  value={selectedCategory}
                   label="카테고리"
                   onChange={handleCategoryChange}
                 >
-                  <MenuItem value="tech">기술</MenuItem>
-                  <MenuItem value="books">도서</MenuItem>
-                  {/* 추가 카테고리 */}
+                  {category.map((category) => (
+                    <MenuItem
+                      value={category.categoryId}
+                      key={category.categoryId}
+                    >
+                      {category.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-              <Box sx={{ mt: 1 }}>
-                {selectedCategories.map((category) => (
-                  <Chip
-                    label={category}
-                    onDelete={() => handleDeleteCategory(category)}
-                    key={category}
-                  />
-                ))}
-              </Box>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id="region-select-label">지역</InputLabel>
+                <InputLabel id="sub-category-select-label">
+                  서브 카테고리
+                </InputLabel>
                 <Select
-                  labelId="region-select-label"
-                  id="region-select"
-                  value={region}
-                  label="지역"
-                  onChange={handleRegionChange}
+                  labelId="sub-category-select-label"
+                  id="sub-category-select"
+                  value={selectedSubCategory}
+                  label="서브 카테고리"
+                  onChange={handleSubCategoryChange}
                 >
-                  <MenuItem value="seoul">서울</MenuItem>
-                  <MenuItem value="busan">부산</MenuItem>
-                  {/* 추가 지역 */}
+                  <MenuItem value="default">---------------</MenuItem>
+                  {subCategory.map((subCat) => (
+                    <MenuItem key={subCat.categoryId} value={subCat.categoryId}>
+                      {subCat.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-              <Box sx={{ mt: 1 }}>
-                {selectedRegions.map((region) => (
-                  <Chip
-                    label={region}
-                    onDelete={() => handleDeleteRegion(region)}
-                    key={region}
-                  />
-                ))}
-              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="area-select-label">지역</InputLabel>
+                <Select
+                  labelId="area-select-label"
+                  id="area-select"
+                  value={selectedSido ? selectedSido.id.toString() : ''}
+                  label="지역"
+                  onChange={handleSidoSelect}
+                >
+                  {area.map((sido) => (
+                    <MenuItem key={sido.id} value={sido.id}>
+                      {sido.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="sigg-select-label">시군구</InputLabel>
+                <Select
+                  labelId="sigg-select-label"
+                  id="sigg-select"
+                  value={selectedSigg ? selectedSigg.id.toString() : ''}
+                  label="시군구"
+                  onChange={handleSiggSelect}
+                >
+                  {selectedSido?.sigg.map((sigg) => (
+                    <MenuItem key={sigg.id} value={sigg.id}>
+                      {sigg.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel id="emd-select-label">읍면동</InputLabel>
+                <Select
+                  labelId="emd-select-label"
+                  id="emd-select"
+                  value={selectedEmd ? selectedEmd.toString() : ''}
+                  label="읍면동"
+                  onChange={handleEmdClick}
+                >
+                  {selectedSigg?.emd.map((emd) => (
+                    <MenuItem key={emd.id} value={emd.id}>
+                      {emd.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>

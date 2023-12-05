@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Chip, Button, Divider } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { createKeywords, getProductDetail } from '../api/axios.custom';
-import NavigationBar from '../components/common/NavigationBar';
-import { useParams } from 'react-router-dom';
-import testImg from '../assets/images/jungkoIcon.png';
-import { ProductDetail, Keyword } from '../types/types';
-import { Area } from '../types/types';
+import { Modal, Box, Typography, Chip, Button, Divider } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { createKeywords, getProductDetail } from '../../api/axios.custom';
+import testImg from '../../assets/images/jungkoIcon.png';
+import { ProductDetail, Area, Keyword } from '../../types/types';
 
 const style = {
   width: '100%',
@@ -42,9 +39,18 @@ const KeywordChip = styled(Chip)(({ theme, color }) => ({
 //     '구매하신 뒤에 안 맞거나 사이즈가 다르면 반품이 안되요. 사이즈는 상세에 있어요.'
 // };
 
-const ProductDetail = () => {
+interface ProductDetailModalProps {
+  productId: number;
+  open: boolean;
+  onClose: () => void;
+}
+
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+  productId,
+  open,
+  onClose
+}) => {
   const [productData, setProductData] = useState<ProductDetail | null>(null);
-  const { productId } = useParams();
   const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
   //const navigate = useNavigate();
 
@@ -58,6 +64,8 @@ const ProductDetail = () => {
       }
     });
   };
+
+  const theme = useTheme();
 
   const addKeywords = async () => {
     //키워드 추가 API 호출
@@ -75,10 +83,8 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        console.log('productId:', productId);
-        const id = Number(productId);
-        if (!isNaN(id)) {
-          const response = await getProductDetail(id);
+        if (productId) {
+          const response = await getProductDetail(productId);
           setProductData(response.data.productDetail);
         }
       } catch (error) {
@@ -107,8 +113,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <>
-      <NavigationBar />
+    <Modal open={open} onClose={onClose}>
       <div
         style={{
           position: 'absolute',
@@ -121,7 +126,18 @@ const ProductDetail = () => {
           padding: '20px'
         }}
       >
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '40%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '70%',
+            bgcolor: 'background.paper',
+            boxShadow: theme.shadows[5],
+            p: 4
+          }}
+        >
           <Box
             sx={{
               ...style,
@@ -133,7 +149,7 @@ const ProductDetail = () => {
               component="img"
               src={productData ? productData.productImageUrl : testImg}
               alt="Product Image"
-              sx={{ width: 400, height: 400 }}
+              sx={{ width: 300, height: 300 }}
             />
 
             <Box
@@ -232,8 +248,8 @@ const ProductDetail = () => {
           </Typography>
         </Box>
       </div>
-    </>
+    </Modal>
   );
 };
 
-export default ProductDetail;
+export default ProductDetailModal;
