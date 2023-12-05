@@ -11,11 +11,16 @@ import Chip from '@mui/material/Chip';
 import NavigationBar from '../components/common/NavigationBar';
 import { compareProduct } from '../api/axios.custom.ts';
 import { Product } from '../types/types.tsx';
+import ProductDetailModal from '../components/common/ProductDetailModal.tsx';
 
 const ComparePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
+  const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  );
   const handleBack = () => {
     navigate(-1);
   };
@@ -59,7 +64,12 @@ const ComparePage = () => {
   };
 
   const handleProductClick = (productId: number) => {
-    navigate(`/product/${productId}`);
+    setSelectedProductId(productId);
+    setShowProductDetailModal(true);
+  };
+
+  const handleCloseProductDetailModal = () => {
+    setShowProductDetailModal(false);
   };
 
   const arrowWidth = 50;
@@ -130,7 +140,12 @@ const ComparePage = () => {
                   component="img"
                   src={product.productImageUrl}
                   alt={product.title}
-                  sx={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                  sx={{
+                    width: '100%',
+                    height: '350px',
+                    objectFit: 'contain',
+                    objectPosition: 'center'
+                  }}
                 />
                 <Box sx={{ padding: 2, flexGrow: 1 }}>
                   <Typography variant="h5" gutterBottom>
@@ -170,6 +185,13 @@ const ComparePage = () => {
           </IconButton>
         </Box>
       </div>
+      {showProductDetailModal && selectedProductId !== null && (
+        <ProductDetailModal
+          productId={selectedProductId}
+          open={showProductDetailModal}
+          onClose={handleCloseProductDetailModal}
+        />
+      )}
     </>
   );
 };

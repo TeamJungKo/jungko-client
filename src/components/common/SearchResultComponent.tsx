@@ -16,7 +16,6 @@ import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
 import CreateCardPage from '../../pages/CreateCardModal.tsx';
-import SearchModal from '../../pages/SearchModal.tsx';
 import { searchProduct } from '../../api/axios.custom.ts';
 import { ProductSearchRequest, Product } from '../../types/types.ts';
 
@@ -36,7 +35,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 }) => {
   const [SearchOptions, setSearchOptions] = useState({ SearchOption });
   const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성 모달이 열렸는지 여부
-  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 모달이 열렸는지 여부
   const [products, setProducts] = useState<Product[]>([]); //화면에 표시할 상품 목록
   const [totalResources, setTotalResources] = useState(0); //총 상품 목록
   const [page, setPage] = useState(1);
@@ -110,14 +108,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   };
 
   const navigate = useNavigate();
-
-  const handleOpenCardOption = () => {
-    setIsCardOptionOpen(true);
-  };
-
-  const handleCloseCardOption = () => {
-    setIsCardOptionOpen(false);
-  };
 
   const handleCheck = (product: Product) => {
     setSelectedProducts((prevSelected: Product[]) =>
@@ -281,10 +271,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
           </Box>
         </Box>
       </div>
-      <SearchModal
-        open={isCardOptionOpen}
-        handleClose={handleCloseCardOption}
-      />
       <ProductDetailModal
         productId={showProductDetail}
         open={isProductDetailOpen}
