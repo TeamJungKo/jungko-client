@@ -27,15 +27,15 @@ function HomePage() {
   const [order, setOrder] = useState<string | null>(null);
 
   const popularCardPageChange = (page: number) => {
-    setPopularCardPage(page - 1); //인덱스는 0부터이므로
+    setPopularCardPage(page - 1);
   };
   
   const myCardPageChange = (page: number) => {
-    setMyCardPage(page - 1); //인덱스는 0부터이므로
+    setMyCardPage(page - 1);
   };
   
   const interestedCardPageChange = (page: number) => {
-    setInterestedCardPage(page - 1); //인덱스는 0부터이므로
+    setInterestedCardPage(page - 1);
   };
 
   const fetchPopularCard = useCallback(async () => {
@@ -151,7 +151,6 @@ function HomePage() {
               {/*아래는 인기 카드*/}
 
               {popularCards.map((card) => {
-                // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
                 while (subCategory) {
@@ -159,7 +158,6 @@ function HomePage() {
                   subCategory = subCategory.subCategory;
                 }
 
-                // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
                 const sigg = card.area.sido.sigg;
                 if (sigg) {
@@ -169,7 +167,6 @@ function HomePage() {
                   }
                 }
 
-                // description을 설정합니다.
                 const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
                 카테고리: ${category}
                 지역: ${area}`;
@@ -205,7 +202,6 @@ function HomePage() {
               {/*아래는 내 카드 가져오기*/}
 
               {myCards.map((card) => {
-                // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
                 while (subCategory) {
@@ -213,7 +209,6 @@ function HomePage() {
                   subCategory = subCategory.subCategory;
                 }
 
-                // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
                 const sigg = card.area.sido.sigg;
                 if (sigg) {
@@ -223,7 +218,6 @@ function HomePage() {
                   }
                 }
 
-                // description을 설정합니다.
                 const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
                 카테고리: ${category}
                 지역: ${area}`;
@@ -255,11 +249,8 @@ function HomePage() {
 
             <div style={fontStyle}>관심 카드 목록</div>
             <Grid container spacing={2}>
-
-              {/*아래는 관심카드 가져오기*/}
               
               {interestedCards.map((card) => {
-                // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
                 while (subCategory) {
@@ -267,7 +258,6 @@ function HomePage() {
                   subCategory = subCategory.subCategory;
                 }
 
-                // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
                 const sigg = card.area.sido.sigg;
                 if (sigg) {
@@ -277,7 +267,6 @@ function HomePage() {
                   }
                 }
 
-                // description을 설정합니다.
                 const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
                 카테고리: ${category}
                 지역: ${area}`;

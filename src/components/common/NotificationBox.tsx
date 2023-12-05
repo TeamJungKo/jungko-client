@@ -10,8 +10,8 @@ interface NotificationBoxProps {
   content: string;
   time: string;
   index: number;
-  onDelete: (index: number) => void; // 삭제 함수
-  onClick: () => void; //클릭시 실행될 함수
+  onDelete: (index: number) => void;
+  onClick: () => void;
 }
 
 const NotificationBox: React.FC<NotificationBoxProps> = ({ productId, title, content, time, index, onDelete, onClick }) => {
@@ -26,9 +26,8 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({ productId, title, con
   useEffect(() => {
     fetchProductDetail();
     console.log("이미지url: ", imageUrl);
-  }, [fetchProductDetail, imageUrl]); //이부분 imageUrl추후제거해야함
+  }, [fetchProductDetail, imageUrl]);
   
-
   return (
     <ButtonBase style={{display: 'block', width: '100%'}} onClick={onClick}>
       <Box display="flex" flexDirection="column"  sx={{width: '100%'}}>

@@ -43,18 +43,16 @@ function MyProfile() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isNotificationOn, setIsNotificationOn] = useState(false);
 
-  const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
-  const [myInterestedCards, setMyInterestedCards] = useState<Card[]>([]); // api로 받은 내 관심카드
-  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 키워드
+  const [myCards, setMyCards] = useState<Card[]>([]);
+  const [myInterestedCards, setMyInterestedCards] = useState<Card[]>([]);
+  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]);
 
   const [interestedCardPage, setInterestedCardPage] = useState(0);
   const [myCardPage, setMyCardPage] = useState(0);
 
-  const [nickname, setNickname] = useState('닉네임'); // 닉네임
-  const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태
-
-  const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드
-
+  const [nickname, setNickname] = useState('닉네임');
+  const [isEditing, setIsEditing] = useState(false);
+  const [newKeyword, setNewKeyword] = useState('');
   const [myCardTotalPages, setMyCardTotalPages] = useState(0);
   const [interestedCardTotalPages, setInterestedCardTotalPages] = useState(0);
 
@@ -68,16 +66,14 @@ function MyProfile() {
   const [keywordReload, setKeywordReload] = useState(false);
 
   const myCardPageChange = (page: number) => {
-    setMyCardPage(page - 1); //인덱스는 0부터이므로
+    setMyCardPage(page - 1);
   };
   
   const interestedCardPageChange = (page: number) => {
-    setInterestedCardPage(page - 1); //인덱스는 0부터이므로
+    setInterestedCardPage(page - 1);
   };
 
   const handleNotificationToggle = async () => {
-    // 알림이 비동의 상태일 때 동의로 바꾸는 함수
-    // FCM firebase-messaging-sw.ts에 있는 코드를 실행하여 토큰을 발급받음.
     if (!isNotificationOn) {
       const token = await requestFCMAndGetDeviceToken();
       await changeNoticeSetting(token);
@@ -118,7 +114,7 @@ function MyProfile() {
       await updateMyProfile(nickname, null);
       setMyProfileReload(prevState => !prevState);
     }
-    setIsEditing(!isEditing); // 닉네임 수정 토글 핸들러
+    setIsEditing(!isEditing);
   };
 
   const toggleSelectCard = (id: number) => {
@@ -128,7 +124,7 @@ function MyProfile() {
       )
     );
     setAllMyCardsSelected(false);
-  }; //내 카드 선택 토글러
+  };
 
   const selectAllObjects = (type: string) => {
     if (type === 'myCards') {
@@ -155,7 +151,7 @@ function MyProfile() {
       );
       setAllKeywordsSelected(true);
     }
-  };//전체 카드/키워드 선택
+  };
   
   const deselectAllObjects = (type: string) => {
     if (type === 'myCards') {
@@ -182,7 +178,7 @@ function MyProfile() {
       );
       setAllKeywordsSelected(false);
     }
-  };//전체 카드/키워드 선택 해제
+  };
 
   const deleteSelectedCards = async () => {
     const selectedCardIds = myCards
@@ -192,13 +188,13 @@ function MyProfile() {
     const promises = selectedCardIds.map((id) => deleteCard(id)); 
   
     try {
-      await Promise.all(promises); // 선택한 모든 카드가 삭제될 때까지 기다림
+      await Promise.all(promises);
       setAllMyCardsSelected(false);
       setMyCardReload(prevState => !prevState);
     } catch (error) {
       console.error(error);
     }
-  };// 선택 카드 삭제
+  };
 
   const makeCardsPublic = async () => {
     const selectedCardIds = myCards
@@ -216,7 +212,7 @@ function MyProfile() {
       console.error(error);
     }
     setAllMyCardsSelected(false);
-  };  // 선택 카드 공개 전환
+  };
   
   const makeCardsPrivate = async () => {
     const selectedCardIds = myCards
@@ -235,7 +231,7 @@ function MyProfile() {
       console.error(error);
     }
     setAllMyCardsSelected(false);
-  };  // 선택 카드 비공개 전환
+  };
   
 
   useEffect(() => {
@@ -264,7 +260,7 @@ function MyProfile() {
       )
     );
     setAllInterestedCardsSelected(false);
-  }; //관심 카드 선택 토글러
+  };
 
   const unlikeInterestedCards = async () => {
     const selectedCardIds = myInterestedCards
@@ -280,7 +276,7 @@ function MyProfile() {
       console.error(error);
     }
     setAllInterestedCardsSelected(false);
-  }; // 선택한 관심 카드 해제
+  };
 
   useEffect(() => {
     getMyProfile()
@@ -318,7 +314,7 @@ function MyProfile() {
       )
     );
     setAllKeywordsSelected(false);
-  }; // 키워드 선택 토글러
+  };
 
   const deleteSelectedKeywords = async () => {
     const selectedKeywordIds = myKeywords
@@ -334,13 +330,13 @@ function MyProfile() {
       console.error(error);
     }
     setAllKeywordsSelected(false);
-  };  // 선택한 키워드를 삭제하는 함수
+  };
 
   const writeNewKeyword = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setNewKeyword(event.target.value);
-  }; // 작성한 키워드를 newKeyword에저장
+  };
 
   const addKeyword = async () => {
     try {
@@ -350,13 +346,15 @@ function MyProfile() {
       console.error(error);
     }
     setAllKeywordsSelected(false);
-  } // newKeyword를 바탕으로 키워드 생성
+  }
   
 
   const handleUnregister = () => {
     if (window.confirm('정말 탈퇴하시겠습니까?')) {
       unregisterUser();
-      window.location.href = 'http://localhost';
+      window.location.replace(
+        `${import.meta.env.VITE_BE_HOST}`
+      );
       alert('그동안 중코거래를 이용해주셔서 감사합니다.');
     }
   };
@@ -552,10 +550,7 @@ function MyProfile() {
             }}
           >
 
-            {/* 생성한 카드들 */}
-
             {myCards.map((card, index) => {
-              // 모든 카테고리 이름을 가져옵니다.
               let category = card.category.name;
               let subCategory = card.category.subCategory;
               while (subCategory) {
@@ -563,7 +558,6 @@ function MyProfile() {
                 subCategory = subCategory.subCategory;
               }
 
-              // 모든 지역 이름을 가져옵니다.
               let area = card.area.sido.name;
               const sigg = card.area.sido.sigg;
               if (sigg) {
@@ -573,7 +567,6 @@ function MyProfile() {
                 }
               }
 
-              // description을 설정합니다.
               const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
               카테고리: ${category}
               지역: ${area}`;
@@ -663,11 +656,8 @@ function MyProfile() {
               gap: '16px'
             }}
           >
-
-            {/* 관심 카드들 */}
             
             {myInterestedCards.map((card, index) => {
-              // 모든 카테고리 이름을 가져옵니다.
               let category = card.category.name;
               let subCategory = card.category.subCategory;
               while (subCategory) {
@@ -675,7 +665,6 @@ function MyProfile() {
                 subCategory = subCategory.subCategory;
               }
 
-              // 모든 지역 이름을 가져옵니다.
               let area = card.area.sido.name;
               const sigg = card.area.sido.sigg;
               if (sigg) {
@@ -685,7 +674,6 @@ function MyProfile() {
                 }
               }
 
-              // description을 설정합니다.
               const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
               카테고리: ${category}
               지역: ${area}`;

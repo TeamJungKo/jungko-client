@@ -22,7 +22,7 @@ function CategoryPage() {
 
 
   const pageChange = (page: number) => {
-    setPage(page - 1); //인덱스는 0부터이므로
+    setPage(page - 1);
   };
 
   useEffect(() => {
@@ -110,9 +110,7 @@ function CategoryPage() {
 
             <Grid container spacing={2}>
 
-              {/*해당 카테고리의 인기카드*/}
               {popularCards.map((card) => {
-                // 모든 카테고리 이름을 가져옵니다.
                 let category = card.category.name;
                 let subCategory = card.category.subCategory;
                 while (subCategory) {
@@ -120,7 +118,6 @@ function CategoryPage() {
                   subCategory = subCategory.subCategory;
                 }
 
-                // 모든 지역 이름을 가져옵니다.
                 let area = card.area.sido.name;
                 const sigg = card.area.sido.sigg;
                 if (sigg) {
@@ -130,7 +127,6 @@ function CategoryPage() {
                   }
                 }
 
-                // description을 설정합니다.
                 const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
                 카테고리: ${category}
                 지역: ${area}`;

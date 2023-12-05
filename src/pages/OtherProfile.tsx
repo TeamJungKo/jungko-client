@@ -29,7 +29,7 @@ function OtherProfile() {
   const [keywordsForAddition, setKeywordsForAddition] = useState<string[]>([]);
 
   const cardPageChange = (page: number) => {
-    setCardPage(page - 1); //인덱스는 0부터이므로
+    setCardPage(page - 1);
   };
 
   const selectCard = 
@@ -195,7 +195,6 @@ function OtherProfile() {
             {/* 타 유저가 만든 카드들 */}
 
             {cards.map((card, index) => {
-              // 모든 카테고리 이름을 가져옵니다.
               let category = card.category.name;
               let subCategory = card.category.subCategory;
               while (subCategory) {
@@ -203,7 +202,6 @@ function OtherProfile() {
                 subCategory = subCategory.subCategory;
               }
 
-              // 모든 지역 이름을 가져옵니다.
               let area = card.area.sido.name;
               const sigg = card.area.sido.sigg;
               if (sigg) {
@@ -213,7 +211,6 @@ function OtherProfile() {
                 }
               }
 
-              // description을 설정합니다.
               const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
               카테고리: ${category}
               지역: ${area}`;

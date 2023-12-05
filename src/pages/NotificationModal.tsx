@@ -19,7 +19,7 @@ const NotificationModal: React.FC<Props> = ({ nickname, open, onClose }) => {
   const [noticeReload, setNoticeReload] = useState(false);
   
   const linkNotice = (productId: number) => {
-    navigate(`/product/${productId}`);  // productId에 해당하는 페이지로 이동
+    navigate(`/product/${productId}`);
   };
 
   const deleteAllNotices = async () => {
