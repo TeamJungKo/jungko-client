@@ -14,6 +14,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CardMaker from '../components/common/CardMaker';
 import NavigationBar from '../components/common/NavigationBar';
 import EditIcon from '@mui/icons-material/Edit';
+import Pagination from '@mui/material/Pagination';
 import KeywordMaker from '../components/common/KeywordMaker';
 import Add from '@mui/icons-material/Add';
 import {
@@ -36,45 +37,43 @@ import {
   deleteFCMToken
 } from '../firebase-messaging-sw';
 
-// 추후 interested -> myInterested
-//      cards -> myCard
-//      keywords -> myKeywords
-//로 변환하는 작업이 필요합니다. 지금 더미데이터를 위해 이 작업은 미뤄두었습니다.
 
 function MyProfile() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isNotificationOn, setIsNotificationOn] = useState(false);
+
   const [myCards, setMyCards] = useState<Card[]>([]); // api로 받은 내카드
   const [myInterestedCards, setMyInterestedCards] = useState<Card[]>([]); // api로 받은 내 관심카드
-  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 관심카드
+  const [myKeywords, setMyKeywords] = useState<Keyword[]>([]); // api로 받은 내 키워드
 
-  const [nickname, setNickname] = useState('닉네임'); // 닉네임 상태값 추가
-  const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태값 추가
-  const [email, setEmail] = useState('이메일'); // 기존 이메일
+  const [interestedCardPage, setInterestedCardPage] = useState(0);
+  const [myCardPage, setMyCardPage] = useState(0);
 
-  const [cards, setCards] = useState([
-    { id: 1, isOpen: 'public', isSelected: false },
-    { id: 2, isOpen: 'public', isSelected: false },
-    { id: 3, isOpen: 'private', isSelected: false },
-    { id: 4, isOpen: 'private', isSelected: false }
-  ]); //카드 선택 상태값 추가
+  const [nickname, setNickname] = useState('닉네임'); // 닉네임
+  const [isEditing, setIsEditing] = useState(false); // 닉네임 수정 가능 상태
 
-  const [interestedCards, setInterestedCards] = useState([
-    { id: 1, isOpen: 1, isSelected: false },
-    { id: 2, isOpen: 1, isSelected: false },
-    { id: 3, isOpen: 2, isSelected: false },
-    { id: 4, isOpen: 2, isSelected: false }
-  ]); // 관심 카드 상태값 추가
+  const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드
 
-  const [keywords, setKeywords] = useState([
-    { id: 1, text: '검정바지', isSelected: false, isOpen: true },
-    { id: 2, text: '흰둥이', isSelected: false, isOpen: true },
-    { id: 3, text: '아이유', isSelected: false, isOpen: true },
-    { id: 4, text: '당근', isSelected: false, isOpen: true }
-  ]); // 키워드 선택 상태값 추가
+  const [myCardTotalPages, setMyCardTotalPages] = useState(0);
+  const [interestedCardTotalPages, setInterestedCardTotalPages] = useState(0);
 
-  const [newKeyword, setNewKeyword] = useState(''); // 새로운 키워드 상태값 추가
+  const [allMyCardsSelected, setAllMyCardsSelected] = useState(false);
+  const [allInterestedCardsSelected, setAllInterestedCardsSelected] = useState(false);
+  const [allKeywordsSelected, setAllKeywordsSelected] = useState(false);
+  
+  const [myProfileReload, setMyProfileReload] = useState(false);
+  const [myCardReload, setMyCardReload] = useState(false);
+  const [interestedCardReload, setInterestedCardReload] = useState(false);
+  const [keywordReload, setKeywordReload] = useState(false);
+
+  const myCardPageChange = (page: number) => {
+    setMyCardPage(page - 1); //인덱스는 0부터이므로
+  };
+  
+  const interestedCardPageChange = (page: number) => {
+    setInterestedCardPage(page - 1); //인덱스는 0부터이므로
+  };
 
   const handleNotificationToggle = async () => {
     // 알림이 비동의 상태일 때 동의로 바꾸는 함수
@@ -97,7 +96,6 @@ function MyProfile() {
   ) => {
     const newNickname = event.target.value;
     setNickname(newNickname);
-    await updateMyProfile(newNickname, null);
   };
 
   const handleProfileImageChange = async (
@@ -108,256 +106,276 @@ function MyProfile() {
     await updateMyProfile(null, file);
     const imageUrl = URL.createObjectURL(file);
     setImageUrl(imageUrl);
+    setMyProfileReload(prevState => !prevState);
   };
 
   const handleProfileImageClick = () => {
     fileInput.current?.click();
   };
 
-  const toggleEdit = () => {
-    // 닉네임 수정 토글 핸들러
-    setIsEditing(!isEditing);
+  const toggleEdit = async () => {
     if (isEditing) {
-      window.location.reload();
+      await updateMyProfile(nickname, null);
+      setMyProfileReload(prevState => !prevState);
     }
-    setIsEditing(!isEditing);
+    setIsEditing(!isEditing); // 닉네임 수정 토글 핸들러
   };
 
   const toggleSelectCard = (id: number) => {
-    setCards(
-      cards.map((card) =>
-        card.id === id ? { ...card, isSelected: !card.isSelected } : card
+    setMyCards(
+      myCards.map((card) =>
+        card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
-  }; //카드 선택 토글러
+    setAllMyCardsSelected(false);
+  }; //내 카드 선택 토글러
 
-  const deleteSelectedCards = () => {
-    const selectedCardIds = cards
+  const selectAllObjects = (type: string) => {
+    if (type === 'myCards') {
+      setMyCards(
+        myCards.map((card) =>
+          ({ ...card, isSelected: true })
+        )
+      );
+      setAllMyCardsSelected(true);
+    } 
+    else if (type === 'interestedCards') {
+      setMyInterestedCards(
+        myInterestedCards.map((card) =>
+          ({ ...card, isSelected: true })
+        )
+      );
+      setAllInterestedCardsSelected(true);
+    }
+    else if (type === 'keywords') {
+      setMyKeywords(
+        myKeywords.map((keyword) =>
+          ({ ...keyword, isSelected: true })
+        )
+      );
+      setAllKeywordsSelected(true);
+    }
+  };//전체 카드/키워드 선택
+  
+  const deselectAllObjects = (type: string) => {
+    if (type === 'myCards') {
+      setMyCards(
+        myCards.map((card) =>
+          ({ ...card, isSelected: false })
+        )
+      );
+      setAllMyCardsSelected(false);
+    } 
+    else if (type === 'interestedCards') {
+      setMyInterestedCards(
+        myInterestedCards.map((card) =>
+          ({ ...card, isSelected: false })
+        )
+      );
+      setAllInterestedCardsSelected(false);
+    }
+    else if (type === 'keywords') {
+      setMyKeywords(
+        myKeywords.map((keyword) =>
+          ({ ...keyword, isSelected: false })
+        )
+      );
+      setAllKeywordsSelected(false);
+    }
+  };//전체 카드/키워드 선택 해제
+
+  const deleteSelectedCards = async () => {
+    const selectedCardIds = myCards
       .filter((card) => card.isSelected)
-      .map((card) => card.id);
-    selectedCardIds.forEach((id) => {
-      deleteCard(id);
-    });
-    setCards(cards.filter((card) => !card.isSelected)); //뷰 테스트용 삭제
-  };
-  // 선택 카드 삭제
+      .map((card) => card.cardId);
+      
+    const promises = selectedCardIds.map((id) => deleteCard(id)); 
+  
+    try {
+      await Promise.all(promises); // 선택한 모든 카드가 삭제될 때까지 기다림
+      setAllMyCardsSelected(false);
+      setMyCardReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+  };// 선택 카드 삭제
 
-  const makeCardsPublic = () => {
-    const selectedCardIds = cards
+  const makeCardsPublic = async () => {
+    const selectedCardIds = myCards
       .filter((card) => card.isSelected)
-      .map((card) => card.id);
-    selectedCardIds.forEach((id) => {
+      .map((card) => card.cardId);
+    const promises = selectedCardIds.map(async (id) => {
       const formData = new FormData();
-      formData.append('scope', 'public');
-      changeCardOption(id, formData);
+      formData.append('scope', 'PUBLIC');
+      return await changeCardOption(id, formData);
     });
-    setCards(
-      cards.map((card) =>
-        card.isSelected ? { ...card, isOpen: 'public' } : card
-      )
-    ); //뷰 테스트용 공개
-  }; // 선택 카드 공개전환
-
-  const makeAllCardsPublic = () => {
-    cards.forEach((card) => {
-      const formData = new FormData();
-      formData.append('scope', 'public');
-      changeCardOption(card.id, formData);
-    });
-    setCards(cards.map((card) => ({ ...card, isOpen: 'public' }))); //뷰 테스트용 전체공개
-  }; // 전체 카드 공개전환
-
-  const makeCardsPrivate = () => {
-    const selectedCardIds = cards
+    try {
+      await Promise.all(promises);
+      setMyCardReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+    setAllMyCardsSelected(false);
+  };  // 선택 카드 공개 전환
+  
+  const makeCardsPrivate = async () => {
+    const selectedCardIds = myCards
       .filter((card) => card.isSelected)
-      .map((card) => card.id);
-    selectedCardIds.forEach((id) => {
+      .map((card) => card.cardId);
+    const promises = selectedCardIds.map(async (id) => {
       const formData = new FormData();
-      formData.append('scope', 'private');
-      changeCardOption(id, formData);
+      formData.append('scope', 'PRIVATE');
+      return await changeCardOption(id, formData);
     });
-    setCards(
-      cards.map((card) =>
-        card.isSelected ? { ...card, isOpen: 'private' } : card
-      )
-    ); //뷰 테스트용 비공개
-  }; // 선택 카드 비공개전환
+  
+    try {
+      await Promise.all(promises);
+      setMyCardReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+    setAllMyCardsSelected(false);
+  };  // 선택 카드 비공개 전환
+  
+
+  useEffect(() => {
+    getMyCard(myCardPage,8)
+    .then((res) => {
+      setMyCardTotalPages(Math.ceil(res.data.totalResources/8));
+      const completeCards = res.data.cards.map((card: any) => ({
+        ...card,
+        isSelected: false
+      }));
+      setMyCards(completeCards);
+      console.log("페이지넘버: ",myCardPage);
+      console.log("가져온 내카드 개수: ",res.data.totalResources);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  }, [myProfileReload, myCardReload, myCardPage]);
+
 
   const toggleSelectInterestedCard = (id: number) => {
-    setInterestedCards(
-      interestedCards.map((card) =>
-        card.id === id ? { ...card, isSelected: !card.isSelected } : card
+    setMyInterestedCards(
+      myInterestedCards.map((card) =>
+        card.cardId === id ? { ...card, isSelected: !card.isSelected } : card
       )
     );
-  }; // 관심 카드 선택 토글러
+    setAllInterestedCardsSelected(false);
+  }; //관심 카드 선택 토글러
 
-  const deleteSelectedInterestedCards = () => {
-    const selectedCardIds = interestedCards
+  const unlikeInterestedCards = async () => {
+    const selectedCardIds = myInterestedCards
       .filter((card) => card.isSelected)
-      .map((card) => card.id);
-    selectedCardIds.forEach((id) => {
-      unlikeCard(id);
+      .map((card) => card.cardId);
+    
+    const promises = selectedCardIds.map((id) => unlikeCard(id));
+  
+    try {
+      await Promise.all(promises);
+      setInterestedCardReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+    setAllInterestedCardsSelected(false);
+  }; // 선택한 관심 카드 해제
+
+  useEffect(() => {
+    getMyProfile()
+    .then((res) => {
+      setNickname(res.data.nickname);
+      setImageUrl(res.data.imageUrl);
+      setIsNotificationOn(res.data.notificationAgreement);
+      getInterestedCard(res.data.memberId,interestedCardPage,8)
+        .then((response) => {
+          setInterestedCardTotalPages(Math.ceil(response.data.totalResources/8));
+          const completeCards = response.data.cards.map((card: any) => ({
+            ...card,
+            isSelected: false
+          }));
+          setMyInterestedCards(completeCards);
+          console.log("가져온 관심카드 개수: ",response.data.totalResources);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-    setInterestedCards(interestedCards.filter((card) => !card.isSelected)); //뷰 테스트용 관심해제
-  }; // 선택한 관심 카드 삭제
+
+  }, [interestedCardReload, interestedCardPage]);
+
 
   const toggleSelectKeyword = (text: string) => {
-    setKeywords(
-      keywords.map((keyword) =>
-        keyword.text === text
+    setMyKeywords(
+      myKeywords.map((keyword) =>
+        keyword.keyword === text
           ? { ...keyword, isSelected: !keyword.isSelected }
           : keyword
       )
     );
+    setAllKeywordsSelected(false);
   }; // 키워드 선택 토글러
 
-  const deleteSelectedKeywords = () => {
-    const selectedKeywordIds = keywords
+  const deleteSelectedKeywords = async () => {
+    const selectedKeywordIds = myKeywords
       .filter((keyword) => keyword.isSelected)
-      .map((keyword) => keyword.id);
-    selectedKeywordIds.forEach((id) => {
-      deleteKeywords(id);
-    });
-    setKeywords(keywords.filter((keyword) => !keyword.isSelected)); // 뷰 테스트용 키워드 삭제
-  }; // 선택한 키워드를 삭제하는 함수
+      .map((keyword) => keyword.keywordId);
+    
+    const promises = selectedKeywordIds.map(id => deleteKeywords(id));
+  
+    try {
+      await Promise.all(promises);
+      setKeywordReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+    setAllKeywordsSelected(false);
+  };  // 선택한 키워드를 삭제하는 함수
 
-  const makeKeywordsPublic = () => {
-    /* 아직 키워드 옵션 변경 api가 없음..!
-    const selectedKeywordIds = keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
-    selectedKeywordIds.forEach((id) => {
-      let formData = new FormData();
-      formData.append('scope', 'public');
-      changeKeywordOption(id, formData);
-    });*/
-    setKeywords(
-      keywords.map((keyword) =>
-        keyword.isSelected ? { ...keyword, isOpen: true } : keyword
-      ) //뷰에서만 키워드 퍼블릭화
-    );
-  }; // 선택 키워드 공개전환
-
-  const makeAllKeywordsPublic = () => {
-    /* 아직 키워드 옵션 변경 api가 없음..!
-    keywords.forEach((keyword) => {
-      let formData = new FormData();
-      formData.append('scope', 'public');
-      changeKeywordOption(id, formData);
-    });*/
-    setKeywords(keywords.map((keyword) => ({ ...keyword, isOpen: true })));
-    //뷰에서만 전체키워드 퍼블릭화
-  }; // 전체 키워드 공개전환
-
-  const makeKeywordsPrivate = () => {
-    /* 아직 키워드 옵션 변경 api가 없음..!
-    const selectedKeywordIds = keywords.filter((keyword) => keyword.isSelected).map((keyword) => keyword.id);
-    selectedKeywordIds.forEach((id) => {
-      let formData = new FormData();
-      formData.append('scope', 'private');
-      changeKeywordOption(id, formData);
-    });*/
-    setKeywords(
-      keywords.map((keyword) =>
-        keyword.isSelected ? { ...keyword, isOpen: false } : keyword
-      )
-    ); //뷰에서만 키워드 프라이빗화
-  }; // 선택 키워드 비공개전환
-
-  const handleNewKeywordChange = (
+  const writeNewKeyword = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setNewKeyword(event.target.value);
-  }; // 새 키워드 작성 핸들러
+  }; // 작성한 키워드를 newKeyword에저장
 
-  const addKeyword = () => {
-    setKeywords((prevKeywords) => [
-      ...prevKeywords,
-      {
-        id:
-          prevKeywords.length > 0
-            ? prevKeywords[prevKeywords.length - 1].id + 1
-            : 1,
-        text: newKeyword,
-        isSelected: false,
-        isOpen: false
-      }
-    ]);
-    createKeywords([newKeyword]);
-    setNewKeyword('');
-  }; // 키워드에 추가 속성을 부여하는 함수
+  const addKeyword = async () => {
+    try {
+      await createKeywords([newKeyword]);
+      setKeywordReload(prevState => !prevState);
+    } catch (error) {
+      console.error(error);
+    }
+    setAllKeywordsSelected(false);
+  } // newKeyword를 바탕으로 키워드 생성
+  
 
   const handleUnregister = () => {
     if (window.confirm('정말 탈퇴하시겠습니까?')) {
       unregisterUser();
       window.location.href = 'http://localhost';
-      alert('그동안 이용해주셔서 감사합니다.');
+      alert('그동안 중코거래를 이용해주셔서 감사합니다.');
     }
   };
 
   useEffect(() => {
-    getMyProfile()
-      .then((res) => {
-        setNickname(res.data.nickname);
-        setEmail(res.data.email);
-        setImageUrl(res.data.imageUrl);
-        setIsNotificationOn(res.data.notificationAgreement);
-        getInterestedCard(res.data.memberId)
-          .then((response) => {
-            const completeCards = response.data.cards.map((card: any) => ({
-              ...card,
-              isSelected: false
-            }));
-            setMyInterestedCards(completeCards);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    getMyCard()
-      .then((res) => {
-        const completeCards = res.data.cards.map((card: any) => ({
-          ...card,
-          isSelected: false
-        }));
-        setMyCards(completeCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
     getMyKeywords()
-      .then((res) => {
-        const completeKeywords = res.data.keywordList.map((keyword: any) => ({
-          ...keyword,
-          isSelected: false,
-          isOpen: false
-        }));
-        setMyKeywords(completeKeywords);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((res) => {
+      const completeKeywords = res.data.keywordList.map((keyword: any) => ({
+        ...keyword,
+        isSelected: false,
+      }));
+      setMyKeywords(completeKeywords);
+      console.log("가져온 키워드 개수: ",res.data.keywordList.length);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-    // 다른 영역 클릭 시 모든 카드 선택 해제
-    const handleClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.divider')) {
-        // 클릭한 요소가 Divider 내부인지 확인
-        setCards(cards.map((card) => ({ ...card, isSelected: false })));
-      }
-    };
-
-    // 클릭 이벤트 리스너 등록
-    document.addEventListener('click', handleClick);
-
-    // 컴포넌트 unmount 시 클릭 이벤트 리스너 해제
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [cards]);
+  }, [keywordReload]);
 
   const title_space = {
     display: 'flex',
@@ -371,9 +389,10 @@ function MyProfile() {
   const default_space = {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginTop: '50px',
-    marginBottom: '35px'
+    marginBottom: '35px',
+    marginLeft: '16px'
   };
 
   const setting_space = {
@@ -381,13 +400,9 @@ function MyProfile() {
     flexDirection: 'column',
     justifyContent: 'space-between',
     marginTop: '50px',
-    paddingBottom: '50px'
+    paddingBottom: '50px',
+    marginLeft: '16px'
   };
-
-  // 카드 추가 함수 (ui구현은 안함)
-  /*const addCard = () => {
-    setCards((prevCards) => [...prevCards, { id: prevCards.length + 1, isOpen: 0 }]);
-  };*/
 
   return (
     <div
@@ -397,7 +412,7 @@ function MyProfile() {
       }}
     >
       <Box>
-        <NavigationBar />
+        <NavigationBar reload={myProfileReload}/>
         <Box sx={{ marginTop: '160px' }}>
           <Box sx={title_space}>
             <input
@@ -437,7 +452,6 @@ function MyProfile() {
               <TextField
                 value={nickname}
                 onChange={handleNicknameChange}
-                onBlur={toggleEdit} // 수정을 완료하면 토글
               />
             ) : (
               <Typography fontSize={'50px'} fontFamily={'Jua'}>
@@ -451,65 +465,83 @@ function MyProfile() {
           <Divider className="divider" />
 
           <Box sx={default_space}>
-            <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
+            <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top'}}>
               내가 생성한 카드
             </Typography>
-            <Box>
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'red',
-                  background: 'white'
-                }}
-                onClick={deleteSelectedCards}
-              >
-                선택삭제
-              </Button>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                gap: '16px'
+              }}
+            >
+              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: allMyCardsSelected ? 'darkred' : 'green',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: allMyCardsSelected ? 'darkred' : 'green',
+                    background: 'white',
+                  }}
+                  onClick={() => {
+                    if (allMyCardsSelected) {
+                      deselectAllObjects("myCards");
+                    } else {
+                      selectAllObjects("myCards");
+                    }
+                  }}
+                >
+                  {allMyCardsSelected ? '페이지내 전체 해제' : '페이지내 전체 선택'}
+                </Button>
+              </Box>
 
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeCardsPublic}
-              >
-                공개
-              </Button>
+              
+              <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'green',
+                    marginRight: '15px',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'green',
+                    background: 'white',
+                  }}
+                  onClick={makeCardsPublic}
+                >
+                  공개
+                </Button>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'darkred',
+                    marginRight: '15px',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'darkred',
+                    background: 'white',
+                  }}
+                  onClick={makeCardsPrivate}
+                >
+                  비공개
+                </Button>
 
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'red',
-                  background: 'white'
-                }}
-                onClick={makeCardsPrivate}
-              >
-                비공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeAllCardsPublic}
-              >
-                전체공개
-              </Button>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: 'red',
+                    fontFamily: 'Noto Sans KR',
+                    borderColor: 'red',
+                    background: 'white',
+                  }}
+                  onClick={deleteSelectedCards}
+                >
+                  삭제
+                </Button>
+              </Box>
             </Box>
+
           </Box>
           <Box
             sx={{
@@ -519,37 +551,67 @@ function MyProfile() {
               gap: '16px'
             }}
           >
+
             {/* 생성한 카드들 */}
-            {cards.map(
-              (
-                card //샘플임
-              ) => (
-                <CardMaker
-                  cardId={card.id}
-                  isOpen={card.isOpen}
-                  isSelected={card.isSelected}
-                  onContextMenu={(event: React.MouseEvent) => {
-                    event.preventDefault();
-                    toggleSelectCard(card.id);
-                  }}
-                />
-              )
-            )}
-            {myCards.map(
-              (
-                card //이부분이 api에서 가져온 "내 카드"들임
-              ) => (
-                <CardMaker
-                  cardId={card.cardId}
-                  isOpen={card.scope}
-                  isSelected={false}
-                  onContextMenu={(event: React.MouseEvent) => {
-                    event.preventDefault();
-                    toggleSelectCard(card.cardId);
-                  }}
-                />
-              )
-            )}
+
+            {myCards.map((card, index) => {
+              // 모든 카테고리 이름을 가져옵니다.
+              let category = card.category.name;
+              let subCategory = card.category.subCategory;
+              while (subCategory) {
+                category += ' > ' + subCategory.name;
+                subCategory = subCategory.subCategory;
+              }
+
+              // 모든 지역 이름을 가져옵니다.
+              let area = card.area.sido.name;
+              const sigg = card.area.sido.sigg;
+              if (sigg) {
+                area += ' > ' + sigg.name;
+                if (sigg.emd) {
+                  area += ' > ' + sigg.emd.name;
+                }
+              }
+
+              // description을 설정합니다.
+              const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+              카테고리: ${category}
+              지역: ${area}`;
+
+              return (
+                <div
+                  key={card.cardId} 
+                  style={index === 0 ? { marginLeft: '16px' } : {}}
+                >
+                  <CardMaker
+                    cardId={card.cardId}
+                    imageUrl={card.category.imageUrl}
+                    title={card.title}
+                    description={description}
+                    isOpen={card.scope}
+                    isSelected={card.isSelected}
+                    onContextMenu={(event: React.MouseEvent) => {
+                      event.preventDefault();
+                      toggleSelectCard(card.cardId);
+                    }}
+                  />
+                </div>
+              );
+            })} 
+
+          </Box>
+            
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            marginTop={4}
+            marginBottom={2}
+          >
+            <Pagination 
+              count={myCardTotalPages} 
+              page={myCardPage + 1} 
+              onChange={(_, page) => myCardPageChange(page)} 
+            />
           </Box>
           <Divider className="divider" />
 
@@ -557,18 +619,41 @@ function MyProfile() {
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
               관심 카드
             </Typography>
-            <Button
-              variant="outlined"
-              sx={{
-                color: 'darkred',
-                fontFamily: 'Noto Sans KR',
-                borderColor: 'red',
-                background: 'white'
-              }}
-              onClick={deleteSelectedInterestedCards}
-            >
-              선택삭제
-            </Button>
+            
+            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+              <Button
+                variant="outlined"
+                sx={{
+                  color: allInterestedCardsSelected ? 'darkred' : 'green',
+                  fontFamily: 'Noto Sans KR',
+                  borderColor: allInterestedCardsSelected ? 'darkred' : 'green',
+                  background: 'white',
+                }}
+                onClick={() => {
+                  if (allInterestedCardsSelected) {
+                    deselectAllObjects("interestedCards");
+                  } else {
+                    selectAllObjects("interestedCards");
+                  }
+                }}
+              >
+                {allInterestedCardsSelected ? '페이지내 전체 해제' : '페이지내 전체 선택'}
+              </Button>
+
+              <Button
+                variant="outlined"
+                sx={{
+                  color: 'red',
+                  marginLeft: '16px',
+                  fontFamily: 'Noto Sans KR',
+                  borderColor: 'red',
+                  background: 'white'
+                }}
+                onClick={unlikeInterestedCards}
+              >
+                관심 해제
+              </Button>
+            </Box>  
           </Box>
           <Box
             sx={{
@@ -578,43 +663,67 @@ function MyProfile() {
               gap: '16px'
             }}
           >
+
             {/* 관심 카드들 */}
-            <CardMaker
-              onContextMenu={(event: React.MouseEvent) => {
-                event.preventDefault();
-              }}
-            />{' '}
-            {/*시연용 이후 삭제할것*/}
-            {interestedCards.map(
-              (
-                card //샘플
-              ) => (
-                <CardMaker
-                  cardId={card.id}
-                  isOpen={'default'}
-                  isSelected={card.isSelected}
-                  onContextMenu={(event: React.MouseEvent) => {
-                    event.preventDefault();
-                    toggleSelectInterestedCard(card.id);
-                  }}
-                />
-              )
-            )}
-            {myInterestedCards.map(
-              (
-                card //api에서 호출한 진짜 관심카드
-              ) => (
-                <CardMaker
-                  cardId={card.cardId}
-                  isOpen={'default'}
-                  isSelected={false}
-                  onContextMenu={(event: React.MouseEvent) => {
-                    event.preventDefault();
-                    toggleSelectInterestedCard(card.cardId);
-                  }}
-                />
-              )
-            )}
+            
+            {myInterestedCards.map((card, index) => {
+              // 모든 카테고리 이름을 가져옵니다.
+              let category = card.category.name;
+              let subCategory = card.category.subCategory;
+              while (subCategory) {
+                category += ' > ' + subCategory.name;
+                subCategory = subCategory.subCategory;
+              }
+
+              // 모든 지역 이름을 가져옵니다.
+              let area = card.area.sido.name;
+              const sigg = card.area.sido.sigg;
+              if (sigg) {
+                area += ' > ' + sigg.name;
+                if (sigg.emd) {
+                  area += ' > ' + sigg.emd.name;
+                }
+              }
+
+              // description을 설정합니다.
+              const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+              카테고리: ${category}
+              지역: ${area}`;
+
+              return (
+                <div 
+                  key={card.cardId}
+                  style={index === 0 ? { marginLeft: '16px' } : {}}
+                >
+                  <CardMaker
+                    cardId={card.cardId}
+                    imageUrl={card.category.imageUrl}
+                    title={card.title}
+                    description={description}
+                    isOpen={card.scope}
+                    isSelected={card.isSelected}
+                    onContextMenu={(event: React.MouseEvent) => {
+                      event.preventDefault();
+                      toggleSelectInterestedCard(card.cardId);
+                    }}
+                  />
+                </div>
+              );
+            })} 
+
+          </Box>
+
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            marginTop={4} 
+            marginBottom={2}
+          >
+            <Pagination 
+              count={interestedCardTotalPages} 
+              page={interestedCardPage + 1} 
+              onChange={(_, page) => interestedCardPageChange(page)} 
+            />
           </Box>
           <Divider className="divider" />
 
@@ -622,61 +731,39 @@ function MyProfile() {
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
               내가 추가한 키워드
             </Typography>
-            <Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: '15px' }}>
+            <Button
+                variant="outlined"
+                sx={{
+                  color: allKeywordsSelected ? 'darkred' : 'green',
+                  fontFamily: 'Noto Sans KR',
+                  borderColor: allKeywordsSelected ? 'darkred' : 'green',
+                  background: 'white',
+                }}
+                onClick={() => {
+                  if (allKeywordsSelected) {
+                    deselectAllObjects("keywords");
+                  } else {
+                    selectAllObjects("keywords");
+                  }
+                }}
+              >
+                {allKeywordsSelected ? '전체 해제' : '전체 선택'}
+              </Button>
               <Button
                 variant="outlined"
                 sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
+                  color: 'red',
+                  marginLeft: '16px',
                   fontFamily: 'Noto Sans KR',
                   borderColor: 'red',
                   background: 'white'
                 }}
                 onClick={deleteSelectedKeywords}
               >
-                선택삭제
+                삭제
               </Button>
 
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeKeywordsPublic}
-              >
-                공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkred',
-                  marginRight: '15px',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'red',
-                  background: 'white'
-                }}
-                onClick={makeKeywordsPrivate}
-              >
-                비공개
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'darkgreen',
-                  fontFamily: 'Noto Sans KR',
-                  borderColor: 'green',
-                  background: 'white'
-                }}
-                onClick={makeAllKeywordsPublic}
-              >
-                전체공개
-              </Button>
             </Box>
           </Box>
           <Box
@@ -684,46 +771,38 @@ function MyProfile() {
               marginBottom: '50px',
               display: 'flex',
               alignItems: 'center',
-              gap: '16px'
+              gap: '16px',
+              flexWrap: 'wrap'
             }}
           >
-            {/* 키워드 박스들 */}
-            {keywords.map(
-              (
-                keyword // 샘플임
-              ) => (
-                <KeywordMaker
-                  keyword={keyword.text}
-                  isSelected={keyword.isSelected}
-                  isOpen={keyword.isOpen}
-                  onContextMenu={(event: React.MouseEvent) => {
-                    event.preventDefault();
-                    toggleSelectKeyword(keyword.text);
-                  }}
-                />
-              )
-            )}
-            {myKeywords.map(
-              (
-                keyword // 실제 api로부터 가져오는 키워드
-              ) => (
+            {/* 키워드들 */}
+
+            {myKeywords.map((keyword, index) => (
+              <div
+                key={keyword.keywordId} 
+                style={index === 0 ? { marginLeft: '16px' } : {}}
+              >
                 <KeywordMaker
                   keyword={keyword.keyword}
-                  isSelected={false}
-                  isOpen={false}
+                  isSelected={keyword.isSelected}
                   onContextMenu={(event: React.MouseEvent) => {
                     event.preventDefault();
                     toggleSelectKeyword(keyword.keyword);
                   }}
                 />
+              </div>
               )
             )}
             <TextField
               value={newKeyword}
-              onChange={handleNewKeywordChange}
+              onChange={writeNewKeyword}
               placeholder="새 키워드"
+              sx={{marginLeft: '16px'}}
             />
-            <IconButton sx={{ marginLeft: '10px' }} onClick={addKeyword}>
+            <IconButton 
+              sx={{ marginLeft: '10px' }} 
+              onClick={addKeyword}
+            >
               <Add sx={{ color: 'Black' }} />
             </IconButton>
           </Box>

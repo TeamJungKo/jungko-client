@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../assets/css/naverLoginButton.css'; // CSS 파일 import
+import '../../assets/css/naverLoginButton.css';
 
 const login = () => {
   window.location.replace(

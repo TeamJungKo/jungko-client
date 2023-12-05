@@ -13,7 +13,7 @@ function GuestHomePage() {
       <LoginDirection url="/login" />
       <SiteGuide/>
       <SiteIntroduction/>
-      <HotCards url="/login"/>
+      <HotCards/>
     </>
   );
 }

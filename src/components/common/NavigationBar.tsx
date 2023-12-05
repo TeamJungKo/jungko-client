@@ -55,12 +55,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   }
 }));
 
-const NavigationBar = () => {
+interface Prop {
+  reload?: boolean;
+}
+
+const NavigationBar = ({reload=false}:Prop) => {
   const [nickname, setNickname] = useState('닉네임');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false); // 모달의 열림/닫힘
   const [searchModalOpen, setSearchModalOpen] = useState(false); // SearchModal의 열림/닫힘 상태를 관리하는 state
-  const notificationsCount = 4; //확인 안 한 알림 숫자(recoil 써서 받아올 듯)
 
   const handleOpenModal = () => {
     setOpenModal(true); // 모달을 엽니다.
@@ -97,7 +100,7 @@ const NavigationBar = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [reload]);
 
   return (
     <Box
@@ -150,21 +153,18 @@ const NavigationBar = () => {
             color="inherit"
             onClick={handleOpenModal} // 아이콘을 클릭하면 모달을 엽니다.
           >
-            <Badge
-              badgeContent={notificationsCount > 0 ? notificationsCount : null}
-              color="secondary"
-            >
+            <Badge>
               <NotificationsIcon />
             </Badge>
           </IconButton>
           <NotificationModal nickname={nickname} open={openModal} onClose={handleCloseModal} />
 
           {/*여기에 링크 달았음*/}
-          <Link
-            to="/myProfile"
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Link
+              to="/myProfile"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
               <img
                 src={imageUrl ? imageUrl : defaultImage}
                 alt="Profile"
@@ -172,9 +172,11 @@ const NavigationBar = () => {
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  marginLeft: '16px'
+                  marginLeft: '16px',
+                  backgroundColor: 'darkgrey'
                 }}
               />
+            </Link>
 
               <Box
                 sx={{
@@ -193,7 +195,6 @@ const NavigationBar = () => {
                   {nickname}
                 </Typography>
 
-                <Link to="/">
                   <Button
                     startIcon={<Logout />}
                     sx={{
@@ -205,13 +206,13 @@ const NavigationBar = () => {
                       padding: '0px'
                     }}
                     size="small"
+                    component={Link}
+                    to="/"
                   >
                     Logout
                   </Button>
-                </Link>
               </Box>
             </Box>
-          </Link>
         </Box>
       </Toolbar>
       <SearchModal
