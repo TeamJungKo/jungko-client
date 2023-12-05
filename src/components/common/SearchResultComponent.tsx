@@ -153,9 +153,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
         >
           카드 생성
         </Button>
-        <Button variant="contained" onClick={handleOpenCardOption}>
-          카드 옵션
-        </Button>
       </>
     );
   };
