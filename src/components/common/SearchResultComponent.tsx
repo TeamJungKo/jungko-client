@@ -43,6 +43,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달 열렸는지 여부
   const [showProductDetail, setShowProductDetail] = useState<number>(0);
+  const [selectedSort, setSelectedSort] = useState('recentDesc');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [sortDirection, setSortDirection] = useState('price');
   const handleProductClick = (productId: number) => {
@@ -87,6 +88,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
+    setSelectedSort(value);
     switch (value) {
       case 'priceDesc':
         setSortOrder('DESC');
@@ -190,15 +192,18 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Select
-                value={
-                  sortOrder === 'DESC' && sortDirection === 'uploadedAt'
-                    ? 'recentDesc'
-                    : sortOrder
-                }
+                value={selectedSort}
                 onChange={handleSortChange}
                 displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  height: '40px', // 버튼과 동일한 높이로 조절
+                  '.MuiSelect-select': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px'
+                  }
+                }}
               >
                 <MenuItem value="priceDesc">높은 가격 순</MenuItem>
                 <MenuItem value="priceAsc">낮은 가격 순</MenuItem>

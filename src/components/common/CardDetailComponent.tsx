@@ -58,6 +58,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
   const [sortOrder, setSortOrder] = useState('uploadedAt');
   const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
+  const [selectedSort, setSelectedSort] = useState('recentDesc');
   const handleProductClick = (productId: number) => {
     setShowProductDetail(productId);
     setIsProductDetailOpen(true);
@@ -89,14 +90,13 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           memberId: response.author.memberId,
           email: response.author.email
         });
-        console.log('멤버 정보', author);
       } catch (error) {
         console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
       }
     };
 
     fetchProducts();
-    const fetchCards = async () => {
+    const fetchCardsTitle = async () => {
       try {
         const memberId = author.memberId;
         const response = await getMemberCard(memberId);
@@ -107,15 +107,16 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           setCardTitle(matchingCard.title);
         }
       } catch (error) {
-        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다: ', error);
+        console.log('카드 제목을 가져오는 도중 오류가 발생했습니다: ', error);
       }
     };
 
-    fetchCards();
+    fetchCardsTitle();
   }, [cardId, page, productsPerPage, sortOrder, sortDirection, author]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
+    setSelectedSort(value);
     switch (value) {
       case 'priceDesc':
         setSortOrder('price');
@@ -293,15 +294,18 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Select
-                value={
-                  sortOrder === 'created_at' && sortDirection === 'DESC'
-                    ? 'recentDesc'
-                    : sortOrder
-                }
+                value={selectedSort}
                 onChange={handleSortChange}
                 displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  height: '40px', // 버튼과 동일한 높이로 조절
+                  '.MuiSelect-select': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px'
+                  }
+                }}
               >
                 <MenuItem value="priceDesc">높은 가격 순</MenuItem>
                 <MenuItem value="priceAsc">낮은 가격 순</MenuItem>
