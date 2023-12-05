@@ -42,7 +42,7 @@ function CategoryPage() {
     };
 
     fetchPopularCard();
-  }, [categoryId, page, order]);
+  }, [categoryId, page, order, sort]);
 
   const fontStyle = {
     fontSize: '44px',
@@ -101,10 +101,6 @@ function CategoryPage() {
                 style={{ marginLeft: '40px'}}
               >
                 <MenuItem value="" disabled>정렬순</MenuItem>
-                <MenuItem value={"title-ASC"}>제목 오름차순</MenuItem>
-                <MenuItem value={"title-DESC"}>제목 내림차순</MenuItem>
-                <MenuItem value={"keyword-ASC"}>키워드 오름차순</MenuItem>
-                <MenuItem value={"keyword-DESC"}>키워드 내림차순</MenuItem>
                 <MenuItem value={"minprice-ASC"}>낮은가격순</MenuItem>
                 <MenuItem value={"maxprice-DESC"}>높은가격순</MenuItem>
                 <MenuItem value={"createdAt-DESC"}>최신순</MenuItem>

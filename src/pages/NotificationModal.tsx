@@ -19,7 +19,7 @@ const NotificationModal: React.FC<Props> = ({ nickname, open, onClose }) => {
   const [noticeReload, setNoticeReload] = useState(false);
   
   const linkNotice = (productId: number) => {
-    navigate(`/productDetail/${productId}`);  // productId에 해당하는 페이지로 이동
+    navigate(`/product/${productId}`);  // productId에 해당하는 페이지로 이동
   };
 
   const deleteAllNotices = async () => {
@@ -94,8 +94,7 @@ const NotificationModal: React.FC<Props> = ({ nickname, open, onClose }) => {
               {keywordNotices.map((notice, index) => (
                 <NotificationBox
                   key={notice.noticeId}
-                  imageAlt="Keyword Image"
-                  imageUrl="" 
+                  productId={notice.productId}
                   title={notice.title}
                   content={notice.content}
                   time={notice.createdAt}

@@ -29,11 +29,11 @@ const InitialTitle = (): React.ReactElement => {
     <>
       <div className="main_top">
         <ul className='explanation'>
-          <li><span className="main_head_title">구매가 손쉬워지는 순간</span></li>
-          <li><span className="main_head_title">중코거래</span></li>
+          <li><span className="main_head_title">모든 중고마켓들을 한눈에 보는</span></li>
+          <li><span className="main_head_title" style={{fontSize:'60px'}}>중코 거래</span></li>
         </ul><br/>
         <div className="cube_background"></div>
-        <Cube/> {/* 큐브를 main_top영역에 삽입 */}
+        <Cube/> 
       </div>
     </>
   );

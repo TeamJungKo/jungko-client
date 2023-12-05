@@ -33,7 +33,7 @@ const HotCards = (): React.ReactElement => {
     };
 
     fetchCards();
-  }, []);
+  }, [cards.length]);
 
   return (
     <>

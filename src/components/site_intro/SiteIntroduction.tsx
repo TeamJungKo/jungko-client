@@ -31,15 +31,15 @@ const SiteIntroduction = (): React.ReactElement => {
       <div className="main_site_introduction">
         <div className="illust_wrapper">
           <img className='main_illust illust_thinking' src={illust_thinking} alt="설명" />
-          <p ref={textRef1} className="main_illust_text text_thinking">대략 어디서 사지? 와 관련된 멘트를 추가.</p>
+          <p ref={textRef1} className="main_illust_text text_thinking">어디서 좋은 상품을 찾을 수 있을까 고민이신가요? 중코거래에서 원하는 상품을 한 번에 찾아보세요</p>
         </div>
         <div className="illust_wrapper">
-          <p ref={textRef2} className="main_illust_text text_worried">여기저기 찾느라 귀찮다는 것을 강조하는 문구</p>
+          <p ref={textRef2} className="main_illust_text text_worried">여러 플랫폼을 돌아다니며 <br/> 원하는 물건 찾는 일에 지치셨나요? <br/> 중코거래에서 더 이상의 번거로움은 없습니다</p>
           <img className='main_illust illust_worried' src={illust_worried} alt="설명" />
         </div>
         <div className="illust_wrapper">
           <img className='main_illust illust_platforms' src={platforms} alt="설명" />
-          <p ref={textRef3} className="main_illust_text text_platforms">우리 사이트는 플랫폼 3사를 모두 제공함을 강조</p>
+          <p ref={textRef3} className="main_illust_text text_platforms">중코거래는 당근마켓, 번개장터, 중고나라 등 <br/> 대표 중고 플랫폼 3사의 상품 정보를 <br/> 모두 한눈에 볼 수 있습니다. <br/><br/> 이제 중코거래에서 <br/> 효율적인 중고 거래를 경험해보세요! </p>
         </div>
       </div>
     </>

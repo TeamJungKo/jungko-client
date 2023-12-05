@@ -70,30 +70,15 @@ const Cube = (): React.ReactElement => {
   return (
     <>
         <div className='cube'>
-          <img className='face1' src={danggeun} alt="설명" />
-          <img className='face2' src={danggeun}  alt="설명" />
-          <img className='face3' src={junggonara} alt="설명" />
-          <img className='face4' src={junggonara} alt="설명" />
-          <img className='face5' src={bungae} alt="설명" />
-          <img className='face6' src={bungae} alt="설명" />
+          <img className='face1' src={danggeun} />
+          <img className='face2' src={danggeun} />
+          <img className='face3' src={junggonara} />
+          <img className='face4' src={junggonara} />
+          <img className='face5' src={bungae} />
+          <img className='face6' src={bungae} />
         </div>
     </>
   );
 };
 
 export default Cube;
-
-
-/* 만약 큐브 컴포넌트를 다른 곳에서 쓰고싶다면 다음과 같이 사용해주세요.
-<div className="cube_space">
-  <Cube>
-</div>
-
-그리고 이 큐브스페이스에는 3d를 위해 퍼스펙티브를 입혀줘야합니다.
-.cube_space {
-  perspective: 800px;
-  height: 100%;
-  width: 100%;
-}
-를 css에 추가하시면 됩니다.
-*/
