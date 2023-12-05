@@ -42,6 +42,8 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   const [maxPrice, setMaxPrice] = useState('');
   const [category, setCategory] = useState<AllCategory[]>([]);
   const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
+  const [selectedSuperCategory, setSelectedSuperCategory] =
+    useState<string>(''); // 서브 카테고리가 선택되었을 때, 상위 카테고리를 저장하는 state
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [area, setArea] = useState<AllSido[]>([]);
@@ -87,6 +89,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     const categoryId = event.target.value as string;
+    setSelectedSuperCategory(categoryId);
     setSelectedCategory(categoryId);
     const foundCategory = category.find(
       (c) => c.categoryId === Number(categoryId)
@@ -101,15 +104,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
     if (subCategoryId !== 'default') {
       setSelectedCategory(subCategoryId);
     } else {
-      const currentCategoryId = category
-        .find(
-          (c) =>
-            c.subCategory?.some(
-              (subCat) => subCat.categoryId === Number(subCategoryId)
-            )
-        )
-        ?.categoryId.toString();
-      setSelectedCategory(currentCategoryId || '');
+      setSelectedCategory(selectedSuperCategory);
     }
   };
 
@@ -257,7 +252,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
                 <Select
                   labelId="category-select-label"
                   id="category-select"
-                  value={selectedCategory}
+                  value={selectedSuperCategory}
                   label="카테고리"
                   onChange={handleCategoryChange}
                 >
