@@ -1,27 +1,22 @@
-# React + TypeScript + Vite
+## JungkoServer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+모든 중고거래 마켓을 한 곳에 보는 "중코거래" 서비스의 클라이언트 프로젝트입니다.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- NodeJS 설치가 필요합니다.
+  https://nodejs.org/en
+- pnpm 설치가 필요합니다. (npm i -g pnpm)
+  https://pnpm.io/ko/installation
 
-## Expanding the ESLint configuration
+## Quickstart
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```bash
+chmod +x quickstart.sh && bash quickstart.sh demo
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+⚠️ 중코거래 서버 프로젝트가 실행되어 있어야 합니다.
+
+서버 프로젝트: https://github.com/TeamJungKo/jungko-server
+
+http://localhost 로 접속하면 중코거래 서비스를 로컬 환경에서 확인할 수 있습니다.
