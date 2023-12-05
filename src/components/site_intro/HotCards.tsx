@@ -53,14 +53,6 @@ const HotCards = (): React.ReactElement => {
                 onClick={goToUrl}
               />
           ))}
-          <CardMaker //이부분은 샘플이니 지워도무관
-            imageUrl={jungkoIcon}
-            title="카드제목"
-            description="카드설명"
-            imageHeight="50%"
-            contentHeight="50%"
-            onClick={goToUrl}
-          />
         </div>
       </div>
     </>
