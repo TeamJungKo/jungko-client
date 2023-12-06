@@ -43,7 +43,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   const [category, setCategory] = useState<AllCategory[]>([]);
   const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
   const [selectedSuperCategory, setSelectedSuperCategory] =
-    useState<string>(''); // 서브 카테고리가 선택되었을 때, 상위 카테고리를 저장하는 state
+    useState<string>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [area, setArea] = useState<AllSido[]>([]);

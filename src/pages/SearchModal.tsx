@@ -34,6 +34,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
   const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSuperCategory, setSelectedSuperCategory] =
+    useState<string>('');
   const [area, setArea] = useState<AllSido[]>([]);
   const [selectedSido, setSelectedSido] = useState<AllSido>();
   const [selectedSigg, setSelectedSigg] = useState<AllSigg>();
@@ -68,6 +70,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     const categoryId = event.target.value as string;
+    setSelectedSuperCategory(categoryId);
     setSelectedCategory(categoryId);
     const foundCategory = category.find(
       (c) => c.categoryId === Number(categoryId)
@@ -82,15 +85,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
     if (subCategoryId !== 'default') {
       setSelectedCategory(subCategoryId);
     } else {
-      const currentCategoryId = category
-        .find(
-          (c) =>
-            c.subCategory?.some(
-              (subCat) => subCat.categoryId === Number(subCategoryId)
-            )
-        )
-        ?.categoryId.toString();
-      setSelectedCategory(currentCategoryId || '');
+      setSelectedCategory(selectedSuperCategory);
     }
   };
 
