@@ -41,14 +41,46 @@ const ProductDetail = () => {
         return [...prevSelectedKeywords, keywordIdStr];
       }
     });
+
+    // 선택된 키워드 상태 업데이트
+    setProductData((prevProductData) => {
+      if (!prevProductData) return prevProductData;
+
+      return {
+        ...prevProductData,
+        keywords: prevProductData.keywords.map((keyword) => {
+          if (keyword.id === keywordId) {
+            return { ...keyword, isSelected: !keyword.isSelected };
+          }
+          return keyword;
+        })
+      };
+    });
   };
 
   const addKeywords = async () => {
-    //키워드 추가 API 호출
+    // 키워드 추가 API 호출
     if (selectedKeywordIds.length > 0) {
       try {
         const response = await createKeywords(selectedKeywordIds);
         console.log('키워드 추가 완료', response);
+
+        // 선택된 키워드의 isSelected 상태를 false로 업데이트
+        setProductData((prevProductData) => {
+          if (!prevProductData) return prevProductData;
+
+          return {
+            ...prevProductData,
+            keywords: prevProductData.keywords.map((keyword) => {
+              if (selectedKeywordIds.includes(keyword.id.toString())) {
+                return { ...keyword, isSelected: false };
+              }
+              return keyword;
+            })
+          };
+        });
+
+        // 선택된 키워드 ID 목록을 초기화
         setSelectedKeywordIds([]);
       } catch (error) {
         console.error('키워드 추가 중 에러가 발생했습니다.', error);
@@ -64,6 +96,7 @@ const ProductDetail = () => {
           const response = await getProductDetail(id);
           setProductData(response.data.productDetail);
           setMarketProductUrl(response.data.productDetail.marketProductUrl);
+          console.log('상품 상세정보', response.data.productDetail);
         }
       } catch (error) {
         console.log(
@@ -83,12 +116,10 @@ const ProductDetail = () => {
   const renderKeywords = (keywords: Keyword[]) => {
     return keywords.map((keyword) => (
       <KeywordChip
-        key={keyword.keywordId}
+        key={keyword.id}
         label={keyword.keyword}
-        onClick={() => toggleKeyword(keyword.keywordId)}
-        color={
-          selectedKeywordIds.includes(keyword.keyword) ? 'primary' : 'default'
-        }
+        onClick={() => toggleKeyword(keyword.id)}
+        color={keyword.isSelected ? 'primary' : 'default'}
       />
     ));
   };
@@ -184,8 +215,8 @@ const ProductDetail = () => {
               marginBottom: 3
             }}
           >
-            {productData && productData.KeywordList ? (
-              renderKeywords(productData.KeywordList)
+            {productData && productData.keywords ? (
+              renderKeywords(productData.keywords)
             ) : (
               <Typography>Loading Keywords...</Typography>
             )}
@@ -195,7 +226,7 @@ const ProductDetail = () => {
               disabled={selectedKeywordIds.length === 0}
               sx={{ ml: 1 }}
             >
-              Add to My Keywords
+              내 키워드에 추가
             </Button>
           </Box>
 

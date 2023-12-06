@@ -40,13 +40,27 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [marketProductUrl, setMarketProductUrl] = useState<string>(''); //"상품 페이지 이동" 버튼 클릭 시 이동할 URL
 
   const toggleKeyword = (keywordId: number) => {
-    const keywordIdStr = keywordId.toString();
     setSelectedKeywordIds((prevSelectedKeywords) => {
-      if (prevSelectedKeywords.includes(keywordIdStr)) {
-        return prevSelectedKeywords.filter((id) => id !== keywordIdStr);
+      if (prevSelectedKeywords.includes(keywordId.toString())) {
+        return prevSelectedKeywords.filter((id) => id !== keywordId.toString());
       } else {
-        return [...prevSelectedKeywords, keywordIdStr];
+        return [...prevSelectedKeywords, keywordId.toString()];
       }
+    });
+
+    // 선택된 키워드 상태 업데이트
+    setProductData((prevProductData) => {
+      if (!prevProductData) return prevProductData;
+
+      return {
+        ...prevProductData,
+        keywords: prevProductData.keywords.map((keyword) => {
+          if (keyword.id === keywordId) {
+            return { ...keyword, isSelected: !keyword.isSelected };
+          }
+          return keyword;
+        })
+      };
     });
   };
 
@@ -86,12 +100,10 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const renderKeywords = (keywords: Keyword[]) => {
     return keywords.map((keyword) => (
       <KeywordChip
-        key={keyword.keywordId}
+        key={keyword.id}
         label={keyword.keyword}
-        onClick={() => toggleKeyword(keyword.keywordId)}
-        color={
-          selectedKeywordIds.includes(keyword.keyword) ? 'primary' : 'default'
-        }
+        onClick={() => toggleKeyword(keyword.id)}
+        color={keyword.isSelected ? 'primary' : 'default'}
       />
     ));
   };
@@ -203,8 +215,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               marginBottom: 3
             }}
           >
-            {productData && productData.KeywordList ? (
-              renderKeywords(productData.KeywordList)
+            {productData && productData.keywords ? (
+              renderKeywords(productData.keywords)
             ) : (
               <Typography>Loading Keywords...</Typography>
             )}
