@@ -439,7 +439,7 @@ function MyProfile() {
             <Typography
               sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top' }}
             >
-              내가 생성한 카드
+              내가 생성한 카드 (우클릭으로 선택)
             </Typography>
             <Box
               sx={{
@@ -600,7 +600,7 @@ function MyProfile() {
 
           <Box sx={default_space}>
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
-              관심 카드
+              관심 카드 (우클릭으로 선택)
             </Typography>
 
             <Box
@@ -718,7 +718,7 @@ function MyProfile() {
 
           <Box sx={default_space}>
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
-              내가 추가한 키워드
+              내가 추가한 키워드 (우클릭으로 선택)
             </Typography>
             <Box
               sx={{
