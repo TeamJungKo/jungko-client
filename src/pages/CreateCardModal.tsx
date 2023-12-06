@@ -24,22 +24,29 @@ import {
   AllCategory,
   AllSubCategory,
   AllSido,
-  AllSigg
+  AllSigg,
+  ProductSearchRequest
 } from '../types/types.ts';
 
 interface CreateCardPageProps {
   open: boolean;
   handleClose: () => void;
+  searchOption: ProductSearchRequest;
 }
 
 const CreateCardPage: React.FC<CreateCardPageProps> = ({
   open,
-  handleClose
+  handleClose,
+  searchOption
 }) => {
   const [newCardTitle, setNewCardTitle] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchOption.keyword);
+  const [minPrice, setMinPrice] = useState(
+    searchOption.minPrice ? searchOption.minPrice.toString() : ''
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    searchOption.maxPrice ? searchOption.maxPrice.toString() : ''
+  );
   const [category, setCategory] = useState<AllCategory[]>([]);
   const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
   const [selectedSuperCategory, setSelectedSuperCategory] =
@@ -134,19 +141,24 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
 
   const handleCreate = async () => {
     const formData = new FormData();
-    formData.append('categoryId', selectedCategory);
+
+    // Append only if values are not undefined
+    if (selectedCategory) {
+      formData.append('categoryId', selectedCategory);
+    }
     if (selectedEmd !== undefined) {
       formData.append('areaId', selectedEmd.toString());
     }
-    formData.append('title', searchTerm);
-    formData.append('keyword', newCardTitle);
-    formData.append('minPrice', minPrice);
-    formData.append('maxPrice', maxPrice);
-    if (isPublic == true) {
-      formData.append('scope', 'PUBLIC');
-    } else {
-      formData.append('scope', 'PRIVATE');
+    formData.append('title', newCardTitle);
+    formData.append('keyword', searchTerm);
+    if (minPrice) {
+      formData.append('minPrice', minPrice);
     }
+    if (maxPrice) {
+      formData.append('maxPrice', maxPrice);
+    }
+    formData.append('scope', isPublic ? 'PUBLIC' : 'PRIVATE');
+
     try {
       const response = await createCard(formData);
       if (response.status === 201) {
