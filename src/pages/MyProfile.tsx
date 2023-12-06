@@ -219,6 +219,7 @@ function MyProfile() {
   useEffect(() => {
     getMyCard(myCardPage, 8)
       .then((res) => {
+        console.log("도착한 카드 배열: ",res.data.cards);
         setMyCardTotalPages(Math.ceil(res.data.totalResources / 8));
         const completeCards = res.data.cards.map((card: any) => ({
           ...card,
@@ -439,7 +440,7 @@ function MyProfile() {
             <Typography
               sx={{ fontSize: '30px', fontFamily: 'Gugi', alignSelf: 'top' }}
             >
-              내가 생성한 카드
+              내가 생성한 카드 (우클릭으로 선택)
             </Typography>
             <Box
               sx={{
@@ -600,7 +601,7 @@ function MyProfile() {
 
           <Box sx={default_space}>
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
-              관심 카드
+              관심 카드 (우클릭으로 선택)
             </Typography>
 
             <Box
@@ -718,7 +719,7 @@ function MyProfile() {
 
           <Box sx={default_space}>
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
-              내가 추가한 키워드
+              내가 추가한 키워드 (우클릭으로 선택)
             </Typography>
             <Box
               sx={{
