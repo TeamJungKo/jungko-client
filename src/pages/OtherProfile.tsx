@@ -32,7 +32,7 @@ function OtherProfile() {
   const [keywordsForAddition, setKeywordsForAddition] = useState<string[]>([]);
 
   const cardPageChange = (page: number) => {
-    setCardPage(page - 1); //인덱스는 0부터이므로
+    setCardPage(page - 1);  //인덱스는 0부터이므로
   };
 
   const selectCard = (index: number) => (event: React.MouseEvent) => {
@@ -279,7 +279,7 @@ function OtherProfile() {
 
           <Box sx={default_space}>
             <Typography sx={{ fontSize: '30px', fontFamily: 'Gugi' }}>
-              키워드 목록
+              키워드 목록 (우클릭으로 선택)
             </Typography>
             <Box>
               <Button
@@ -292,7 +292,7 @@ function OtherProfile() {
                 }}
                 onClick={addToMyKeyword}
               >
-                내 키워드에 추가
+                내 키워드에 추가 (우클릭으로 선택)
               </Button>
             </Box>
           </Box>

@@ -17,8 +17,8 @@ function CategoryPage() {
   const [page, setPage] = useState(0);
   const { id } = useParams();
   const categoryId = Number(id);
-  const [sort, setSort] = useState<string | null>(null);
-  const [order, setOrder] = useState<string | null>(null);
+  const [sort, setSort] = useState<string | undefined>(undefined);
+  const [order, setOrder] = useState<string | undefined>(undefined);
 
   const pageChange = (page: number) => {
     setPage(page - 1); //인덱스는 0부터이므로
@@ -27,7 +27,7 @@ function CategoryPage() {
   useEffect(() => {
     const fetchPopularCard = async () => {
       try {
-        const response = await getPopularCard(page, 48, categoryId);
+        const response = await getPopularCard(page, 48, categoryId, sort, order);
 
         setTotalPages(Math.ceil(response.data.totalResources / 48));
         const { cards } = response.data;
@@ -39,7 +39,7 @@ function CategoryPage() {
     };
 
     fetchPopularCard();
-  }, [categoryId, page, order, sort]);
+  }, [categoryId, page, sort, order]);
 
   const fontStyle = {
     fontSize: '44px',
@@ -97,8 +97,10 @@ function CategoryPage() {
                 <MenuItem value="" disabled>
                   정렬순
                 </MenuItem>
-                <MenuItem value={'minprice-ASC'}>낮은가격순</MenuItem>
-                <MenuItem value={'maxprice-DESC'}>높은가격순</MenuItem>
+                <MenuItem value={'minPrice-ASC'}>최소 가격 낮은순</MenuItem>
+                <MenuItem value={'minPrice-DESC'}>최소 가격 높은순</MenuItem>
+                <MenuItem value={'maxPrice-ASC'}>최대 가격 낮은순</MenuItem>
+                <MenuItem value={'maxPrice-DESC'}>최대 가격 높은순</MenuItem>
                 <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
                 <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>
@@ -126,7 +128,7 @@ function CategoryPage() {
                 }
 
                 // description을 설정합니다.
-                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}원
                 카테고리: ${category}
                 지역: ${area}`;
 

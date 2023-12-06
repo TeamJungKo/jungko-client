@@ -44,7 +44,7 @@
   width: 50%;
   text-align: center;
   font-family: 'Gugi', cursive;
-  font-size: 40px;
+  font-size: 35px;
   animation-name: none; /* 초기에는 애니메이션 이름을 none으로 설정 */
   animation-duration: 2s;
   animation-timing-function: ease-out;

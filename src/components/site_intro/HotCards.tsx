@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/css/hotCards.css';
-import jungkoIcon from '../../assets/images/jungkoIcon.png';
 import CardMaker from '../common/CardMaker.tsx';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import { getPopularCard } from '../../api/axios.custom.ts';
@@ -19,7 +18,7 @@ const HotCards = (): React.ReactElement => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getPopularCard(0, 8);
+        const response = await getPopularCard(0, 5);
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {
@@ -43,7 +42,7 @@ const HotCards = (): React.ReactElement => {
           {cards.map((card) => (
             <CardMaker
               key={card.cardId}
-              imageUrl={jungkoIcon}
+              imageUrl={card.category.imageUrl}
               title={card.title}
               description={`${card.keyword}\n가격범위: ${card.minPrice}~${card.maxPrice}`}
               imageHeight="50%"
