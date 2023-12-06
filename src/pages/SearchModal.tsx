@@ -70,13 +70,21 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     const categoryId = event.target.value as string;
-    setSelectedSuperCategory(categoryId);
-    setSelectedCategory(categoryId);
-    const foundCategory = category.find(
-      (c) => c.categoryId === Number(categoryId)
-    );
-    setSubCategory(foundCategory?.subCategory || []);
-    setSelectedSubCategory('default');
+
+    if (categoryId === 'default') {
+      setSelectedSuperCategory('');
+      setSelectedCategory('');
+      setSelectedSubCategory('');
+      setSubCategory([]);
+    } else {
+      setSelectedSuperCategory(categoryId);
+      setSelectedCategory(categoryId);
+      const foundCategory = category.find(
+        (c) => c.categoryId === Number(categoryId)
+      );
+      setSubCategory(foundCategory?.subCategory || []);
+      setSelectedSubCategory('default');
+    }
   };
 
   const handleSubCategoryChange = (event: SelectChangeEvent<string>) => {
@@ -85,15 +93,22 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
     if (subCategoryId !== 'default') {
       setSelectedCategory(subCategoryId);
     } else {
-      setSelectedCategory(selectedSuperCategory);
+      setSelectedSubCategory('');
     }
   };
 
   const handleSidoSelect = (event: SelectChangeEvent) => {
     const sidoId = event.target.value;
-    const selected = area.find((sido) => sido.id === Number(sidoId));
-    setSelectedSido(selected);
-    setSelectedEmd(undefined);
+    if (sidoId === 'default') {
+      setSelectedSido(undefined);
+      setSelectedSigg(undefined);
+      setSelectedEmd(undefined);
+    } else {
+      const selected = area.find((sido) => sido.id === Number(sidoId));
+      setSelectedSido(selected);
+      setSelectedSigg(undefined);
+      setSelectedEmd(undefined);
+    }
   };
 
   const handleSiggSelect = (event: SelectChangeEvent) => {
@@ -165,7 +180,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
               <TextField
                 value={minPrice}
                 onChange={handleMinPriceChange}
-                required
                 fullWidth
                 id="minPrice"
                 label="최소 가격"
@@ -177,7 +191,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
               <TextField
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
-                required
                 fullWidth
                 id="maxPrice"
                 label="최대 가격"
@@ -191,10 +204,11 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
                 <Select
                   labelId="category-select-label"
                   id="category-select"
-                  value={selectedCategory}
+                  value={selectedSuperCategory}
                   label="카테고리"
                   onChange={handleCategoryChange}
                 >
+                  <MenuItem value="default">----------------</MenuItem>
                   {category.map((category) => (
                     <MenuItem
                       value={category.categoryId}
@@ -229,14 +243,15 @@ const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
             </Grid>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth>
-                <InputLabel id="area-select-label">지역</InputLabel>
+                <InputLabel id="area-select-label">시도</InputLabel>
                 <Select
-                  labelId="area-select-label"
-                  id="area-select"
+                  labelId="sido-select-label"
+                  id="sido-select"
                   value={selectedSido ? selectedSido.id.toString() : ''}
-                  label="지역"
+                  label="시도"
                   onChange={handleSidoSelect}
                 >
+                  <MenuItem value="default">-------------</MenuItem>
                   {area.map((sido) => (
                     <MenuItem key={sido.id} value={sido.id}>
                       {sido.name}
