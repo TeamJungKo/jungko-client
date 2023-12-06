@@ -28,8 +28,8 @@ function HomePage() {
   const [myCardTotalPages, setMyCardTotalPages] = useState(0);
   const [interestedCardTotalPages, setInterestedCardTotalPages] = useState(0);
 
-  const [sort, setSort] = useState<string | undefined>(undefined);
-  const [order, setOrder] = useState<string | undefined>(undefined);  
+  const [sort, setSort] = useState<string | null>(null);
+  const [order, setOrder] = useState<string | null>(null);
 
   const popularCardPageChange = (page: number) => {
     setPopularCardPage(page - 1); //인덱스는 0부터이므로
@@ -45,14 +45,13 @@ function HomePage() {
 
   const fetchPopularCard = useCallback(async () => {
     try {
-      const response = await getPopularCard(popularCardPage, 12, undefined, sort, order);
+      const response = await getPopularCard(popularCardPage, 12);
       setPopularCards(response.data.cards);
       setPopularCardTotalPages(Math.ceil(response.data.totalResources / 12));
     } catch (error) {
       console.log('인기카드를 가져오는 도중 오류가 발생했습니다: ', error);
     }
-  }, [popularCardPage, sort, order]);
-
+  }, [popularCardPage]);
 
   const fetchMyCards = useCallback(async () => {
     try {
@@ -141,10 +140,10 @@ function HomePage() {
                 <MenuItem value="" disabled>
                   정렬순
                 </MenuItem>
-                <MenuItem value={'minPrice-ASC'}>최소 가격 낮은순</MenuItem>
-                <MenuItem value={'minPrice-DESC'}>최소 가격 높은순</MenuItem>
-                <MenuItem value={'maxPrice-ASC'}>최대 가격 낮은순</MenuItem>
-                <MenuItem value={'maxPrice-DESC'}>최대 가격 높은순</MenuItem>
+                <MenuItem value={'minprice-ASC'}>최소 가격 낮은순</MenuItem>
+                <MenuItem value={'minprice-DESC'}>최소 가격 높은순</MenuItem>
+                <MenuItem value={'maxprice-ASC'}>최대 가격 낮은순</MenuItem>
+                <MenuItem value={'maxprice-DESC'}>최대 가격 높은순</MenuItem>
                 <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
                 <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>

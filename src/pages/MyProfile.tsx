@@ -219,7 +219,6 @@ function MyProfile() {
   useEffect(() => {
     getMyCard(myCardPage, 8)
       .then((res) => {
-        console.log("도착한 카드 배열: ",res.data.cards);
         setMyCardTotalPages(Math.ceil(res.data.totalResources / 8));
         const completeCards = res.data.cards.map((card: any) => ({
           ...card,
