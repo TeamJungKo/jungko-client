@@ -5,7 +5,7 @@ import { createKeywords, getProductDetail } from '../api/axios.custom';
 import NavigationBar from '../components/common/NavigationBar';
 import { useParams } from 'react-router-dom';
 import testImg from '../assets/images/jungkoIcon.png';
-import { ProductDetail, Keyword } from '../types/types';
+import { ProductDetail, keywordDTO } from '../types/types';
 import { Area } from '../types/types';
 
 const style = {
@@ -117,7 +117,7 @@ const ProductDetail = () => {
     return `${area.sido.name} ${area.sido.sigg.name} ${area.sido.sigg.emd.name}`;
   };
 
-  const renderKeywords = (keywords: Keyword[]) => {
+  const renderKeywords = (keywords: keywordDTO[]) => {
     return keywords.map((keyword) => (
       <KeywordChip
         key={keyword.id}
