@@ -279,6 +279,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
       <CreateCardPage
         open={isCreateCardOpen}
         handleClose={handleCloseCreateCard}
+        searchOption={SearchOption}
       />
     </>
   );
