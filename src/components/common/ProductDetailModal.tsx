@@ -3,7 +3,7 @@ import { Modal, Box, Typography, Chip, Button, Divider } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { createKeywords, getProductDetail } from '../../api/axios.custom';
 import testImg from '../../assets/images/jungkoIcon.png';
-import { ProductDetail, Area, Keyword } from '../../types/types';
+import { ProductDetail, Area, keywordDTO } from '../../types/types';
 
 const style = {
   width: '100%',
@@ -36,46 +36,68 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose
 }) => {
   const [productData, setProductData] = useState<ProductDetail | null>(null);
-  const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
   const [marketProductUrl, setMarketProductUrl] = useState<string>(''); //"상품 페이지 이동" 버튼 클릭 시 이동할 URL
+  const [selectedKeywordStrings, setSelectedKeywordStrings] = useState<
+    string[]
+  >([]);
 
   const toggleKeyword = (keywordId: number) => {
-    setSelectedKeywordIds((prevSelectedKeywords) => {
-      if (prevSelectedKeywords.includes(keywordId.toString())) {
-        return prevSelectedKeywords.filter((id) => id !== keywordId.toString());
-      } else {
-        return [...prevSelectedKeywords, keywordId.toString()];
-      }
-    });
-
-    // 선택된 키워드 상태 업데이트
     setProductData((prevProductData) => {
       if (!prevProductData) return prevProductData;
 
+      const updatedKeywords = prevProductData.keywords.map((keyword) => {
+        if (keyword.id === keywordId) {
+          const isSelected = !keyword.isSelected;
+          // 키워드 문자열 상태 업데이트
+          if (isSelected) {
+            setSelectedKeywordStrings((prev) => [...prev, keyword.keyword]);
+          } else {
+            setSelectedKeywordStrings((prev) =>
+              prev.filter((k) => k !== keyword.keyword)
+            );
+          }
+          return { ...keyword, isSelected };
+        }
+        return keyword;
+      });
+
       return {
         ...prevProductData,
-        keywords: prevProductData.keywords.map((keyword) => {
-          if (keyword.id === keywordId) {
-            return { ...keyword, isSelected: !keyword.isSelected };
-          }
-          return keyword;
-        })
+        keywords: updatedKeywords
       };
     });
   };
 
-  const theme = useTheme();
-
   const addKeywords = async () => {
-    if (selectedKeywordIds.length > 0) {
+    if (selectedKeywordStrings.length > 0) {
       try {
-        await createKeywords(selectedKeywordIds);
-        setSelectedKeywordIds([]);
+        const response = await createKeywords(selectedKeywordStrings);
+        console.log('키워드 추가 완료', response);
+
+        setProductData((prevProductData) => {
+          if (!prevProductData) return null;
+
+          const updatedKeywords = prevProductData.keywords.map((keyword) => ({
+            ...keyword,
+            isSelected: selectedKeywordStrings.includes(keyword.keyword)
+              ? false
+              : keyword.isSelected
+          }));
+
+          return {
+            ...prevProductData,
+            keywords: updatedKeywords
+          };
+        });
+
+        setSelectedKeywordStrings([]);
       } catch (error) {
-        console.log('키워드 추가 중 에러가 발생했습니다 :', error);
+        console.error('키워드 추가 중 에러가 발생했습니다.', error);
       }
     }
   };
+
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -97,7 +119,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     return `${area.sido.name} ${area.sido.sigg.name} ${area.sido.sigg.emd.name}`;
   };
 
-  const renderKeywords = (keywords: Keyword[]) => {
+  const renderKeywords = (keywords: keywordDTO[]) => {
     return keywords.map((keyword) => (
       <KeywordChip
         key={keyword.id}
@@ -223,10 +245,10 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <Button
               variant="contained"
               onClick={addKeywords}
-              disabled={selectedKeywordIds.length === 0}
+              disabled={selectedKeywordStrings.length === 0}
               sx={{ ml: 1 }}
             >
-              Add to My Keywords
+              내 키워드에 추가
             </Button>
           </Box>
 

@@ -30,58 +30,62 @@ const KeywordChip = styled(Chip)(({ theme, color }) => ({
 const ProductDetail = () => {
   const [productData, setProductData] = useState<ProductDetail | null>(null);
   const { productId } = useParams();
-  const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
   const [marketProductUrl, setMarketProductUrl] = useState<string>(''); //상품 페이지로 이동 버튼 클릭 시 이동할 URL
-  const toggleKeyword = (keywordId: number) => {
-    const keywordIdStr = keywordId.toString();
-    setSelectedKeywordIds((prevSelectedKeywords) => {
-      if (prevSelectedKeywords.includes(keywordIdStr)) {
-        return prevSelectedKeywords.filter((id) => id !== keywordIdStr);
-      } else {
-        return [...prevSelectedKeywords, keywordIdStr];
-      }
-    });
+  // selectedKeywordIds 상태를 키워드 문자열로 관리하기 위해 타입 변경
+  const [selectedKeywordStrings, setSelectedKeywordStrings] = useState<
+    string[]
+  >([]);
 
-    // 선택된 키워드 상태 업데이트
+  const toggleKeyword = (keywordId: number) => {
     setProductData((prevProductData) => {
       if (!prevProductData) return prevProductData;
 
+      const updatedKeywords = prevProductData.keywords.map((keyword) => {
+        if (keyword.id === keywordId) {
+          const isSelected = !keyword.isSelected;
+          // 키워드 문자열 상태 업데이트
+          if (isSelected) {
+            setSelectedKeywordStrings((prev) => [...prev, keyword.keyword]);
+          } else {
+            setSelectedKeywordStrings((prev) =>
+              prev.filter((k) => k !== keyword.keyword)
+            );
+          }
+          return { ...keyword, isSelected };
+        }
+        return keyword;
+      });
+
       return {
         ...prevProductData,
-        keywords: prevProductData.keywords.map((keyword) => {
-          if (keyword.id === keywordId) {
-            return { ...keyword, isSelected: !keyword.isSelected };
-          }
-          return keyword;
-        })
+        keywords: updatedKeywords
       };
     });
   };
 
   const addKeywords = async () => {
-    // 키워드 추가 API 호출
-    if (selectedKeywordIds.length > 0) {
+    if (selectedKeywordStrings.length > 0) {
       try {
-        const response = await createKeywords(selectedKeywordIds);
+        const response = await createKeywords(selectedKeywordStrings);
         console.log('키워드 추가 완료', response);
 
-        // 선택된 키워드의 isSelected 상태를 false로 업데이트
         setProductData((prevProductData) => {
-          if (!prevProductData) return prevProductData;
+          if (!prevProductData) return null;
+
+          const updatedKeywords = prevProductData.keywords.map((keyword) => ({
+            ...keyword,
+            isSelected: selectedKeywordStrings.includes(keyword.keyword)
+              ? false
+              : keyword.isSelected
+          }));
 
           return {
             ...prevProductData,
-            keywords: prevProductData.keywords.map((keyword) => {
-              if (selectedKeywordIds.includes(keyword.id.toString())) {
-                return { ...keyword, isSelected: false };
-              }
-              return keyword;
-            })
+            keywords: updatedKeywords
           };
         });
 
-        // 선택된 키워드 ID 목록을 초기화
-        setSelectedKeywordIds([]);
+        setSelectedKeywordStrings([]);
       } catch (error) {
         console.error('키워드 추가 중 에러가 발생했습니다.', error);
       }
@@ -223,7 +227,7 @@ const ProductDetail = () => {
             <Button
               variant="contained"
               onClick={addKeywords}
-              disabled={selectedKeywordIds.length === 0}
+              disabled={selectedKeywordStrings.length === 0}
               sx={{ ml: 1 }}
             >
               내 키워드에 추가

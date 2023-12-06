@@ -49,7 +49,13 @@ interface BaseProduct {
   marketName: string;
   marketProductId: string;
   area: Area;
-  keywords: Keyword[]; //API 변경으로 추가
+  keywords: keywordDTO[]; //API 변경으로 추가
+}
+
+export interface keywordDTO {
+  id: number;
+  keyword: string;
+  isSelected: boolean;
 }
 
 // 상품 일반 정보
@@ -185,7 +191,7 @@ export interface KeywordListResponse {
 
 // 키워드 정보
 export interface Keyword {
-  id: number;
+  keywordId: number;
   keyword: string;
   isSelected?: boolean;
 }

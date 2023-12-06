@@ -151,11 +151,11 @@ const ComparePage = () => {
                   <Typography variant="h5" gutterBottom>
                     {product.title}
                   </Typography>
-                  {product.KeywordList &&
-                    Array.isArray(product.KeywordList) &&
-                    product.KeywordList.map((keyword) => (
+                  {product.keywords &&
+                    Array.isArray(product.keywords) &&
+                    product.keywords.map((keyword) => (
                       <Chip
-                        key={keyword.keywordId}
+                        key={keyword.id}
                         label={`#${keyword.keyword}`}
                         variant="outlined"
                         sx={{ mr: 1, mb: 1 }}
