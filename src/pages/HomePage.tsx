@@ -140,8 +140,10 @@ function HomePage() {
                 <MenuItem value="" disabled>
                   정렬순
                 </MenuItem>
-                <MenuItem value={'minprice-ASC'}>낮은가격순</MenuItem>
-                <MenuItem value={'maxprice-DESC'}>높은가격순</MenuItem>
+                <MenuItem value={'minprice-ASC'}>최소 가격 낮은순</MenuItem>
+                <MenuItem value={'minprice-DESC'}>최소 가격 높은순</MenuItem>
+                <MenuItem value={'maxprice-ASC'}>최대 가격 낮은순</MenuItem>
+                <MenuItem value={'maxprice-DESC'}>최대 가격 높은순</MenuItem>
                 <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
                 <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>
