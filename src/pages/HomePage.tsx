@@ -169,7 +169,7 @@ function HomePage() {
                 }
 
                 // description을 설정합니다.
-                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}원
                 카테고리: ${category}
                 지역: ${area}`;
 
@@ -222,7 +222,7 @@ function HomePage() {
                 }
 
                 // description을 설정합니다.
-                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}원
                 카테고리: ${category}
                 지역: ${area}`;
 
@@ -275,7 +275,7 @@ function HomePage() {
                 }
 
                 // description을 설정합니다.
-                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}
+                const description = `가격: ${card.minPrice} ~ ${card.maxPrice}원
                 카테고리: ${category}
                 지역: ${area}`;
 

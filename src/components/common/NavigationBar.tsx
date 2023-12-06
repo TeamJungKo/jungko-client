@@ -204,7 +204,7 @@ const NavigationBar = ({ reload = false }: Prop) => {
               }}
             >
               <Typography
-                sx={{ padding: '0px' }}
+                sx={{ padding: '0px', fontFamily: 'Jua' }}
                 variant="subtitle1"
                 align="left"
                 noWrap
