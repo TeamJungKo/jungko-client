@@ -17,8 +17,8 @@ function CategoryPage() {
   const [page, setPage] = useState(0);
   const { id } = useParams();
   const categoryId = Number(id);
-  const [sort, setSort] = useState<string | null>(null);
-  const [order, setOrder] = useState<string | null>(null);
+  const [sort, setSort] = useState<string | undefined>(undefined);
+  const [order, setOrder] = useState<string | undefined>(undefined);
 
   const pageChange = (page: number) => {
     setPage(page - 1); //인덱스는 0부터이므로
@@ -27,7 +27,7 @@ function CategoryPage() {
   useEffect(() => {
     const fetchPopularCard = async () => {
       try {
-        const response = await getPopularCard(page, 48, categoryId);
+        const response = await getPopularCard(page, 48, categoryId, sort, order);
 
         setTotalPages(Math.ceil(response.data.totalResources / 48));
         const { cards } = response.data;
@@ -97,10 +97,10 @@ function CategoryPage() {
                 <MenuItem value="" disabled>
                   정렬순
                 </MenuItem>
-                <MenuItem value={'minprice-ASC'}>최소 가격 낮은순</MenuItem>
-                <MenuItem value={'minprice-DESC'}>최소 가격 높은순</MenuItem>
-                <MenuItem value={'maxprice-ASC'}>최대 가격 낮은순</MenuItem>
-                <MenuItem value={'maxprice-DESC'}>최대 가격 높은순</MenuItem>
+                <MenuItem value={'minPrice-ASC'}>최소 가격 낮은순</MenuItem>
+                <MenuItem value={'minPrice-DESC'}>최소 가격 높은순</MenuItem>
+                <MenuItem value={'maxPrice-ASC'}>최대 가격 낮은순</MenuItem>
+                <MenuItem value={'maxPrice-DESC'}>최대 가격 높은순</MenuItem>
                 <MenuItem value={'createdAt-DESC'}>최신순</MenuItem>
                 <MenuItem value={'createdAt-ASC'}>오래된순</MenuItem>
               </Select>
