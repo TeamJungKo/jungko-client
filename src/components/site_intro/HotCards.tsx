@@ -19,7 +19,7 @@ const HotCards = (): React.ReactElement => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getPopularCard(0, 6);
+        const response = await getPopularCard(0, 5);
         if (response.data.cards) {
           setCards(response.data.cards);
         } else {

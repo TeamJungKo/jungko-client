@@ -15,7 +15,7 @@ import CardDetail from './pages/CardDetail.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
 import ProductDetail from './pages/ProductDetail.tsx';
 import SearchResultPage from './pages/SearchResult.tsx';
-//import './firebase-messaging-sw.ts';
+import './firebase-messaging-sw.ts';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
