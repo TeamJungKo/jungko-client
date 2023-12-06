@@ -43,6 +43,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   setSelectedProducts,
   onRemoveProduct
 }) => {
+  const [cardStatusState, setCardStatusState] = useState(cardStatus); // 카드 상태
   const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림여부
   const [author, setAuthor] = useState<Author>({
     nickname: '',
@@ -107,6 +108,10 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     fetchCardInfo();
   }, [cardId, page, productsPerPage, sortOrder, sortDirection]);
 
+  useEffect(() => {
+    setCardStatusState(cardStatus);
+  }, [cardStatus]);
+
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     setSelectedSort(value);
@@ -169,6 +174,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleUnlikeCard = async (cardId: number) => {
     try {
       await unlikeCard(cardId);
+      setCardStatusState('otherCard');
     } catch (error) {
       console.log('관심 카드를 해제하는 도중 오류가 발생했습니다: ', error);
     }
@@ -178,6 +184,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleDelete = async (cardId: number) => {
     try {
       await deleteCard(cardId);
+      navigate(-1);
     } catch (error) {
       console.log('카드를 삭제하는 도중 오류가 발생했습니다: ', error);
     }
@@ -187,6 +194,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleLikeCard = async (cardId: number) => {
     try {
       await likeCard(cardId);
+      setCardStatusState('interestedCard');
     } catch (error) {
       console.log('관심 카드를 등록하는 도중 오류가 발생했습니다: ', error);
     }
@@ -201,7 +209,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   };
 
   const RenderButtons: React.FC = () => {
-    switch (cardStatus) {
+    switch (cardStatusState) {
       case 'myCard':
         return (
           <>

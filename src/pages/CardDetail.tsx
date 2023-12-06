@@ -48,7 +48,7 @@ const CardDetail: React.FC = () => {
     };
 
     fetchMyCards();
-  }, []);
+  }, [myProfileId]);
 
   useEffect(() => {
     if (myProfileId != null) {
@@ -63,20 +63,20 @@ const CardDetail: React.FC = () => {
 
       fetchInterestedCards();
     }
-  }, [myProfileId]);
+  }, [myProfileId, myCards]);
 
   useEffect(() => {
-    let status: 'myCard' | 'interestedCard' | 'otherCard' = 'otherCard';
+    let status: 'myCard' | 'interestedCard' | 'otherCard';
 
     if (myCards.some((card) => card.cardId === currentCardId)) {
       status = 'myCard';
     } else if (interestedCards.some((card) => card.cardId === currentCardId)) {
       status = 'interestedCard';
+    } else {
+      status = 'otherCard';
     }
-
     setCardStatus(status);
   }, [myCards, interestedCards, currentCardId]);
-
   const handleCheck = (product: Product) => {
     setSelectedProducts((prevSelected) =>
       prevSelected.find((p) => p.productId === product.productId)
