@@ -21,7 +21,7 @@ interface Props {
   isSelected?: boolean;
 }
 
-function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', title='디폴트 제목', description='디폴트 설명', imageHeight = '50%', contentHeight = '50%', isOpen = 'DEFAULT', onContextMenu, onClick, isSelected=false }: Props) {
+function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', title='', description='', imageHeight = '50%', contentHeight = '50%', isOpen = 'DEFAULT', onContextMenu, onClick, isSelected=false }: Props) {
 
   const navigate = useNavigate();
 
@@ -61,15 +61,20 @@ function CardMaker({ cardId=0, width = '200px', height = '300px', imageUrl='', t
           image={imageUrl}
           alt="기본이미지"
         />
-        <CardContent sx={{ width: '100%', height: contentHeight }}>
+        <CardContent sx={{ width: '100%', height: contentHeight, padding: '0px' }}>
           <Typography gutterBottom variant="h5" 
           component="div"
-          sx={{ fontFamily: 'Noto Sans KR' }}>
+          sx={{ fontFamily: 'Noto Sans KR', padding: '10px 0px 10px 10px' }}>
             {title}
           </Typography>
           <Typography variant="body2" 
             color="text.secondary"
-            sx={{ fontFamily: 'Noto Sans KR', whiteSpace: 'pre-line', fontSize: '16px' }}
+            sx={{ 
+              fontFamily: 'Noto Sans KR', 
+              whiteSpace: 'pre-line', 
+              fontSize: '10px', 
+              padding: '0px 0px 0px 10px' 
+            }}
             width={"95%"}
           >
             {description}

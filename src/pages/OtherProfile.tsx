@@ -32,7 +32,7 @@ function OtherProfile() {
   const [keywordsForAddition, setKeywordsForAddition] = useState<string[]>([]);
 
   const cardPageChange = (page: number) => {
-    setCardPage(page - 1); //인덱스는 0부터이므로
+    setCardPage(page - 1);  //인덱스는 0부터이므로
   };
 
   const selectCard = (index: number) => (event: React.MouseEvent) => {
