@@ -5,7 +5,7 @@ import { createKeywords, getProductDetail } from '../api/axios.custom';
 import NavigationBar from '../components/common/NavigationBar';
 import { useParams } from 'react-router-dom';
 import testImg from '../assets/images/jungkoIcon.png';
-import { ProductDetail, Keyword } from '../types/types';
+import { ProductDetail, keywordDTO } from '../types/types';
 import { Area } from '../types/types';
 
 const style = {
@@ -30,26 +30,62 @@ const KeywordChip = styled(Chip)(({ theme, color }) => ({
 const ProductDetail = () => {
   const [productData, setProductData] = useState<ProductDetail | null>(null);
   const { productId } = useParams();
-  const [selectedKeywordIds, setSelectedKeywordIds] = useState<string[]>([]);
   const [marketProductUrl, setMarketProductUrl] = useState<string>(''); //상품 페이지로 이동 버튼 클릭 시 이동할 URL
+  // selectedKeywordIds 상태를 키워드 문자열로 관리하기 위해 타입 변경
+  const [selectedKeywordStrings, setSelectedKeywordStrings] = useState<
+    string[]
+  >([]);
+
   const toggleKeyword = (keywordId: number) => {
-    const keywordIdStr = keywordId.toString();
-    setSelectedKeywordIds((prevSelectedKeywords) => {
-      if (prevSelectedKeywords.includes(keywordIdStr)) {
-        return prevSelectedKeywords.filter((id) => id !== keywordIdStr);
-      } else {
-        return [...prevSelectedKeywords, keywordIdStr];
-      }
+    setProductData((prevProductData) => {
+      if (!prevProductData) return prevProductData;
+
+      const updatedKeywords = prevProductData.keywords.map((keyword) => {
+        if (keyword.id === keywordId) {
+          const isSelected = !keyword.isSelected;
+          // 키워드 문자열 상태 업데이트
+          if (isSelected) {
+            setSelectedKeywordStrings((prev) => [...prev, keyword.keyword]);
+          } else {
+            setSelectedKeywordStrings((prev) =>
+              prev.filter((k) => k !== keyword.keyword)
+            );
+          }
+          return { ...keyword, isSelected };
+        }
+        return keyword;
+      });
+
+      return {
+        ...prevProductData,
+        keywords: updatedKeywords
+      };
     });
   };
 
   const addKeywords = async () => {
-    //키워드 추가 API 호출
-    if (selectedKeywordIds.length > 0) {
+    if (selectedKeywordStrings.length > 0) {
       try {
-        const response = await createKeywords(selectedKeywordIds);
+        const response = await createKeywords(selectedKeywordStrings);
         console.log('키워드 추가 완료', response);
-        setSelectedKeywordIds([]);
+
+        setProductData((prevProductData) => {
+          if (!prevProductData) return null;
+
+          const updatedKeywords = prevProductData.keywords.map((keyword) => ({
+            ...keyword,
+            isSelected: selectedKeywordStrings.includes(keyword.keyword)
+              ? false
+              : keyword.isSelected
+          }));
+
+          return {
+            ...prevProductData,
+            keywords: updatedKeywords
+          };
+        });
+
+        setSelectedKeywordStrings([]);
       } catch (error) {
         console.error('키워드 추가 중 에러가 발생했습니다.', error);
       }
@@ -64,6 +100,7 @@ const ProductDetail = () => {
           const response = await getProductDetail(id);
           setProductData(response.data.productDetail);
           setMarketProductUrl(response.data.productDetail.marketProductUrl);
+          console.log('상품 상세정보', response.data.productDetail);
         }
       } catch (error) {
         console.log(
@@ -80,15 +117,13 @@ const ProductDetail = () => {
     return `${area.sido.name} ${area.sido.sigg.name} ${area.sido.sigg.emd.name}`;
   };
 
-  const renderKeywords = (keywords: Keyword[]) => {
+  const renderKeywords = (keywords: keywordDTO[]) => {
     return keywords.map((keyword) => (
       <KeywordChip
-        key={keyword.keywordId}
+        key={keyword.id}
         label={keyword.keyword}
-        onClick={() => toggleKeyword(keyword.keywordId)}
-        color={
-          selectedKeywordIds.includes(keyword.keyword) ? 'primary' : 'default'
-        }
+        onClick={() => toggleKeyword(keyword.id)}
+        color={keyword.isSelected ? 'primary' : 'default'}
       />
     ));
   };
@@ -184,18 +219,18 @@ const ProductDetail = () => {
               marginBottom: 3
             }}
           >
-            {productData && productData.KeywordList ? (
-              renderKeywords(productData.KeywordList)
+            {productData && productData.keywords ? (
+              renderKeywords(productData.keywords)
             ) : (
               <Typography>Loading Keywords...</Typography>
             )}
             <Button
               variant="contained"
               onClick={addKeywords}
-              disabled={selectedKeywordIds.length === 0}
+              disabled={selectedKeywordStrings.length === 0}
               sx={{ ml: 1 }}
             >
-              Add to My Keywords
+              내 키워드에 추가
             </Button>
           </Box>
 

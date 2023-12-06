@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
-import SearchModal from '../../pages/SearchModal.tsx';
+import SearchModal from './SearchModal.tsx';
 import EditCardOptionModal from './EditCardOptionModal.tsx';
 import {
   deleteCard,
@@ -25,7 +25,7 @@ import {
   unlikeCard,
   getMemberCard
 } from '../../api/axios.custom.ts';
-import { Card, Author, Product, CardInfoResponse } from '../../types/types.ts';
+import { Author, Product } from '../../types/types.ts';
 
 interface CardDetailComponentProps {
   cardStatus: 'myCard' | 'interestedCard' | 'otherCard';
@@ -43,6 +43,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   setSelectedProducts,
   onRemoveProduct
 }) => {
+  const [cardStatusState, setCardStatusState] = useState(cardStatus); // 카드 상태
   const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림여부
   const [author, setAuthor] = useState<Author>({
     nickname: '',
@@ -75,46 +76,41 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCardInfo = async () => {
       try {
-        const response: CardInfoResponse = await getCardInfo(
+        const cardInfoResponse = await getCardInfo(
           cardId,
           page - 1,
           productsPerPage,
           sortOrder,
           sortDirection
         );
-        setProducts(response.products);
-        setTotalResources(response.totalResources);
-        setAuthor({
-          nickname: response.author.nickname,
-          imageUrl: response.author.imageUrl,
-          memberId: response.author.memberId,
-          email: response.author.email
-        });
-      } catch (error) {
-        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
-      }
-    };
+        setProducts(cardInfoResponse.products);
+        setTotalResources(cardInfoResponse.totalResources);
+        setAuthor(cardInfoResponse.author);
 
-    fetchProducts();
-    const fetchCardsTitle = async () => {
-      try {
-        const memberId = author.memberId;
-        const response = await getMemberCard(memberId);
-        const matchingCard = response.data.cards.find(
-          (card: Card) => card.cardId === cardId
+        const memberCardsResponse = await getMemberCard(
+          cardInfoResponse.author.memberId,
+          0,
+          50
+        );
+        const matchingCard = memberCardsResponse.data.cards.find(
+          (card: { cardId: number }) => card.cardId === cardId
         );
         if (matchingCard) {
           setCardTitle(matchingCard.title);
         }
       } catch (error) {
-        console.log('카드 제목을 가져오는 도중 오류가 발생했습니다: ', error);
+        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
       }
     };
 
-    fetchCardsTitle();
-  }, [cardId, page, productsPerPage, sortOrder, sortDirection, author]);
+    fetchCardInfo();
+  }, [cardId, page, productsPerPage, sortOrder, sortDirection]);
+
+  useEffect(() => {
+    setCardStatusState(cardStatus);
+  }, [cardStatus]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
@@ -178,6 +174,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleUnlikeCard = async (cardId: number) => {
     try {
       await unlikeCard(cardId);
+      setCardStatusState('otherCard');
     } catch (error) {
       console.log('관심 카드를 해제하는 도중 오류가 발생했습니다: ', error);
     }
@@ -187,6 +184,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleDelete = async (cardId: number) => {
     try {
       await deleteCard(cardId);
+      navigate(-1);
     } catch (error) {
       console.log('카드를 삭제하는 도중 오류가 발생했습니다: ', error);
     }
@@ -196,6 +194,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const handleLikeCard = async (cardId: number) => {
     try {
       await likeCard(cardId);
+      setCardStatusState('interestedCard');
     } catch (error) {
       console.log('관심 카드를 등록하는 도중 오류가 발생했습니다: ', error);
     }
@@ -210,7 +209,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   };
 
   const RenderButtons: React.FC = () => {
-    switch (cardStatus) {
+    switch (cardStatusState) {
       case 'myCard':
         return (
           <>

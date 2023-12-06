@@ -17,8 +17,8 @@ import {
 } from '@mui/icons-material';
 import logo from '../../assets/images/jungkoLogo.png';
 import { getMyProfile } from '../../api/axios.custom.ts';
-import NotificationModal from '../../pages/NotificationModal.tsx';
-import SearchModal from '../../pages/SearchModal.tsx';
+import NotificationModal from './NotificationModal.tsx';
+import SearchModal from './SearchModal.tsx';
 import defaultImage from '../../assets/images/profile_pic.png';
 
 const Search = styled('div')(({ theme }) => ({

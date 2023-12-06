@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
-import CreateCardPage from '../../pages/CreateCardModal.tsx';
+import CreateCardPage from './CreateCardModal.tsx';
 import { searchProduct } from '../../api/axios.custom.ts';
 import { ProductSearchRequest, Product } from '../../types/types.ts';
 
@@ -279,6 +279,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
       <CreateCardPage
         open={isCreateCardOpen}
         handleClose={handleCloseCreateCard}
+        searchOption={SearchOption}
       />
     </>
   );

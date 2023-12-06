@@ -27,7 +27,7 @@ const SearchResult: React.FC = () => {
     if (queryParams.has('maxPrice')) {
       options.maxPrice = Number(queryParams.get('maxPrice'));
     }
-    if (queryParams.has('category')) {
+    if (queryParams.has('categoryId')) {
       options.categoryId = Number(queryParams.get('categoryId'));
     }
     if (queryParams.has('areaId')) {
