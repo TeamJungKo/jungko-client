@@ -109,6 +109,12 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           width: '100%',
           padding: '20px'
         }}
+        onClick={(event) => {
+          // 모달 바깥쪽 클릭 감지
+          if (event.currentTarget === event.target) {
+            onClose(); // 모달 닫기
+          }
+        }}
       >
         <Box
           sx={{

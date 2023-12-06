@@ -9,12 +9,15 @@ import {
   Divider,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
 import SearchModal from '../../pages/SearchModal.tsx';
+import EditCardOptionModal from './EditCardOptionModal.tsx';
 import {
   deleteCard,
   getCardInfo,
@@ -30,13 +33,15 @@ interface CardDetailComponentProps {
   selectedProducts: Product[];
   onCheck: (product: Product) => void;
   setSelectedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  onRemoveProduct: (product: Product) => void;
 }
 
 const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   cardStatus,
   cardId,
   selectedProducts,
-  setSelectedProducts
+  setSelectedProducts,
+  onRemoveProduct
 }) => {
   const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 열림여부
   const [author, setAuthor] = useState<Author>({
@@ -54,10 +59,12 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
   const [showProductDetail, setShowProductDetail] = useState<number>(0); //상품 상세 정보 모달 선택
   const [sortOrder, setSortOrder] = useState('uploadedAt');
   const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
+  const [selectedSort, setSelectedSort] = useState('recentDesc');
   const handleProductClick = (productId: number) => {
     setShowProductDetail(productId);
     setIsProductDetailOpen(true);
   };
+  const [isEditCardOptionOpen, setIsEditCardOptionOpen] = useState(false);
 
   const handleCloseProductDetail = () => {
     setIsProductDetailOpen(false);
@@ -80,10 +87,10 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         setProducts(response.products);
         setTotalResources(response.totalResources);
         setAuthor({
-          nickname: response.Author.nickname,
-          imageUrl: response.Author.imageUrl,
-          memberId: response.Author.memberId,
-          email: response.Author.email
+          nickname: response.author.nickname,
+          imageUrl: response.author.imageUrl,
+          memberId: response.author.memberId,
+          email: response.author.email
         });
       } catch (error) {
         console.log('카드 정보를 가져오는 도중 오류가 발생했습니다', error);
@@ -91,10 +98,7 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     };
 
     fetchProducts();
-  }, [cardId, page, productsPerPage, sortOrder, sortDirection]);
-
-  useEffect(() => {
-    const fetchCards = async () => {
+    const fetchCardsTitle = async () => {
       try {
         const memberId = author.memberId;
         const response = await getMemberCard(memberId);
@@ -105,15 +109,16 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           setCardTitle(matchingCard.title);
         }
       } catch (error) {
-        console.log('카드 정보를 가져오는 도중 오류가 발생했습니다: ', error);
+        console.log('카드 제목을 가져오는 도중 오류가 발생했습니다: ', error);
       }
     };
 
-    fetchCards();
-  }, [cardId, author.memberId]);
+    fetchCardsTitle();
+  }, [cardId, page, productsPerPage, sortOrder, sortDirection, author]);
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
+    setSelectedSort(value);
     switch (value) {
       case 'priceDesc':
         setSortOrder('price');
@@ -196,6 +201,14 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
     }
   };
 
+  const handleOpenEditCardOption = () => {
+    setIsEditCardOptionOpen(true);
+  };
+
+  const handleCloseEditCardOption = () => {
+    setIsEditCardOptionOpen(false);
+  };
+
   const RenderButtons: React.FC = () => {
     switch (cardStatus) {
       case 'myCard':
@@ -212,8 +225,8 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
                     카드 삭제
                   </Button>
                 )}
-                <Button variant="contained" onClick={handleOpenCardOption}>
-                  카드 옵션
+                <Button variant="contained" onClick={handleOpenEditCardOption}>
+                  카드 옵션 수정
                 </Button>
               </>
             }
@@ -224,13 +237,13 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           <>
             <Button
               variant="outlined"
-              onClick={() => handleLikeCard(cardId)}
+              onClick={() => handleUnlikeCard(cardId)}
               sx={{ mr: 1 }}
             >
               관심 해제
             </Button>
             <Button variant="contained" onClick={handleOpenCardOption}>
-              카드 옵션
+              검색 옵션
             </Button>
           </>
         );
@@ -239,13 +252,13 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
           <>
             <Button
               variant="outlined"
-              onClick={() => handleUnlikeCard(cardId)}
+              onClick={() => handleLikeCard(cardId)}
               sx={{ mr: 1 }}
             >
               관심 추가
             </Button>
             <Button variant="contained" onClick={handleOpenCardOption}>
-              카드 옵션
+              검색 옵션
             </Button>
           </>
         );
@@ -291,15 +304,18 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Select
-                value={
-                  sortOrder === 'created_at' && sortDirection === 'DESC'
-                    ? 'recentDesc'
-                    : sortOrder
-                }
+                value={selectedSort}
                 onChange={handleSortChange}
                 displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  height: '40px', // 버튼과 동일한 높이로 조절
+                  '.MuiSelect-select': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px'
+                  }
+                }}
               >
                 <MenuItem value="priceDesc">높은 가격 순</MenuItem>
                 <MenuItem value="priceAsc">낮은 가격 순</MenuItem>
@@ -352,12 +368,30 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
             }}
           >
             {selectedProducts.map((product) => (
-              <img
-                key={product.productId}
-                src={product.productImageUrl}
-                alt={product.title}
-                style={{ width: '100px', height: '100px', marginRight: '8px' }}
-              />
+              <Box key={product.productId} sx={{ position: 'relative' }}>
+                <img
+                  src={product.productImageUrl}
+                  alt={product.title}
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    marginRight: '8px'
+                  }}
+                />
+                <IconButton
+                  onClick={() => onRemoveProduct(product)}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    borderRadius: '50%'
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
             ))}
           </Box>
         </Box>
@@ -372,6 +406,13 @@ const CardDetailComponent: React.FC<CardDetailComponentProps> = ({
         open={isProductDetailOpen}
         onClose={handleCloseProductDetail}
       />
+      {isEditCardOptionOpen && (
+        <EditCardOptionModal
+          open={isEditCardOptionOpen}
+          handleClose={handleCloseEditCardOption}
+          cardId={cardId}
+        />
+      )}
     </>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Box,
@@ -18,21 +17,23 @@ import { useTheme } from '@mui/material/styles';
 import {
   getAllProductCategory,
   getAllArea,
-  createCard
-} from '../api/axios.custom.ts';
+  changeCardOption
+} from '../../api/axios.custom.ts';
 import {
   AllCategory,
   AllSubCategory,
   AllSido,
   AllSigg
-} from '../types/types.ts';
+} from '../../types/types.ts';
 
-interface CreateCardPageProps {
+interface EditCardOptionModalProps {
+  cardId: number;
   open: boolean;
   handleClose: () => void;
 }
 
-const CreateCardPage: React.FC<CreateCardPageProps> = ({
+const EditCardOptionModal: React.FC<EditCardOptionModalProps> = ({
+  cardId,
   open,
   handleClose
 }) => {
@@ -51,7 +52,6 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   const [selectedSigg, setSelectedSigg] = useState<AllSigg>();
   const [selectedEmd, setSelectedEmd] = useState<number>();
   const [isPublic, setIsPublic] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategoriesAndAreas = async () => {
@@ -132,28 +132,23 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
     setIsPublic(event.target.checked);
   };
 
-  const handleCreate = async () => {
+  const handleEdit = async () => {
     const formData = new FormData();
-    formData.append('categoryId', selectedCategory);
-    if (selectedEmd !== undefined) {
-      formData.append('areaId', selectedEmd.toString());
-    }
-    formData.append('title', searchTerm);
-    formData.append('keyword', newCardTitle);
-    formData.append('minPrice', minPrice);
-    formData.append('maxPrice', maxPrice);
-    if (isPublic == true) {
-      formData.append('scope', 'PUBLIC');
-    } else {
-      formData.append('scope', 'PRIVATE');
-    }
+
+    if (newCardTitle) formData.append('title', newCardTitle);
+    if (searchTerm) formData.append('keyword', searchTerm);
+    if (minPrice) formData.append('minPrice', minPrice);
+    if (maxPrice) formData.append('maxPrice', maxPrice);
+    if (selectedCategory) formData.append('categoryId', selectedCategory);
+    if (selectedEmd) formData.append('areaId', selectedEmd.toString());
+    formData.append('scope', isPublic ? 'PUBLIC' : 'PRIVATE');
+
     try {
-      const response = await createCard(formData);
-      if (response.status === 201) {
-        navigate(`/Card/${response.data.cardId}`);
-      }
+      await changeCardOption(cardId, formData);
+      handleClose();
+      window.location.reload(); // 카드 옵션 수정 후, 카드를 다시 불러오기 위해 페이지를 새로고침
     } catch (error) {
-      console.log('생성 도중 오류가 발생했습니다: ', error);
+      console.error('카드 옵션 수정 중 오류 발생: ', error);
     }
   };
 
@@ -348,9 +343,9 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
               type="submit"
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={handleCreate}
+              onClick={handleEdit}
             >
-              카드 생성
+              옵션 수정
             </Button>
             <Button
               type="button"
@@ -367,4 +362,4 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   );
 };
 
-export default CreateCardPage;
+export default EditCardOptionModal;

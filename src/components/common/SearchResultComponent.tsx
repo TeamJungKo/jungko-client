@@ -8,13 +8,14 @@ import {
   Divider,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
 import CreateCardPage from '../../pages/CreateCardModal.tsx';
-import SearchModal from '../../pages/SearchModal.tsx';
 import { searchProduct } from '../../api/axios.custom.ts';
 import { ProductSearchRequest, Product } from '../../types/types.ts';
 
@@ -23,22 +24,24 @@ interface SearchResultComponentProps {
   selectedProducts: Product[];
   onCheck: (product: Product) => void;
   setSelectedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  onRemoveProduct: (product: Product) => void;
 }
 
 const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   SearchOption,
   selectedProducts,
-  setSelectedProducts
+  setSelectedProducts,
+  onRemoveProduct
 }) => {
   const [SearchOptions, setSearchOptions] = useState({ SearchOption });
   const [isCreateCardOpen, setIsCreateCardOpen] = useState(false); //카드생성 모달이 열렸는지 여부
-  const [isCardOptionOpen, setIsCardOptionOpen] = useState(false); // 카드옵션 모달이 열렸는지 여부
   const [products, setProducts] = useState<Product[]>([]); //화면에 표시할 상품 목록
   const [totalResources, setTotalResources] = useState(0); //총 상품 목록
   const [page, setPage] = useState(1);
   const productsPerPage = 2; // 한 페이지에 표시할 상품 수
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false); //상품 상세 정보 모달 열렸는지 여부
   const [showProductDetail, setShowProductDetail] = useState<number>(0);
+  const [selectedSort, setSelectedSort] = useState('recentDesc');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [sortDirection, setSortDirection] = useState('price');
   const handleProductClick = (productId: number) => {
@@ -83,6 +86,7 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
+    setSelectedSort(value);
     switch (value) {
       case 'priceDesc':
         setSortOrder('DESC');
@@ -104,14 +108,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
   };
 
   const navigate = useNavigate();
-
-  const handleOpenCardOption = () => {
-    setIsCardOptionOpen(true);
-  };
-
-  const handleCloseCardOption = () => {
-    setIsCardOptionOpen(false);
-  };
 
   const handleCheck = (product: Product) => {
     setSelectedProducts((prevSelected: Product[]) =>
@@ -146,9 +142,6 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
           sx={{ mr: 1 }}
         >
           카드 생성
-        </Button>
-        <Button variant="contained" onClick={handleOpenCardOption}>
-          카드 옵션
         </Button>
       </>
     );
@@ -186,15 +179,18 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Select
-                value={
-                  sortOrder === 'DESC' && sortDirection === 'uploadedAt'
-                    ? 'recentDesc'
-                    : sortOrder
-                }
+                value={selectedSort}
                 onChange={handleSortChange}
                 displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  height: '40px', // 버튼과 동일한 높이로 조절
+                  '.MuiSelect-select': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px'
+                  }
+                }}
               >
                 <MenuItem value="priceDesc">높은 가격 순</MenuItem>
                 <MenuItem value="priceAsc">낮은 가격 순</MenuItem>
@@ -247,20 +243,34 @@ const SearchResultComponent: React.FC<SearchResultComponentProps> = ({
             }}
           >
             {selectedProducts.map((product) => (
-              <img
-                key={product.productId}
-                src={product.productImageUrl}
-                alt={product.title}
-                style={{ width: '100px', height: '100px', marginRight: '8px' }}
-              />
+              <Box key={product.productId} sx={{ position: 'relative' }}>
+                <img
+                  src={product.productImageUrl}
+                  alt={product.title}
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    marginRight: '8px'
+                  }}
+                />
+                <IconButton
+                  onClick={() => onRemoveProduct(product)}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    borderRadius: '50%'
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
             ))}
           </Box>
         </Box>
       </div>
-      <SearchModal
-        open={isCardOptionOpen}
-        handleClose={handleCloseCardOption}
-      />
       <ProductDetailModal
         productId={showProductDetail}
         open={isProductDetailOpen}

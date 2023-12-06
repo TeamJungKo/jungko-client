@@ -34,7 +34,7 @@ export interface ProductDetailResponse {
 
 // 카드 내 매물 검색 api
 export interface CardInfoResponse extends ProductResponse {
-  Author: Author;
+  author: Author;
 }
 
 // 앞으로 쓸 상품 정보들에서 겹치는 것만 추출해놓음

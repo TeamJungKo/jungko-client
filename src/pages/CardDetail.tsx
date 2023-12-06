@@ -18,6 +18,11 @@ const CardDetail: React.FC = () => {
   const [myProfileId, setMyProfileId] = useState<number | null>(null);
   const params = useParams<{ cardId: string }>();
   const currentCardId = Number(params.cardId);
+  const handleRemoveProduct = (product: Product) => {
+    setSelectedProducts((prevSelected) =>
+      prevSelected.filter((p) => p.productId !== product.productId)
+    );
+  };
 
   useEffect(() => {
     const fetchMyProfileId = async () => {
@@ -87,6 +92,7 @@ const CardDetail: React.FC = () => {
       selectedProducts={selectedProducts}
       onCheck={handleCheck}
       setSelectedProducts={setSelectedProducts}
+      onRemoveProduct={handleRemoveProduct}
     />
   );
 };
