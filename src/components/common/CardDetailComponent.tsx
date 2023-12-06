@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ProductComponent } from './ProductComponent.tsx';
 import NavigationBar from './NavigationBar.tsx';
 import ProductDetailModal from './ProductDetailModal.tsx';
-import SearchModal from '../../pages/SearchModal.tsx';
+import SearchModal from './SearchModal.tsx';
 import EditCardOptionModal from './EditCardOptionModal.tsx';
 import {
   deleteCard,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
-import NotificationBox from '../components/common/NotificationBox';
-import { Notice } from '../types/types';
-import { getNotices, deleteNotices } from '../api/axios.custom';
+import NotificationBox from './NotificationBox';
+import { Notice } from '../../types/types';
+import { getNotices, deleteNotices } from '../../api/axios.custom';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {

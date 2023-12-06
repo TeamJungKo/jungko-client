@@ -3,63 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Box,
-  Checkbox,
   TextField,
   Button,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
-  FormControlLabel,
   Grid,
   SelectChangeEvent
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import {
-  getAllProductCategory,
-  getAllArea,
-  createCard
-} from '../api/axios.custom.ts';
+import { getAllProductCategory, getAllArea } from '../../api/axios.custom.ts';
 import {
   AllCategory,
   AllSubCategory,
   AllSido,
-  AllSigg,
-  ProductSearchRequest
-} from '../types/types.ts';
+  AllSigg
+} from '../../types/types.ts';
 
-interface CreateCardPageProps {
+interface SearchModalProps {
   open: boolean;
   handleClose: () => void;
-  searchOption: ProductSearchRequest;
 }
 
-const CreateCardPage: React.FC<CreateCardPageProps> = ({
-  open,
-  handleClose,
-  searchOption
-}) => {
-  const [newCardTitle, setNewCardTitle] = useState('');
-  const [searchTerm, setSearchTerm] = useState(searchOption.keyword);
-  const [minPrice, setMinPrice] = useState(
-    searchOption.minPrice ? searchOption.minPrice.toString() : ''
-  );
-  const [maxPrice, setMaxPrice] = useState(
-    searchOption.maxPrice ? searchOption.maxPrice.toString() : ''
-  );
+const SearchModal: React.FC<SearchModalProps> = ({ open, handleClose }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [category, setCategory] = useState<AllCategory[]>([]);
   const [subCategory, setSubCategory] = useState<AllSubCategory[]>([]);
-  const [selectedSuperCategory, setSelectedSuperCategory] =
-    useState<string>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSuperCategory, setSelectedSuperCategory] =
+    useState<string>('');
   const [area, setArea] = useState<AllSido[]>([]);
   const [selectedSido, setSelectedSido] = useState<AllSido>();
   const [selectedSigg, setSelectedSigg] = useState<AllSigg>();
   const [selectedEmd, setSelectedEmd] = useState<number>();
-  const [isPublic, setIsPublic] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchCategoriesAndAreas = async () => {
       try {
@@ -68,18 +49,11 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
         const response2 = await getAllArea();
         setArea(response2.data.areas[0].sido);
       } catch (error) {
-        console.error('카테고리 데이터를 불러오는데 실패했습니다.', error);
+        console.log('카테고리 데이터를 불러오는데 실패했습니다.', error);
       }
     };
     fetchCategoriesAndAreas();
   }, []);
-
-  const handleNewCardTitleChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setNewCardTitle(event.target.value);
-  };
-
   const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -96,13 +70,21 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     const categoryId = event.target.value as string;
-    setSelectedSuperCategory(categoryId);
-    setSelectedCategory(categoryId);
-    const foundCategory = category.find(
-      (c) => c.categoryId === Number(categoryId)
-    );
-    setSubCategory(foundCategory?.subCategory || []);
-    setSelectedSubCategory('default');
+
+    if (categoryId === 'default') {
+      setSelectedSuperCategory('');
+      setSelectedCategory('');
+      setSelectedSubCategory('');
+      setSubCategory([]);
+    } else {
+      setSelectedSuperCategory(categoryId);
+      setSelectedCategory(categoryId);
+      const foundCategory = category.find(
+        (c) => c.categoryId === Number(categoryId)
+      );
+      setSubCategory(foundCategory?.subCategory || []);
+      setSelectedSubCategory('default');
+    }
   };
 
   const handleSubCategoryChange = (event: SelectChangeEvent<string>) => {
@@ -111,15 +93,22 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
     if (subCategoryId !== 'default') {
       setSelectedCategory(subCategoryId);
     } else {
-      setSelectedCategory(selectedSuperCategory);
+      setSelectedSubCategory('');
     }
   };
 
   const handleSidoSelect = (event: SelectChangeEvent) => {
     const sidoId = event.target.value;
-    const selected = area.find((sido) => sido.id === Number(sidoId));
-    setSelectedSido(selected);
-    setSelectedEmd(undefined);
+    if (sidoId === 'default') {
+      setSelectedSido(undefined);
+      setSelectedSigg(undefined);
+      setSelectedEmd(undefined);
+    } else {
+      const selected = area.find((sido) => sido.id === Number(sidoId));
+      setSelectedSido(selected);
+      setSelectedSigg(undefined);
+      setSelectedEmd(undefined);
+    }
   };
 
   const handleSiggSelect = (event: SelectChangeEvent) => {
@@ -135,38 +124,15 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
     setSelectedEmd(Number(emdId));
   };
 
-  const handlePublicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsPublic(event.target.checked);
-  };
-
-  const handleCreate = async () => {
-    const formData = new FormData();
-
-    // Append only if values are not undefined
-    if (selectedCategory) {
-      formData.append('categoryId', selectedCategory);
-    }
-    if (selectedEmd !== undefined) {
-      formData.append('areaId', selectedEmd.toString());
-    }
-    formData.append('title', newCardTitle);
-    formData.append('keyword', searchTerm);
-    if (minPrice) {
-      formData.append('minPrice', minPrice);
-    }
-    if (maxPrice) {
-      formData.append('maxPrice', maxPrice);
-    }
-    formData.append('scope', isPublic ? 'PUBLIC' : 'PRIVATE');
-
-    try {
-      const response = await createCard(formData);
-      if (response.status === 201) {
-        navigate(`/Card/${response.data.cardId}`);
-      }
-    } catch (error) {
-      console.log('생성 도중 오류가 발생했습니다: ', error);
-    }
+  const handleSearch = () => {
+    const searchParams = new URLSearchParams(); // 검색 조건을 URL 쿼리 파라미터로 변환
+    searchParams.append('keyword', encodeURIComponent(searchTerm));
+    if (minPrice) searchParams.append('minPrice', minPrice);
+    if (maxPrice) searchParams.append('maxPrice', maxPrice);
+    if (selectedCategory) searchParams.append('categoryId', selectedCategory);
+    if (selectedEmd) searchParams.append('areaId', selectedEmd.toString());
+    navigate(`/searchresult?${searchParams.toString()}`);
+    handleClose();
   };
 
   const handleCancel = () => {
@@ -196,19 +162,6 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
       >
         <Box sx={{ mt: 3, width: '100%' }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12}>
-              <TextField
-                value={newCardTitle}
-                onChange={handleNewCardTitleChange}
-                autoComplete="given-name"
-                name="newCardTitle"
-                required
-                fullWidth
-                id="newCardTitle"
-                label="카드 제목"
-                autoFocus
-              />
-            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 value={searchTerm}
@@ -222,23 +175,11 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isPublic}
-                    onChange={handlePublicChange}
-                    name="isPublic"
-                  />
-                }
-                label="공개 여부"
-              />
-            </Grid>{' '}
+            <Grid item xs={12} sm={6} />
             <Grid item xs={12} sm={6}>
               <TextField
                 value={minPrice}
                 onChange={handleMinPriceChange}
-                required
                 fullWidth
                 id="minPrice"
                 label="최소 가격"
@@ -250,7 +191,6 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
               <TextField
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
-                required
                 fullWidth
                 id="maxPrice"
                 label="최대 가격"
@@ -268,6 +208,7 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
                   label="카테고리"
                   onChange={handleCategoryChange}
                 >
+                  <MenuItem value="default">----------------</MenuItem>
                   {category.map((category) => (
                     <MenuItem
                       value={category.categoryId}
@@ -302,14 +243,15 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
             </Grid>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth>
-                <InputLabel id="area-select-label">지역</InputLabel>
+                <InputLabel id="area-select-label">시도</InputLabel>
                 <Select
-                  labelId="area-select-label"
-                  id="area-select"
+                  labelId="sido-select-label"
+                  id="sido-select"
                   value={selectedSido ? selectedSido.id.toString() : ''}
-                  label="지역"
+                  label="시도"
                   onChange={handleSidoSelect}
                 >
+                  <MenuItem value="default">-------------</MenuItem>
                   {area.map((sido) => (
                     <MenuItem key={sido.id} value={sido.id}>
                       {sido.name}
@@ -360,9 +302,9 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
               type="submit"
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={handleCreate}
+              onClick={handleSearch}
             >
-              카드 생성
+              검색
             </Button>
             <Button
               type="button"
@@ -379,4 +321,4 @@ const CreateCardPage: React.FC<CreateCardPageProps> = ({
   );
 };
 
-export default CreateCardPage;
+export default SearchModal;
