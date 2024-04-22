@@ -1,0 +1,46 @@
+name: cleaning-up-stale-branches
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+env:
+  DAYS_BEFORE_STALE: 30
+  DAYS_BEFORE_DELETE: 7
+
+jobs:
+  dry-run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cleaning up Stale Branches
+        uses: sichoi42/cleanup-stale-branch@v1
+        id: stale
+        with:
+          days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
+          days-before-delete: ${{ env.DAYS_BEFORE_DELETE }}
+          ignoring-branches: 'main,dev,shlee'
+          ignore-branches-pattern: 'release/*'
+          dry-run: true
+          use-webhook: true
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          webhook-type: 'discord'
+          stale-branch-message: >
+            This branch is considered stale because ${{ env.DAYS_BEFORE_STALE }} days have passed since the last commit.
+            If you still need this branch, please push a new commit to keep it alive.
+            If not, this branch will be deleted in ${{ env.DAYS_BEFORE_DELETE }} days.
+          delete-branch-message: >
+            This branch was deleted because ${{ env.DAYS_BEFORE_DELETE }} days have passed since considered as stale.
+      - name: Print outputs
+        run: echo ${{ format('{0},{1}', toJSON(steps.stale.outputs.staled-branches), toJSON(steps.stale.outputs.deleted-branches)) }}
